@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Encapsulates an orthographic camera
- * Controls zoom and position of the camera
+ * Encapsulates an orthographic camera and controls zoom and position of the camera
+ * @author Benjamin Welsh
  */
 public class CamController {
     private OrthographicCamera cam;
@@ -53,7 +53,7 @@ public class CamController {
         cam.zoom=getZoomFactor();
         cam.update();
     }
-    public Camera getCam() {
+    public OrthographicCamera getCam() {
         return cam;
     }
 

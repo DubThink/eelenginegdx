@@ -6,6 +6,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -13,9 +18,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * The core class of the engine
  */
 public class EelGame extends ApplicationAdapter {
+    // CONSTANTS
+    public static final float GSCALE=100;
 	SpriteBatch worldBatch;
 	SpriteBatch interfaceBatch;
+	ShapeRenderer shapeRenderer;
 	Texture img;
+	Texture bkdimg;
     OrthographicCamera interfaceCam;
     CamController camController;
     Viewport viewport;
@@ -29,8 +38,14 @@ public class EelGame extends ApplicationAdapter {
 	public void create () {
 		worldBatch = new SpriteBatch();
 		interfaceBatch = new SpriteBatch();
+		shapeRenderer = new ShapeRenderer();
+		shapeRenderer.setAutoShapeType(true);
+		Box2D.init();
+        World physicsDomain=new World(Vector2.Zero,true);
 		img = new Texture(Gdx.files.internal("Eel_E_64x.png"),true);
 		img.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
+        bkdimg = new Texture(Gdx.files.internal("semifade_half_black_left.png"));
+        bkdimg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         FontKit.initFonts();
         viewport = new ScreenViewport();
         interfaceCam = new OrthographicCamera(VIRTUAL_WIDTH,VIRTUAL_HEIGHT);
@@ -96,20 +111,29 @@ public class EelGame extends ApplicationAdapter {
         worldBatch.setProjectionMatrix(camController.getCam().combined);
         interfaceCam.update();
         interfaceBatch.setProjectionMatrix(interfaceCam.combined);
-		Gdx.gl.glClearColor(.25f, .25f, .3f, 1);
+
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        shapeRenderer.setProjectionMatrix(camController.getCam().combined);
+        shapeRenderer.begin();
+        DebugView.drawGrid(shapeRenderer,camController.getCam(),true);
+        shapeRenderer.end();
+
 		worldBatch.begin();
-		worldBatch.draw(img, -20, -20,40,40);
-        System.out.println(camController.getZoomFactor()+" "+camController.getPos()+" "+Gdx.input.getY());
+		worldBatch.draw(img, 0, 0,100,100);
+//        System.out.println(camController.getZoomFactor()+" "+camController.getPos()+" "+Gdx.input.getY());
         worldBatch.end();
+
         interfaceBatch.begin();
         if(escapeMenu){
-            FontKit.UtilHuge.setColor(Color.BLUE);
-            FontKit.UtilHuge.draw(interfaceBatch,"ESCAPE MENU",10,Gdx.graphics.getHeight()-10);
-            FontKit.UtilLarge.draw(interfaceBatch,"Press enter to exit",10,Gdx.graphics.getHeight()-58);
-//            FontKit.UtilSmall.draw(batch,
-//                    cam.project(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0)).toString(),
-//                    10,22);
+            interfaceBatch.draw(bkdimg,0,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
+            FontKit.SysHuge.setColor(Color.CHARTREUSE);
+            FontKit.SysHuge.draw(interfaceBatch,"ESCAPE MENU",10,Gdx.graphics.getHeight()-10);
+            FontKit.SysLarge.draw(interfaceBatch,"Press enter to exit",10,Gdx.graphics.getHeight()-58);
+            FontKit.SysSmall.draw(interfaceBatch,
+                    camController.getCam().unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0)).toString(),
+                    10,22);
 
         }
         interfaceBatch.end();
@@ -137,10 +161,10 @@ public class EelGame extends ApplicationAdapter {
     public boolean scrolled(int amount) {
 
         if(amount == 1){
-            camController.changeZoomLevel(-1);
+            camController.changeZoomLevel(1);
         }
         else if(amount == -1){
-            camController.changeZoomLevel(1);
+            camController.changeZoomLevel(-1);
         }
 
         return false;

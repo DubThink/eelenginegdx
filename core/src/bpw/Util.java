@@ -8,7 +8,8 @@ import java.awt.Color;
 
 
 /**
- * Created by benja on 4/12/2017.
+ * Set of utility functions
+ * @author Benjamin Welsh on 4/12/2017.
  */
 public class Util {
     /**
@@ -242,6 +243,16 @@ public class Util {
     public static double round(double val, double roundTo){
         if(roundTo==0)return val;
         return Math.round(val/roundTo)*roundTo;
+
+    }
+    public static float floor(float val, float roundTo){
+        if(roundTo==0)return val;
+        return (float)Math.floor(val/roundTo)*roundTo;
+
+    }
+    public static float ceil(float val, float roundTo){
+        if(roundTo==0)return val;
+        return (float)Math.ceil(val/roundTo)*roundTo;
 
     }
     public static int pColor(Color c){

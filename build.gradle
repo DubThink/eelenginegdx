@@ -36,6 +36,9 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         jcenter()
     }
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
 }
 
 //launch4j {
