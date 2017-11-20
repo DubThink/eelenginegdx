@@ -8,12 +8,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.omg.PortableInterceptor.INACTIVE;
+
+import java.util.ArrayList;
 
 /**
  * The core class of the engine
@@ -30,12 +33,14 @@ public class EelGame extends ApplicationAdapter {
     OrthographicCamera interfaceCam;
     CamController camController;
     Viewport viewport;
+    Box2DDebugRenderer debugRenderer;
 
     public static final int VIRTUAL_WIDTH = 1920;
     public static final int VIRTUAL_HEIGHT = 1080;
-    public static final int VIRTUAL_WINDOWED_WIDTH = 1600/2;
-    public static final int VIRTUAL_WINDOWED_HEIGHT = 900/2;
+    public static final int VIRTUAL_WINDOWED_WIDTH = 1600;
+    public static final int VIRTUAL_WINDOWED_HEIGHT = 900;
 
+    boolean DEBUG_physics_render=true;
     // Temp physics testing
 
 
@@ -49,6 +54,7 @@ public class EelGame extends ApplicationAdapter {
 		img.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
         bkdimg = new Texture(Gdx.files.internal("semifade_half_black_left.png"));
         bkdimg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        debugRenderer = new Box2DDebugRenderer();
 	}
 
     @Override
@@ -62,6 +68,11 @@ public class EelGame extends ApplicationAdapter {
     boolean fullscreen=true;
     boolean escapeMenu=false;
     private void handleInput() {
+//        float yv=Gdx.input.isKeyPressed(Input.Keys.W)?1:Gdx.input.isKeyPressed(Input.Keys.S)?-1:0;
+//        float xv=Gdx.input.isKeyPressed(Input.Keys.D)?1:Gdx.input.isKeyPressed(Input.Keys.A)?-1:0;
+//        yv=Gdx.input.isKeyPressed(Input.Keys.W)||Gdx.input.isKeyPressed(Input.Keys.S)?yv:dynamicBody.getLinearVelocity().y;
+//        xv=Gdx.input.isKeyPressed(Input.Keys.A)||Gdx.input.isKeyPressed(Input.Keys.D)?xv:dynamicBody.getLinearVelocity().x;
+//        dynamicBody.setLinearVelocity(xv,yv);
     }
 
     void physicsDebugDrawer(Body body, ShapeRenderer shapeRenderer){
@@ -129,7 +140,7 @@ public class EelGame extends ApplicationAdapter {
 	@Override
 	public void render () {
         handleInput();
-        physicsDomain.step(Gdx.graphics.getDeltaTime(), 6, 6);
+        physicsDomain.step(Gdx.graphics.getDeltaTime(), 20, 20);
         camController.setViewGrabbed(Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
         camController.updatePan(-Gdx.input.getDeltaX(),Gdx.input.getDeltaY());
         camController.update();
@@ -143,9 +154,9 @@ public class EelGame extends ApplicationAdapter {
         shapeRenderer.setProjectionMatrix(camController.getCam().combined);
         shapeRenderer.begin();
         DebugView.drawGrid(shapeRenderer,camController.getCam(),true);
-        physicsDebugDrawer(dynamicBody,shapeRenderer);
-        physicsDebugDrawer(staticBody,shapeRenderer);
-
+//        physicsDebugDrawer(dynamicBody,shapeRenderer);
+//        physicsDebugDrawer(staticBody,shapeRenderer);
+//        for(Body b:statics)physicsDebugDrawer(b,shapeRenderer);
         shapeRenderer.end();
 
 		worldBatch.begin();
@@ -167,6 +178,11 @@ public class EelGame extends ApplicationAdapter {
 
         }
         interfaceBatch.end();
+        if(DEBUG_physics_render) {
+            Matrix4 matrix4 = new Matrix4(camController.getCam().combined);
+            matrix4.scale(100, 100, 100);
+            debugRenderer.render(physicsDomain, matrix4);
+        }
 	}
 	
 	@Override
@@ -185,13 +201,14 @@ public class EelGame extends ApplicationAdapter {
         entityWorld=new com.artemis.World(entityConfig);
     }
     Body dynamicBody,staticBody;
+    ArrayList<Body> statics=new ArrayList<Body>();
     World physicsDomain;
     void setupPhysics(){
-        Box2D.init();
+        //Box2D.init();
 
         physicsDomain=new World(new Vector2(0,-9.8f),true);
-        dynamicBody= makeThing(0,8,true);
-        dynamicBody.setBullet(true);
+        dynamicBody= makeThing2(0,8,true);
+        //dynamicBody.setBullet(true);
         staticBody=makeThing(0,0,false);
     }
 
@@ -199,10 +216,25 @@ public class EelGame extends ApplicationAdapter {
         BodyDef myBodyDef=new BodyDef();
         myBodyDef.type = dynamic ? BodyDef.BodyType.DynamicBody:BodyDef.BodyType.StaticBody;
         myBodyDef.position.set(x,y); //set the starting position
-        myBodyDef.angle = 0; //set the starting angle
+        //myBodyDef.angle = 0; //set the starting angle
         Body body = physicsDomain.createBody(myBodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(2,2);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        body.createFixture(fixtureDef);
+        shape.dispose();
+        return body;
+    }
+    Body makeThing2(float x, float y,boolean dynamic){
+        BodyDef myBodyDef=new BodyDef();
+        myBodyDef.type = dynamic ? BodyDef.BodyType.DynamicBody:BodyDef.BodyType.StaticBody;
+        myBodyDef.position.set(x,y); //set the starting position
+        //myBodyDef.angle = 0; //set the starting angle
+        Body body = physicsDomain.createBody(myBodyDef);
+        CircleShape shape = new CircleShape();
+        shape.setRadius(1);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
@@ -232,7 +264,7 @@ public class EelGame extends ApplicationAdapter {
 
         CamController camController;
 
-        public InputCore(CamController camController){
+        InputCore(CamController camController){
             this.camController = camController;
         }
 
@@ -241,10 +273,12 @@ public class EelGame extends ApplicationAdapter {
 
         @Override
         public boolean keyDown(int keycode) {
-            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            if (keycode==Input.Keys.ESCAPE) {
                 escapeMenu = !escapeMenu;
             }
-            if(keycode==Input.Keys.SPACE) {
+            if(Gdx.input.isKeyPressed(Input.Keys.F3)){
+                if(keycode==Input.Keys.B)DEBUG_physics_render=!DEBUG_physics_render;
+            }else if(keycode==Input.Keys.SPACE) {
                 dynamicBody.setLinearVelocity(0, 20);
                 return true;
             }else if(keycode== Input.Keys.ENTER){
@@ -278,6 +312,20 @@ public class EelGame extends ApplicationAdapter {
 
             return false;
 
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            // origin top left
+            Vector3 wx=camController.getCam().unproject(new Vector3(screenX,screenY,0));
+            wx.scl(1/EelGame.GSCALE);
+            //return super.touchDown(screenX, screenY, pointer, button);
+            System.out.println(String.format("Button: (%d,%d) world (%.3f,%.3f) ptr: %d button: %d",
+                    screenX,screenY,wx.x,wx.y,pointer, button));
+            if(button==2){
+                statics.add(makeThing(wx.x,wx.y,false));
+            }
+            return false;
         }
     }
 }
