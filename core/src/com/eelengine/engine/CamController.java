@@ -11,8 +11,9 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class CamController {
     private OrthographicCamera cam;
-    public int ZOOM_MAX=5;
-    public int ZOOM_MIN=-10;
+
+    public int ZOOM_MAX=10;
+    public int ZOOM_MIN=-10; // zoom in
     public double ZOOM_COEFFICIENT=Math.pow(2,1/3.0);
     private int zoomLevel=0;
     private boolean viewGrabbed;
