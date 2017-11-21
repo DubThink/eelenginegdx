@@ -1,6 +1,7 @@
 package com.eelengine.engine;
 
-import com.artemis.WorldConfiguration;
+import com.artemis.ComponentMapper;
+import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -14,7 +15,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import java.util.ArrayList;
 
@@ -40,20 +40,21 @@ public class EelGame extends ApplicationAdapter {
     public static final int VIRTUAL_WINDOWED_WIDTH = 1600;
     public static final int VIRTUAL_WINDOWED_HEIGHT = 900;
 
-    boolean DEBUG_physics_render=true;
+    boolean DEV_physics_render =true;
+    boolean DEV_draw_grid=true;
     // Temp physics testing
 
 
 	@Override
 	public void create () {
-        setupRendering();
-        setupPhysics();
-        setupECS();
-        FontKit.initFonts();
 		img = new Texture(Gdx.files.internal("Eel_E_64x.png"),true);
 		img.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
         bkdimg = new Texture(Gdx.files.internal("semifade_half_black_left.png"));
         bkdimg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        setupRendering();
+        setupPhysics();
+        setupECS();
+        FontKit.initFonts();
         debugRenderer = new Box2DDebugRenderer();
 	}
 
@@ -140,30 +141,36 @@ public class EelGame extends ApplicationAdapter {
 	@Override
 	public void render () {
         handleInput();
-        physicsDomain.step(Gdx.graphics.getDeltaTime(), 20, 20);
+
+        // clear graphics
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Step physics
+        physicsWorld.step(Gdx.graphics.getDeltaTime(), 6,2);
+
+        // Update camera systems
         camController.setViewGrabbed(Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
         camController.updatePan(-Gdx.input.getDeltaX(),Gdx.input.getDeltaY());
         camController.update();
         worldBatch.setProjectionMatrix(camController.getCam().combined);
         interfaceCam.update();
         interfaceBatch.setProjectionMatrix(interfaceCam.combined);
-
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         shapeRenderer.setProjectionMatrix(camController.getCam().combined);
-        shapeRenderer.begin();
-        DebugView.drawGrid(shapeRenderer,camController.getCam(),true);
-//        physicsDebugDrawer(dynamicBody,shapeRenderer);
-//        physicsDebugDrawer(staticBody,shapeRenderer);
-//        for(Body b:statics)physicsDebugDrawer(b,shapeRenderer);
-        shapeRenderer.end();
 
-		worldBatch.begin();
-//		/worldBatch.draw(img, 0, 0,100,100);
-//        System.out.println(camController.getZoomFactor()+" "+camController.getPos()+" "+Gdx.input.getY());
-        worldBatch.end();
 
+        // Step ECS
+        entityWorld.setDelta(Gdx.graphics.getDeltaTime());
+        entityWorld.process();
+
+        // Draw grid
+        if (DEV_draw_grid) {
+            shapeRenderer.begin();
+            DebugView.drawGrid(shapeRenderer,camController.getCam(),true);
+            shapeRenderer.end();
+        }
+
+        // Display dev interface
         interfaceBatch.begin();
         if(escapeMenu){
             interfaceBatch.draw(bkdimg,0,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
@@ -178,35 +185,57 @@ public class EelGame extends ApplicationAdapter {
 
         }
         interfaceBatch.end();
-        if(DEBUG_physics_render) {
+
+        // Draw physics debug
+        if(DEV_physics_render) {
             Matrix4 matrix4 = new Matrix4(camController.getCam().combined);
             matrix4.scale(100, 100, 100);
-            debugRenderer.render(physicsDomain, matrix4);
+            debugRenderer.render(physicsWorld, matrix4);
         }
 	}
-	
+
+	int ent;
 	@Override
 	public void dispose () {
         System.out.println("CLEANING UP FOR EXIT");
+        entityWorld.dispose();
 		worldBatch.dispose();
-		physicsDomain.dispose();
+		physicsWorld.dispose();
 		img.dispose();
 		FontKit.dispose();
         System.out.println("EXITING");
     }
 
-	void setupECS(){
-        com.artemis.WorldConfiguration entityConfig=new WorldConfiguration();
+    SpriteRenderSystem spriteRenderSystem;
+    /**
+     * Sets up the Entity-Component-System structure
+     * @pre All subsystems used by ECS should be initialized first
+     */
+    void setupECS(){
+        com.artemis.WorldConfiguration entityConfig=new WorldConfigurationBuilder()
+                .with(spriteRenderSystem=new SpriteRenderSystem(worldBatch))
+                .build();
         //entityConfig.
         entityWorld=new com.artemis.World(entityConfig);
+        ent=entityWorld.create();
+
+        ComponentMapper<GraphicsComponent> mGraphics=entityWorld.getMapper(GraphicsComponent.class);
+        ComponentMapper<PositionComponent> mPosition=entityWorld.getMapper(PositionComponent.class);
+        System.out.println("A");
+        GraphicsComponent graphicsComponent=mGraphics.create(ent);
+        PositionComponent positionComponent=mPosition.create(ent);
+        System.out.println("B "+img);
+        graphicsComponent.texture=img;
+        positionComponent.position.set(5,10);
+
     }
     Body dynamicBody,staticBody;
     ArrayList<Body> statics=new ArrayList<Body>();
-    World physicsDomain;
+    World physicsWorld;
     void setupPhysics(){
         //Box2D.init();
 
-        physicsDomain=new World(new Vector2(0,-9.8f),true);
+        physicsWorld =new World(new Vector2(0,-9.8f),true);
         dynamicBody= makeThing2(0,8,true);
         //dynamicBody.setBullet(true);
         staticBody=makeThing(0,0,false);
@@ -217,7 +246,7 @@ public class EelGame extends ApplicationAdapter {
         myBodyDef.type = dynamic ? BodyDef.BodyType.DynamicBody:BodyDef.BodyType.StaticBody;
         myBodyDef.position.set(x,y); //set the starting position
         //myBodyDef.angle = 0; //set the starting angle
-        Body body = physicsDomain.createBody(myBodyDef);
+        Body body = physicsWorld.createBody(myBodyDef);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(2,2);
         FixtureDef fixtureDef = new FixtureDef();
@@ -232,7 +261,7 @@ public class EelGame extends ApplicationAdapter {
         myBodyDef.type = dynamic ? BodyDef.BodyType.DynamicBody:BodyDef.BodyType.StaticBody;
         myBodyDef.position.set(x,y); //set the starting position
         //myBodyDef.angle = 0; //set the starting angle
-        Body body = physicsDomain.createBody(myBodyDef);
+        Body body = physicsWorld.createBody(myBodyDef);
         CircleShape shape = new CircleShape();
         shape.setRadius(1);
         FixtureDef fixtureDef = new FixtureDef();
@@ -277,7 +306,9 @@ public class EelGame extends ApplicationAdapter {
                 escapeMenu = !escapeMenu;
             }
             if(Gdx.input.isKeyPressed(Input.Keys.F3)){
-                if(keycode==Input.Keys.B)DEBUG_physics_render=!DEBUG_physics_render;
+                if(keycode==Input.Keys.B) DEV_physics_render =!DEV_physics_render;
+                if(keycode==Input.Keys.G) DEV_draw_grid =!DEV_draw_grid;
+
             }else if(keycode==Input.Keys.SPACE) {
                 dynamicBody.setLinearVelocity(0, 20);
                 return true;
