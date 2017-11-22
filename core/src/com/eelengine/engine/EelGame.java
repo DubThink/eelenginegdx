@@ -1,7 +1,10 @@
 package com.eelengine.engine;
 
+import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
+import com.artemis.EntitySubscription;
 import com.artemis.WorldConfigurationBuilder;
+import com.artemis.utils.IntBag;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,6 +16,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -42,6 +46,7 @@ public class EelGame extends ApplicationAdapter {
 
     boolean DEV_physics_render =true;
     boolean DEV_draw_grid=true;
+    float DEV_time_mod=0.2f;
     // Temp physics testing
 
 
@@ -147,7 +152,7 @@ public class EelGame extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Step physics
-        physicsWorld.step(Gdx.graphics.getDeltaTime(), 6,2);
+        physicsWorld.step(Gdx.graphics.getDeltaTime()*DEV_time_mod, 6,2);
 
         // Update camera systems
         camController.setViewGrabbed(Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
@@ -158,9 +163,8 @@ public class EelGame extends ApplicationAdapter {
         interfaceBatch.setProjectionMatrix(interfaceCam.combined);
         shapeRenderer.setProjectionMatrix(camController.getCam().combined);
 
-
         // Step ECS
-        entityWorld.setDelta(Gdx.graphics.getDeltaTime());
+        entityWorld.setDelta(Gdx.graphics.getDeltaTime()*DEV_time_mod);
         entityWorld.process();
 
         // Draw grid
@@ -213,21 +217,69 @@ public class EelGame extends ApplicationAdapter {
      */
     void setupECS(){
         com.artemis.WorldConfiguration entityConfig=new WorldConfigurationBuilder()
+                .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
                 .with(spriteRenderSystem=new SpriteRenderSystem(worldBatch))
+                .with(WorldConfigurationBuilder.Priority.LOWEST,new PhysicsSystem())
                 .build();
         //entityConfig.
         entityWorld=new com.artemis.World(entityConfig);
+
+        EntitySubscription subscription = entityWorld.getAspectSubscriptionManager().get(Aspect.all(PhysicsComponent.class));
+
+        subscription.addSubscriptionListener(new EntitySubscription.SubscriptionListener() {
+            ComponentMapper<PhysicsComponent> mPhysics=entityWorld.getMapper(PhysicsComponent.class);
+            ComponentMapper<TransformComponent> mPosition=entityWorld.getMapper(TransformComponent.class);
+
+            @Override
+            //IntBag is all entities with a new physics component since last ECS update
+            public void inserted(IntBag entities) {
+                for(int i=0;i<entities.size();i++){
+                    System.out.println("Subscriber "+entities.get(i)+" "+mPhysics.get(entities.get(i)));
+                    mPhysics.get(entities.get(i)).buildBody(physicsWorld);
+                    if(mPosition.has(entities.get(i))){
+                        TransformComponent transform=mPosition.get(entities.get(i));
+                        System.out.println(transform);
+                        System.out.println(mPhysics.get(entities.get(i)).body.getPosition());
+                        mPhysics.get(entities.get(i)).body
+                                .setTransform(transform.pos,transform.rotLockedToPhysics?transform.rot:0);
+                        System.out.println(mPhysics.get(entities.get(i)).body.getPosition());
+                    }
+
+                }
+            }
+
+            @Override
+            public void removed(IntBag entities) {
+                for(int i=0;i<entities.size();i++){
+                    physicsWorld.destroyBody(mPhysics.get(entities.get(i)).body);
+                }
+            }
+        });
+
         ent=entityWorld.create();
 
         ComponentMapper<GraphicsComponent> mGraphics=entityWorld.getMapper(GraphicsComponent.class);
-        ComponentMapper<PositionComponent> mPosition=entityWorld.getMapper(PositionComponent.class);
+        ComponentMapper<TransformComponent> mPosition=entityWorld.getMapper(TransformComponent.class);
+        ComponentMapper<PhysicsComponent> mPhysics=entityWorld.getMapper(PhysicsComponent.class);
+
         System.out.println("A");
         GraphicsComponent graphicsComponent=mGraphics.create(ent);
-        PositionComponent positionComponent=mPosition.create(ent);
+        TransformComponent transformComponent =mPosition.create(ent);
         System.out.println("B "+img);
         graphicsComponent.texture=img;
-        positionComponent.position.set(5,10);
-
+        transformComponent.pos.set(2,10);
+        PhysicsComponent pc=mPhysics.create(ent);
+        pc.buildBody(physicsWorld);
+        pc.body.setType(BodyDef.BodyType.DynamicBody);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1,1);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        pc.body.createFixture(fixtureDef);
+        shape.dispose();
+        int e2=entityWorld.create();
+        mPhysics.create(e2);
     }
     Body dynamicBody,staticBody;
     ArrayList<Body> statics=new ArrayList<Body>();
@@ -309,7 +361,33 @@ public class EelGame extends ApplicationAdapter {
                 if(keycode==Input.Keys.B) DEV_physics_render =!DEV_physics_render;
                 if(keycode==Input.Keys.G) DEV_draw_grid =!DEV_draw_grid;
 
-            }else if(keycode==Input.Keys.SPACE) {
+            }else if(keycode==Input.Keys.A){
+                /////////////
+                // TEST SPACE
+                Body body=statics.get(statics.size()-1);
+                if(body.getType()==BodyDef.BodyType.DynamicBody)
+                    body.setType(BodyDef.BodyType.StaticBody);
+                else body.setType(BodyDef.BodyType.DynamicBody);
+
+                /////////////
+            }else if(keycode==Input.Keys.S) {
+                /////////////
+                // TEST SPACE
+                System.out.println("S PRES");
+                spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
+                //ComponentMapper<PhysicsComponent> mPhysics=entityWorld.getMapper(PhysicsComponent.class);
+                //Body body=
+                        //mPhysics.get(ent).body.setType(BodyDef.BodyType.DynamicBody);
+//                if(body.getType()==BodyDef.BodyType.DynamicBody)
+//                    body.setType(BodyDef.BodyType.StaticBody);
+//                else body.setType(BodyDef.BodyType.DynamicBody);
+//                Array<Body> bodies = new Array<Body>();
+//                physicsWorld.getBodies(bodies);
+//                for (Body body : bodies) {
+//                }
+                /////////////
+            }
+            else if(keycode==Input.Keys.SPACE) {
                 dynamicBody.setLinearVelocity(0, 20);
                 return true;
             }else if(keycode== Input.Keys.ENTER){
@@ -323,9 +401,9 @@ public class EelGame extends ApplicationAdapter {
                 } else {
                     System.out.println("FULLSCREEN ON");
                     Graphics.Monitor currMonitor = Gdx.graphics.getMonitor();
-                    Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode(currMonitor);
-                    Gdx.graphics.setFullscreenMode(displayMode);
-                    fullscreen = true;
+                Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode(currMonitor);
+                Gdx.graphics.setFullscreenMode(displayMode);
+                fullscreen = true;
                 }
             }
             return false;

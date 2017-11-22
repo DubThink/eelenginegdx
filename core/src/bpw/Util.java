@@ -12,6 +12,12 @@ import java.awt.Color;
  * @author Benjamin Welsh on 4/12/2017.
  */
 public class Util {
+    // CONSTS
+    public static final float RAD_TO_DEG_F=57.295779513f;
+    public static final double RAD_TO_DEG_D=57.295779513082320876798154814105170332405472466564;
+    public static final float DEG_TO_RAD_F=1/RAD_TO_DEG_F;
+    public static final double DEG_TO_RAD_D=1/RAD_TO_DEG_D;
+
     /**
      * returns true if num is between a and b, inclusive.
      * It does not matter if a>b
