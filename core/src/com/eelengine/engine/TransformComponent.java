@@ -9,6 +9,10 @@ public class TransformComponent extends Component {
     float rot=0;
     boolean rotLockedToPhysics=true;
 
+    public void setScale(float scl) {
+        this.scl.set(scl,scl);
+    }
+
     @Override
     public String toString() {
         return "(pos:"+pos.toString()+"scl:"+scl.toString()+"rot:"+rot+")";

@@ -17,9 +17,6 @@ public class PhysicsToTransformUpdateSystem extends IteratingSystem {
     @Override
     protected void process(int e) {
         TransformComponent transform=mTransform.get(e);
-        System.out.println("PhysicsToTransformSystem "+e);
-        System.out.println(transform);
-        System.out.println(mPhysics.get(e).getPos());
         transform.pos=mPhysics.get(e).getPos();
         if(transform.rotLockedToPhysics)transform.rot=mPhysics.get(e).getRot();
     }

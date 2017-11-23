@@ -20,8 +20,6 @@ public class PhysicsSystem extends IteratingSystem {
         TransformComponent transform=mTransform.get(e);
         PhysicsComponent physics=mPhysics.get(e);
         if(physics.isStunned())physics.stunnedFor= Util.max(0,physics.stunnedFor-world.getDelta());
-        System.out.println("PhysicsSystem "+e);
-        System.out.println(transform);
         physics.body.setTransform(transform.pos,transform.rotLockedToPhysics?transform.rot:physics.body.getAngle());
     }
 }

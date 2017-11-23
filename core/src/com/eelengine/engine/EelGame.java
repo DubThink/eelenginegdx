@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -199,6 +198,7 @@ public class EelGame extends ApplicationAdapter {
 	}
 
 	int ent;
+    InputComponent entInput;
 	@Override
 	public void dispose () {
         System.out.println("CLEANING UP FOR EXIT");
@@ -220,10 +220,11 @@ public class EelGame extends ApplicationAdapter {
                 .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
                 .with(spriteRenderSystem=new SpriteRenderSystem(worldBatch))
                 .with(WorldConfigurationBuilder.Priority.LOWEST,new PhysicsSystem())
+                .with(new MovementInputSystem())
                 .build();
         //entityConfig.
         entityWorld=new com.artemis.World(entityConfig);
-
+        ECS.initialize(entityWorld);
         EntitySubscription subscription = entityWorld.getAspectSubscriptionManager().get(Aspect.all(PhysicsComponent.class));
 
         subscription.addSubscriptionListener(new EntitySubscription.SubscriptionListener() {
@@ -258,17 +259,13 @@ public class EelGame extends ApplicationAdapter {
 
         ent=entityWorld.create();
 
-        ComponentMapper<GraphicsComponent> mGraphics=entityWorld.getMapper(GraphicsComponent.class);
-        ComponentMapper<TransformComponent> mPosition=entityWorld.getMapper(TransformComponent.class);
-        ComponentMapper<PhysicsComponent> mPhysics=entityWorld.getMapper(PhysicsComponent.class);
-
-        System.out.println("A");
-        GraphicsComponent graphicsComponent=mGraphics.create(ent);
-        TransformComponent transformComponent =mPosition.create(ent);
-        System.out.println("B "+img);
+        GraphicsComponent graphicsComponent=ECS.mGraphics.create(ent);
+        TransformComponent transformComponent = ECS.mTransform.create(ent);
+        entInput = ECS.mInput.create(ent);
         graphicsComponent.texture=img;
         transformComponent.pos.set(2,10);
-        PhysicsComponent pc=mPhysics.create(ent);
+        transformComponent.setScale(2.5f);
+        PhysicsComponent pc=ECS.mPhysics.create(ent);
         pc.buildBody(physicsWorld);
         pc.body.setType(BodyDef.BodyType.DynamicBody);
         PolygonShape shape = new PolygonShape();
@@ -278,8 +275,9 @@ public class EelGame extends ApplicationAdapter {
         fixtureDef.density = 1f;
         pc.body.createFixture(fixtureDef);
         shape.dispose();
+        transformComponent.rotLockedToPhysics=false;
         int e2=entityWorld.create();
-        mPhysics.create(e2);
+        ECS.mPhysics.create(e2);
     }
     Body dynamicBody,staticBody;
     ArrayList<Body> statics=new ArrayList<Body>();
@@ -287,7 +285,7 @@ public class EelGame extends ApplicationAdapter {
     void setupPhysics(){
         //Box2D.init();
 
-        physicsWorld =new World(new Vector2(0,-9.8f),true);
+        physicsWorld =new World(new Vector2(0,0),true);
         dynamicBody= makeThing2(0,8,true);
         //dynamicBody.setBullet(true);
         staticBody=makeThing(0,0,false);
@@ -361,7 +359,18 @@ public class EelGame extends ApplicationAdapter {
                 if(keycode==Input.Keys.B) DEV_physics_render =!DEV_physics_render;
                 if(keycode==Input.Keys.G) DEV_draw_grid =!DEV_draw_grid;
 
+            }
+            // WASD
+            else if(keycode==Input.Keys.W){
+                entInput.down(InputComponent.UP);
             }else if(keycode==Input.Keys.A){
+                entInput.down(InputComponent.LEFT);
+            }else if(keycode==Input.Keys.S){
+                entInput.down(InputComponent.DOWN);
+            }else if(keycode==Input.Keys.D){
+                entInput.down(InputComponent.RIGHT);
+            }
+            else if(keycode==Input.Keys.Z){
                 /////////////
                 // TEST SPACE
                 Body body=statics.get(statics.size()-1);
@@ -370,11 +379,11 @@ public class EelGame extends ApplicationAdapter {
                 else body.setType(BodyDef.BodyType.DynamicBody);
 
                 /////////////
-            }else if(keycode==Input.Keys.S) {
+            }else if(keycode==Input.Keys.X) {
                 /////////////
                 // TEST SPACE
-                System.out.println("S PRES");
-                spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
+//                System.out.println("S PRES");
+//                spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
                 //ComponentMapper<PhysicsComponent> mPhysics=entityWorld.getMapper(PhysicsComponent.class);
                 //Body body=
                         //mPhysics.get(ent).body.setType(BodyDef.BodyType.DynamicBody);
@@ -407,6 +416,20 @@ public class EelGame extends ApplicationAdapter {
                 }
             }
             return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            if(keycode==Input.Keys.W){
+                entInput.up(InputComponent.UP);
+            }else if(keycode==Input.Keys.A){
+                entInput.up(InputComponent.LEFT);
+            }else if(keycode==Input.Keys.S){
+                entInput.up(InputComponent.DOWN);
+            }else if(keycode==Input.Keys.D){
+                entInput.up(InputComponent.RIGHT);
+            }else return false;
+            return true; // aaa
         }
 
         @Override
