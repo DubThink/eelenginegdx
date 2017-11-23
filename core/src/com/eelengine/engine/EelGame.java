@@ -210,7 +210,7 @@ public class EelGame extends ApplicationAdapter {
         System.out.println("EXITING");
     }
 
-    SpriteRenderSystem spriteRenderSystem;
+    RenderOneTexSystem spriteRenderSystem;
     /**
      * Sets up the Entity-Component-System structure
      * @pre All subsystems used by ECS should be initialized first
@@ -218,7 +218,7 @@ public class EelGame extends ApplicationAdapter {
     void setupECS(){
         com.artemis.WorldConfiguration entityConfig=new WorldConfigurationBuilder()
                 .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
-                .with(spriteRenderSystem=new SpriteRenderSystem(worldBatch))
+                .with(spriteRenderSystem=new RenderOneTexSystem(worldBatch))
                 .with(WorldConfigurationBuilder.Priority.LOWEST,new PhysicsSystem())
                 .with(new MovementInputSystem())
                 .build();
@@ -259,10 +259,10 @@ public class EelGame extends ApplicationAdapter {
 
         ent=entityWorld.create();
 
-        CGraphics cGraphics =ECS.mGraphics.create(ent);
+        COneTex cOneTex =ECS.mGraphics.create(ent);
         CTransform cTransform = ECS.mTransform.create(ent);
         entInput = ECS.mInput.create(ent);
-        cGraphics.texture=img;
+        cOneTex.texture=img;
         cTransform.pos.set(2,10);
         cTransform.setScale(2.5f);
         CPhysics pc=ECS.mPhysics.create(ent);

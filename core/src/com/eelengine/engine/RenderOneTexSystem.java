@@ -10,12 +10,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 /**
  * Simple sprite renderer
  */
-public class SpriteRenderSystem extends IteratingSystem {
+public class RenderOneTexSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.
-    ComponentMapper<CGraphics> mGraphics; // injected automatically.
+    ComponentMapper<COneTex> mGraphics; // injected automatically.
     SpriteBatch renderBatch;
-    public SpriteRenderSystem(SpriteBatch renderBatch) {
-        super(Aspect.all(CGraphics.class,CTransform.class));
+    public RenderOneTexSystem(SpriteBatch renderBatch) {
+        super(Aspect.all(COneTex.class,CTransform.class));
         assert renderBatch!=null;
         this.renderBatch=renderBatch;
     }

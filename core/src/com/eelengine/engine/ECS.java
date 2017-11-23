@@ -8,7 +8,7 @@ import com.artemis.World;
  * {@link #initialize(World)} must be called after the entity world is started.
  */
 public class ECS {
-    public static ComponentMapper<CGraphics> mGraphics;
+    public static ComponentMapper<COneTex> mGraphics;
     public static ComponentMapper<CTransform> mTransform;
     public static ComponentMapper<CPhysics> mPhysics;
     public static ComponentMapper<CInput> mInput;
@@ -18,7 +18,7 @@ public class ECS {
      * @param entityWorld The entity world to
      */
     public static void initialize(World entityWorld){
-        mGraphics=entityWorld.getMapper(CGraphics.class);
+        mGraphics=entityWorld.getMapper(COneTex.class);
         mTransform =entityWorld.getMapper(CTransform.class);
         mPhysics=entityWorld.getMapper(CPhysics.class);
         mInput=entityWorld.getMapper(CInput.class);
