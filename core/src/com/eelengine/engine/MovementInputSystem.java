@@ -10,30 +10,30 @@ import com.badlogic.gdx.math.Vector2;
  * Simple sprite renderer
  */
 public class MovementInputSystem extends IteratingSystem {
-    ComponentMapper<TransformComponent> mTransform; // injected automatically.
-    ComponentMapper<PhysicsComponent> mPhysics; // injected automatically.
-    ComponentMapper<InputComponent> mInput; // injected automatically.
+    ComponentMapper<CTransform> mTransform; // injected automatically.
+    ComponentMapper<CPhysics> mPhysics; // injected automatically.
+    ComponentMapper<CInput> mInput; // injected automatically.
     public MovementInputSystem() {
-        super(Aspect.all(PhysicsComponent.class,TransformComponent.class,InputComponent.class));
+        super(Aspect.all(CPhysics.class,CTransform.class,CInput.class));
     }
 
     @Override
     protected void process(int e) {
-        PhysicsComponent physics=mPhysics.get(e);
+        CPhysics physics=mPhysics.get(e);
         if(physics.isStunned())return;
-        InputComponent input=mInput.get(e);
-        TransformComponent transform = mTransform.get(e);
+        CInput input=mInput.get(e);
+        CTransform transform = mTransform.get(e);
 
         //System.out.println(transform.rotLockedToPhysics+" "+transform.rot);
         if(physics.body.getLinearVelocity().len2()>0.05)
             transform.rot=physics.body.getLinearVelocity().angle()* Util.DEG_TO_RAD_F ;
         float speed=10;
         int xMove=0;
-        if(input.checkOn(InputComponent.LEFT))xMove--;
-        if(input.checkOn(InputComponent.RIGHT))xMove++;
+        if(input.checkOn(CInput.LEFT))xMove--;
+        if(input.checkOn(CInput.RIGHT))xMove++;
         int yMove=0;
-        if(input.checkOn(InputComponent.UP))yMove++;
-        if(input.checkOn(InputComponent.DOWN))yMove--;
+        if(input.checkOn(CInput.UP))yMove++;
+        if(input.checkOn(CInput.DOWN))yMove--;
         Vector2 v=new Vector2(xMove,yMove);
         v.setLength(speed);
         physics.body.setLinearVelocity(v);

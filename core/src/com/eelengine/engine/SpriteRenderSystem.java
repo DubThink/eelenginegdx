@@ -6,17 +6,16 @@ import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 
 /**
  * Simple sprite renderer
  */
 public class SpriteRenderSystem extends IteratingSystem {
-    ComponentMapper<TransformComponent> mTransform; // injected automatically.
-    ComponentMapper<GraphicsComponent> mGraphics; // injected automatically.
+    ComponentMapper<CTransform> mTransform; // injected automatically.
+    ComponentMapper<CGraphics> mGraphics; // injected automatically.
     SpriteBatch renderBatch;
     public SpriteRenderSystem(SpriteBatch renderBatch) {
-        super(Aspect.all(GraphicsComponent.class,TransformComponent.class));
+        super(Aspect.all(CGraphics.class,CTransform.class));
         assert renderBatch!=null;
         this.renderBatch=renderBatch;
     }
@@ -33,7 +32,7 @@ public class SpriteRenderSystem extends IteratingSystem {
 
     @Override
     protected void process(int e) {
-        TransformComponent trans= mTransform.get(e);
+        CTransform trans= mTransform.get(e);
         Texture texture=mGraphics.get(e).texture;
         renderBatch.draw(texture,
                 trans.pos.x*EelGame.GSCALE-texture.getWidth()*.5f,

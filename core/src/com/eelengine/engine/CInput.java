@@ -3,12 +3,12 @@ package com.eelengine.engine;
 import com.artemis.Component;
 
 /**
- * InputComponent
+ * CInput
  * Tracks up to 32 inputs.
  * Each input can be on or off. Use {@link #checkDown(int)} and {@link #checkUp(int)} to check if input has been put
  * down and/or up since the last update.
  */
-public class InputComponent extends Component {
+public class CInput extends Component {
     public static final int UP=1;
     public static final int DOWN=1<<1;
     public static final int LEFT=1<<2;
