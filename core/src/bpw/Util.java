@@ -1,8 +1,11 @@
 package bpw;
 
 //import eelengine.Point;
-//import eelengine.navigation.Node;
+//import eelengine.navigation.Cell;
 //import org.dyn4j.geometry.Vector2;
+
+import com.badlogic.gdx.math.Vector2;
+import com.eelengine.engine.ai.Cell;
 
 import java.awt.Color;
 
@@ -12,6 +15,17 @@ import java.awt.Color;
  * @author Benjamin Welsh on 4/12/2017.
  */
 public class Util {
+    // CONSTS
+    public static final float RAD_TO_DEG_F=57.295779513f;
+    public static final double RAD_TO_DEG_D=57.295779513082320876798154814105170332405472466564;
+    public static final float DEG_TO_RAD_F=1/RAD_TO_DEG_F;
+    public static final double DEG_TO_RAD_D=1/RAD_TO_DEG_D;
+
+    public static final float PI_F=3.14159265358979323846f;
+    public static final float HALF_PI_F=PI_F/2;
+    public static final float TWO_PI_F=PI_F*2;
+
+
     /**
      * returns true if num is between a and b, inclusive.
      * It does not matter if a>b
@@ -61,8 +75,14 @@ public class Util {
 //    public static double dist(Point a, Point b){
 //        return dist(a.x,a.y,b.x,b.y);
 //    }
+    public static float dist(float x1, float y1, float x2, float y2){
+        return (float)Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+    }
     public static double dist(double x1, double y1, double x2, double y2){
         return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+    }
+    public static float halfBetween(float a, float b){
+        return a+((b-a)/2.0f);
     }
     public static double halfBetween(double a, double b){
         return a+((b-a)/2.0);
@@ -231,12 +251,12 @@ public class Util {
 //        return new Point(start.x-length*Math.sin(theta),start.y-length*Math.cos(theta));
 //    }
 //
-//    public static Vector2 toPoint(double x1, double y1, double x2, double y2){
-//        return new Vector2(x2-x1,y2-y1);
-//    }
-//    public static Vector2 toPoint(double x1, double y1, Node node){
-//        return toPoint(x1,y1,node.centerX(),node.centerY());
-//    }
+    public static Vector2 toPoint(float x1, float y1, float x2, float y2){
+        return new Vector2(x2-x1,y2-y1);
+    }
+    public static Vector2 toPoint(float x1, float y1, Cell cell){
+        return toPoint(x1,y1, cell.centerX(), cell.centerY());
+    }
     public static float round(float val, float roundTo){
         return (float)round((double)val,roundTo);
     }
