@@ -4,8 +4,11 @@ import bpw.Util;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Simple sprite renderer
@@ -13,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class RenderOneTexSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.
     ComponentMapper<COneTex> mGraphics; // injected automatically.
+    ComponentMapper<CHealth> mHealth; // injected automatically.
     SpriteBatch renderBatch;
     public RenderOneTexSystem(SpriteBatch renderBatch) {
         super(Aspect.all(COneTex.class,CTransform.class));
@@ -50,5 +54,11 @@ public class RenderOneTexSystem extends IteratingSystem {
                 texture.getHeight(),
                 false,
                 false);
+        if(mHealth.has(e)){
+            FontKit.SysHuge.setColor(Color.FIREBRICK);
+            FontKit.SysHuge.draw(renderBatch,
+                    mHealth.get(e).health + "",
+                    trans.pos.x*EelGame.GSCALE, trans.pos.y*EelGame.GSCALE);
+        }
     }
 }

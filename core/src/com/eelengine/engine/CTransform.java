@@ -9,8 +9,29 @@ public class CTransform extends Component {
     float rot=0;
     boolean rotLockedToPhysics=true;
 
-    public void setScale(float scl) {
+    /**
+     * Points the up direction at the velocity
+     * Has no effect if {@link #rotLockedToPhysics}
+     * see {@link PhysicsToTransformUpdateSystem} for implementation
+     */
+    boolean pointAtVelocity=false;
+
+    public CTransform setScale(float scl) {
         this.scl.set(scl,scl);
+        return this;
+    }
+    public CTransform setPos(float x, float y) {
+        this.pos.set(x,y);
+        return this;
+    }
+    public CTransform setPos(Vector2 pos) {
+        this.pos = pos;
+        return this;
+    }
+
+    public CTransform setRot(float rot) {
+        this.rot = rot;
+        return this;
     }
 
     @Override

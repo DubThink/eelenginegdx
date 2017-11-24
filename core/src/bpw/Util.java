@@ -18,6 +18,11 @@ public class Util {
     public static final float DEG_TO_RAD_F=1/RAD_TO_DEG_F;
     public static final double DEG_TO_RAD_D=1/RAD_TO_DEG_D;
 
+    public static final float PI_F=3.14159265358979323846f;
+    public static final float HALF_PI_F=PI_F/2;
+    public static final float TWO_PI_F=PI_F*2;
+
+
     /**
      * returns true if num is between a and b, inclusive.
      * It does not matter if a>b

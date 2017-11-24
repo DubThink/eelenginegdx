@@ -1,25 +1,27 @@
 package com.eelengine.engine;
 
-import com.artemis.Aspect;
-import com.artemis.ComponentMapper;
-import com.artemis.EntitySubscription;
-import com.artemis.WorldConfigurationBuilder;
+import bpw.Util;
+import com.artemis.*;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import org.omg.PortableInterceptor.INACTIVE;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * The core class of the engine
@@ -31,12 +33,15 @@ public class EelGame extends ApplicationAdapter {
 	SpriteBatch interfaceBatch;
 	ShapeRenderer shapeRenderer;
 	com.artemis.World entityWorld;
-	Texture img;
+	Texture img,img2;
 	Texture bkdimg;
     OrthographicCamera interfaceCam;
     CamController camController;
     Viewport viewport;
     Box2DDebugRenderer debugRenderer;
+    Sound screenshotSound;
+    int entityCount;
+
 
     public static final int VIRTUAL_WIDTH = 1920;
     public static final int VIRTUAL_HEIGHT = 1080;
@@ -45,16 +50,19 @@ public class EelGame extends ApplicationAdapter {
 
     boolean DEV_physics_render =true;
     boolean DEV_draw_grid=true;
-    float DEV_time_mod=0.2f;
+    float DEV_time_mod=1f;
     // Temp physics testing
 
 
 	@Override
 	public void create () {
-		img = new Texture(Gdx.files.internal("Eel_E_64x.png"),true);
-		img.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
+        img = new Texture(Gdx.files.internal("Eel_E_64x.png"),true);
+        img2 = new Texture(Gdx.files.internal("blic_32x.png"),true);
+        img.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
+        img2.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
         bkdimg = new Texture(Gdx.files.internal("semifade_half_black_left.png"));
         bkdimg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        screenshotSound=Gdx.audio.newSound(Gdx.files.internal("interface/camera-shutter.wav"));
         setupRendering();
         setupPhysics();
         setupECS();
@@ -150,8 +158,7 @@ public class EelGame extends ApplicationAdapter {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Step physics
-        physicsWorld.step(Gdx.graphics.getDeltaTime()*DEV_time_mod, 6,2);
+        // // Step physics
 
         // Update camera systems
         camController.setViewGrabbed(Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
@@ -165,7 +172,6 @@ public class EelGame extends ApplicationAdapter {
         // Step ECS
         entityWorld.setDelta(Gdx.graphics.getDeltaTime()*DEV_time_mod);
         entityWorld.process();
-
         // Draw grid
         if (DEV_draw_grid) {
             shapeRenderer.begin();
@@ -179,13 +185,27 @@ public class EelGame extends ApplicationAdapter {
             interfaceBatch.draw(bkdimg,0,0,Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
             FontKit.SysHuge.setColor(Color.CHARTREUSE);
             FontKit.SysHuge.draw(interfaceBatch,"ESCAPE MENU",10,Gdx.graphics.getHeight()-10);
+            FontKit.SysLarge.setColor(Color.FIREBRICK);
             FontKit.SysLarge.draw(interfaceBatch,"Press enter to exit",10,Gdx.graphics.getHeight()-58);
-            FontKit.SysMedium.draw(interfaceBatch,""+dynamicBody.getPosition(),10,Gdx.graphics.getHeight()-78);
-            FontKit.SysMedium.draw(interfaceBatch,""+staticBody.getPosition(),10,Gdx.graphics.getHeight()-98);
+            FontKit.SysMedium.setColor(Color.WHITE);
+            FontKit.SysMedium.draw(interfaceBatch,"FPS:"+Gdx.graphics.getFramesPerSecond(),10,Gdx.graphics.getHeight()-88);
+            FontKit.SysMedium.draw(interfaceBatch,"Entity count: "+entityCount,10,Gdx.graphics.getHeight()-108);
+//            FontKit.SysMedium.draw(interfaceBatch,"FPS:"+Gdx.graphics.getFramesPerSecond(),10,Gdx.graphics.getHeight()-128);
+//            FontKit.SysMedium.draw(interfaceBatch,"FPS:"+Gdx.graphics.getFramesPerSecond(),10,Gdx.graphics.getHeight()-148);
+            FontKit.SysMedium.draw(interfaceBatch,
+                    "Tab to toggle 1/5 speed\n" +
+                            "F3+G to toggle grid\n" +
+                            "F3+B to toggle physics debug\n" +
+                            "F11 to toggle fullscreen\n" +
+                            "F12 for screenshot (saved to assets/screenshots)"
+                    ,10,Gdx.graphics.getHeight()-168);
             FontKit.SysSmall.draw(interfaceBatch,
                     camController.getCam().unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0)).toString(),
                     10,22);
 
+        }else {
+            FontKit.SysMedium.setColor(Color.FIREBRICK);
+            FontKit.SysMedium.draw(interfaceBatch, "Press ESC for menu", 10, Gdx.graphics.getHeight() - 10);
         }
         interfaceBatch.end();
 
@@ -194,6 +214,9 @@ public class EelGame extends ApplicationAdapter {
             Matrix4 matrix4 = new Matrix4(camController.getCam().combined);
             matrix4.scale(100, 100, 100);
             debugRenderer.render(physicsWorld, matrix4);
+        }
+        if(Gdx.graphics.getFrameId()%60==0){
+            makeBloob((int)((Math.random()-0.5)*40),(int)((Math.random()-0.5)*40));
         }
 	}
 
@@ -211,14 +234,91 @@ public class EelGame extends ApplicationAdapter {
     }
 
     RenderOneTexSystem spriteRenderSystem;
+    void makeBloob(int x,int y){
+        int e=entityWorld.create();
+        COneTex cOneTex =ECS.mGraphics.create(e);
+        CTransform cTransform = ECS.mTransform.create(e)
+                .setPos(x,y)
+                .setScale(1.5f)
+                .setRot((float)Math.random()*Util.TWO_PI_F);
+        cOneTex.texture=img;
+
+        CPhysics pc=ECS.mPhysics.create(e);
+        pc.buildBody(physicsWorld);
+        pc.body.setType(BodyDef.BodyType.DynamicBody);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(.5f,.5f);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        pc.body.createFixture(fixtureDef);
+        shape.dispose();
+        //pc.body.setLinearDamping(10);
+        //pc.body.setAngularDamping(10);
+        Vector2 v=new Vector2((float)Math.random()-0.5f,(float)Math.random()-0.5f).setLength((float)Math.random()*8);
+        pc.body.setLinearVelocity(v);
+        ECS.mHealth.create(e)
+                .set(5);
+        ECS.mDamager.create(e)
+                .set(5);
+        ECS.mProjectile.create(e)
+                .destroyOnHit=true;
+    }
+
+    void makeBullet(float x, float y, float tx, float ty){
+        int e=entityWorld.create();
+        COneTex cOneTex =ECS.mGraphics.create(e);
+        CTransform cTransform = ECS.mTransform.create(e);
+        cOneTex.texture=img2;
+        cTransform.pos.set(x,y);
+        cTransform.setScale(1.5f);
+//        cTransform.rotLockedToPhysics=false;
+//        cTransform.pointAtVelocity=true;
+        CPhysics pc=ECS.mPhysics.create(e);
+        pc.buildBody(physicsWorld);
+        pc.body.setType(BodyDef.BodyType.StaticBody);
+        pc.body.setBullet(true);
+        Vector2 v=new Vector2(tx-x,ty-y).setLength(20);
+        cTransform.rot=v.angle()* Util.DEG_TO_RAD_F-Util.HALF_PI_F;
+//        System.out.println("Velocity:"+v);
+        pc.body.setLinearVelocity(v);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(.25f,.25f);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 10f;
+        pc.body.createFixture(fixtureDef);
+        shape.dispose();
+        //pc.body.setLinearDamping(10);
+        pc.body.setAngularDamping(1);
+        pc.setFilter(PHYS.ONE,~PHYS.PLAYERTEAM);
+        ECS.mProjectile.create(e);
+        CDamager damager=ECS.mDamager.create(e);
+        damager.set(10);
+    }
     /**
      * Sets up the Entity-Component-System structure
      * @pre All subsystems used by ECS should be initialized first
      */
     void setupECS(){
         com.artemis.WorldConfiguration entityConfig=new WorldConfigurationBuilder()
+                .with(WorldConfigurationBuilder.Priority.HIGH + 1, new BaseSystem() {
+                    @Override
+                    protected void processSystem() {
+                        physicsWorld.step(Gdx.graphics.getDeltaTime()*DEV_time_mod, 6,2);
+                    }
+                })
                 .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
                 .with(spriteRenderSystem=new RenderOneTexSystem(worldBatch))
+                .with(WorldConfigurationBuilder.Priority.LOW,new UtilSystem())
+                .with(WorldConfigurationBuilder.Priority.LOW,new HealthSystem(interfaceBatch,camController))
+                .with(WorldConfigurationBuilder.Priority.LOW - 1, new BaseEntitySystem(Aspect.all()) {
+                    @Override
+                    protected void processSystem() {
+                        IntBag actives = subscription.getEntities();
+                        entityCount=actives.size();
+                    }
+                })
                 .with(WorldConfigurationBuilder.Priority.LOWEST,new PhysicsSystem())
                 .with(new MovementInputSystem())
                 .build();
@@ -235,15 +335,14 @@ public class EelGame extends ApplicationAdapter {
             //IntBag is all entities with a new physics component since last ECS update
             public void inserted(IntBag entities) {
                 for(int i=0;i<entities.size();i++){
-                    System.out.println("Subscriber "+entities.get(i)+" "+mPhysics.get(entities.get(i)));
-                    mPhysics.get(entities.get(i)).buildBody(physicsWorld);
-                    if(mPosition.has(entities.get(i))){
-                        CTransform transform=mPosition.get(entities.get(i));
-                        System.out.println(transform);
-                        System.out.println(mPhysics.get(entities.get(i)).body.getPosition());
-                        mPhysics.get(entities.get(i)).body
+                    int e=entities.get(i);
+                    mPhysics.get(e).buildBody(physicsWorld);
+                    mPhysics.get(e).body.setUserData(e);
+//                    System.out.print("@subs "+mPhysics.get(e).body.getLinearVelocity());
+                    if(mPosition.has(e)){
+                        CTransform transform=mPosition.get(e);
+                        mPhysics.get(e).body
                                 .setTransform(transform.pos,transform.rotLockedToPhysics?transform.rot:0);
-                        System.out.println(mPhysics.get(entities.get(i)).body.getPosition());
                     }
 
                 }
@@ -274,11 +373,24 @@ public class EelGame extends ApplicationAdapter {
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
         pc.body.createFixture(fixtureDef);
+        pc.body.setAngularDamping(10);
+        pc.setFilter(PHYS.PLAYERTEAM,PHYS.ALL);
+        // COLLISION TEST GROUND
+        //pc.body.
+        //
         shape.dispose();
         cTransform.rotLockedToPhysics=false;
-        int e2=entityWorld.create();
-        ECS.mPhysics.create(e2);
+        ECS.mHealth.create(ent)
+                .set(40);
+        ECS.mDamager.create(ent)
+                .set(100);
+
+        //for(int i=0;i<10;i+=2)makeBloob(i);
+
+        // This is part of ecs really. mostly needs to be done after ecs is up
+        physicsWorld.setContactListener(new CollisionHandler(entityWorld) );
     }
+
     Body dynamicBody,staticBody;
     ArrayList<Body> statics=new ArrayList<Body>();
     World physicsWorld;
@@ -286,9 +398,9 @@ public class EelGame extends ApplicationAdapter {
         //Box2D.init();
 
         physicsWorld =new World(new Vector2(0,0),true);
-        dynamicBody= makeThing2(0,8,true);
+        //dynamicBody= makeThing2(0,8,true);
         //dynamicBody.setBullet(true);
-        staticBody=makeThing(0,0,false);
+        //staticBody=makeThing(0,0,false);
     }
 
     Body makeThing(float x, float y,boolean dynamic){
@@ -321,7 +433,6 @@ public class EelGame extends ApplicationAdapter {
         shape.dispose();
         return body;
     }
-
     void setupRendering(){
 	    // Renderers
         worldBatch = new SpriteBatch();
@@ -382,6 +493,7 @@ public class EelGame extends ApplicationAdapter {
             }else if(keycode==Input.Keys.X) {
                 /////////////
                 // TEST SPACE
+                spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
 //                System.out.println("S PRES");
 //                spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
                 //ComponentMapper<CPhysics> mPhysics=entityWorld.getMapper(CPhysics.class);
@@ -395,6 +507,8 @@ public class EelGame extends ApplicationAdapter {
 //                for (Body body : bodies) {
 //                }
                 /////////////
+            }else if(keycode==Input.Keys.TAB) {
+                DEV_time_mod=1.2f-DEV_time_mod;
             }
             else if(keycode==Input.Keys.SPACE) {
                 dynamicBody.setLinearVelocity(0, 20);
@@ -414,6 +528,15 @@ public class EelGame extends ApplicationAdapter {
                 Gdx.graphics.setFullscreenMode(displayMode);
                 fullscreen = true;
                 }
+            }else if(keycode==Input.Keys.F12){
+                byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), true);
+                Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
+                BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH_mm_ss_SSS");
+                System.out.println(Gdx.files.getLocalStoragePath());
+                PixmapIO.writePNG(Gdx.files.local("screenshots/screenshot "+sdf.format(new Date())+".png"), pixmap);
+                pixmap.dispose();
+                screenshotSound.play();
             }
             return false;
         }
@@ -452,8 +575,14 @@ public class EelGame extends ApplicationAdapter {
             Vector3 wx=camController.getCam().unproject(new Vector3(screenX,screenY,0));
             wx.scl(1/EelGame.GSCALE);
             //return super.touchDown(screenX, screenY, pointer, button);
-            System.out.println(String.format("Button: (%d,%d) world (%.3f,%.3f) ptr: %d button: %d",
-                    screenX,screenY,wx.x,wx.y,pointer, button));
+//            System.out.println(String.format("Button: (%d,%d) world (%.3f,%.3f) ptr: %d button: %d",
+//                    screenX,screenY,wx.x,wx.y,pointer, button));
+            if(button==0){
+//                System.out.println("##"+ECS.mTransform.get(ent).pos+" "+wx+"##");
+                for(int i=-6;i<=6;i++)
+                    for(int j=-6;j<=6;j++)
+                makeBullet(ECS.mTransform.get(ent).pos.x+i,ECS.mTransform.get(ent).pos.y+j,wx.x+i,wx.y+j);
+            }
             if(button==2){
                 statics.add(makeThing(wx.x,wx.y,false));
             }

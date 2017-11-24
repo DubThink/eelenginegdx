@@ -16,9 +16,9 @@ public class FontKit {
         parameter.genMipMaps=true;
         parameter.size = 12;
         SysSmall = generator.generateFont(parameter);
-        parameter.size = 24;
-        SysMedium = generator.generateFont(parameter);
         parameter.size = 18;
+        SysMedium = generator.generateFont(parameter);
+        parameter.size = 24;
         SysLarge = generator.generateFont(parameter);
         parameter.size = 48;
         SysHuge = generator.generateFont(parameter);

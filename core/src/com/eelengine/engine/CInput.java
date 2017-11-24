@@ -23,13 +23,15 @@ public class CInput extends Component {
     private int _on =0;
     private int _up =0;
 
-    public void down(int command){
+    public CInput down(int command){
         _down |=command;
         _on |=command;
+        return this;
     }
-    public void up(int command){
+    public CInput up(int command){
         _up |= command;
         _on &= ~command;
+        return this;
     }
     public boolean checkOn(int command){
         return (_on&command)!=0;
@@ -51,11 +53,13 @@ public class CInput extends Component {
         _up&=~command;
         return ret;
     }
-    public void clear(){
+    public CInput clear(){
         _down=0;
         _up=0;
+        return this;
     }
-    public void clearOn(){
+    public CInput clearOn(){
         _on=0;
+        return this;
     }
 }

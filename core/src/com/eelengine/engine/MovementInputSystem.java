@@ -25,9 +25,9 @@ public class MovementInputSystem extends IteratingSystem {
         CTransform transform = mTransform.get(e);
 
         //System.out.println(transform.rotLockedToPhysics+" "+transform.rot);
-        if(physics.body.getLinearVelocity().len2()>0.05)
+        if(physics.body.getLinearVelocity().len2()>0.5)
             transform.rot=physics.body.getLinearVelocity().angle()* Util.DEG_TO_RAD_F ;
-        float speed=10;
+        float speed=4;
         int xMove=0;
         if(input.checkOn(CInput.LEFT))xMove--;
         if(input.checkOn(CInput.RIGHT))xMove++;
