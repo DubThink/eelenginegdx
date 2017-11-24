@@ -61,4 +61,8 @@ public class CDamager extends Component {
     public boolean isType(short type){
         return (this.type&type)!=0;
     }
+
+//    public DamageEvent getEvent(){
+//        return new DamageEvent(amount,type,);
+//    }
 }

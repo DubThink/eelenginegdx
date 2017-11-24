@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import org.omg.PortableInterceptor.INACTIVE;
+import com.eelengine.engine.ai.Navigation;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ public class EelGame extends ApplicationAdapter {
     Viewport viewport;
     Box2DDebugRenderer debugRenderer;
     Sound screenshotSound;
+    Navigation navigation;
     int entityCount;
 
 
@@ -68,6 +69,7 @@ public class EelGame extends ApplicationAdapter {
         setupECS();
         FontKit.initFonts();
         debugRenderer = new Box2DDebugRenderer();
+        navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
 	}
 
     @Override
@@ -251,6 +253,7 @@ public class EelGame extends ApplicationAdapter {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
+        fixtureDef.restitution=0.5f;
         pc.body.createFixture(fixtureDef);
         shape.dispose();
         //pc.body.setLinearDamping(10);
@@ -263,20 +266,22 @@ public class EelGame extends ApplicationAdapter {
                 .set(5);
         ECS.mProjectile.create(e)
                 .destroyOnHit=true;
+        ECS.mTeam.create(e)
+                .set(1);
     }
 
     void makeBullet(float x, float y, float tx, float ty){
         int e=entityWorld.create();
         COneTex cOneTex =ECS.mGraphics.create(e);
-        CTransform cTransform = ECS.mTransform.create(e);
+        CTransform cTransform=ECS.mTransform.create(e)
+                .setScale(1.5f)
+                .setPos(x,y);
         cOneTex.texture=img2;
-        cTransform.pos.set(x,y);
-        cTransform.setScale(1.5f);
 //        cTransform.rotLockedToPhysics=false;
 //        cTransform.pointAtVelocity=true;
         CPhysics pc=ECS.mPhysics.create(e);
         pc.buildBody(physicsWorld);
-        pc.body.setType(BodyDef.BodyType.StaticBody);
+        pc.body.setType(BodyDef.BodyType.DynamicBody);
         pc.body.setBullet(true);
         Vector2 v=new Vector2(tx-x,ty-y).setLength(20);
         cTransform.rot=v.angle()* Util.DEG_TO_RAD_F-Util.HALF_PI_F;
@@ -293,8 +298,8 @@ public class EelGame extends ApplicationAdapter {
         pc.body.setAngularDamping(1);
         pc.setFilter(PHYS.ONE,~PHYS.PLAYERTEAM);
         ECS.mProjectile.create(e);
-        CDamager damager=ECS.mDamager.create(e);
-        damager.set(10);
+        ECS.mDamager.create(e)
+                .set(10);
     }
     /**
      * Sets up the Entity-Component-System structure
@@ -433,6 +438,7 @@ public class EelGame extends ApplicationAdapter {
         shape.dispose();
         return body;
     }
+
     void setupRendering(){
 	    // Renderers
         worldBatch = new SpriteBatch();
@@ -579,8 +585,10 @@ public class EelGame extends ApplicationAdapter {
 //                    screenX,screenY,wx.x,wx.y,pointer, button));
             if(button==0){
 //                System.out.println("##"+ECS.mTransform.get(ent).pos+" "+wx+"##");
-                for(int i=-6;i<=6;i++)
-                    for(int j=-6;j<=6;j++)
+                // S T R E S S T E S T
+//                for(int i=-6;i<=6;i++)
+//                    for(int j=-6;j<=6;j++)
+                int i=0,j=0;
                 makeBullet(ECS.mTransform.get(ent).pos.x+i,ECS.mTransform.get(ent).pos.y+j,wx.x+i,wx.y+j);
             }
             if(button==2){

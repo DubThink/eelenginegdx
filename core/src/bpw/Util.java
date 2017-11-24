@@ -1,8 +1,11 @@
 package bpw;
 
 //import eelengine.Point;
-//import eelengine.navigation.Node;
+//import eelengine.navigation.Cell;
 //import org.dyn4j.geometry.Vector2;
+
+import com.badlogic.gdx.math.Vector2;
+import com.eelengine.engine.ai.Cell;
 
 import java.awt.Color;
 
@@ -72,8 +75,14 @@ public class Util {
 //    public static double dist(Point a, Point b){
 //        return dist(a.x,a.y,b.x,b.y);
 //    }
+    public static float dist(float x1, float y1, float x2, float y2){
+        return (float)Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+    }
     public static double dist(double x1, double y1, double x2, double y2){
         return Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
+    }
+    public static float halfBetween(float a, float b){
+        return a+((b-a)/2.0f);
     }
     public static double halfBetween(double a, double b){
         return a+((b-a)/2.0);
@@ -242,12 +251,12 @@ public class Util {
 //        return new Point(start.x-length*Math.sin(theta),start.y-length*Math.cos(theta));
 //    }
 //
-//    public static Vector2 toPoint(double x1, double y1, double x2, double y2){
-//        return new Vector2(x2-x1,y2-y1);
-//    }
-//    public static Vector2 toPoint(double x1, double y1, Node node){
-//        return toPoint(x1,y1,node.centerX(),node.centerY());
-//    }
+    public static Vector2 toPoint(float x1, float y1, float x2, float y2){
+        return new Vector2(x2-x1,y2-y1);
+    }
+    public static Vector2 toPoint(float x1, float y1, Cell cell){
+        return toPoint(x1,y1, cell.centerX(), cell.centerY());
+    }
     public static float round(float val, float roundTo){
         return (float)round((double)val,roundTo);
     }

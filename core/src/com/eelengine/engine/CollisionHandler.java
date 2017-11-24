@@ -23,8 +23,12 @@ public class CollisionHandler implements ContactListener {
         doShit(contact,bid,aid);
     }
     private void doShit(Contact contact, int a, int b){
-        if(ECS.mDamager.has(a)&&ECS.mHealth.has(b)){
-            ECS.mHealth.get(b).damage(ECS.mDamager.get(a).amount);
+        int teamA=ECS.mTeam.has(a)?ECS.mTeam.get(a).team:0;
+        int teamB=ECS.mTeam.has(b)?ECS.mTeam.get(b).team:0;
+        boolean diffTeams = !(teamA==teamB&&teamA!=0);
+        //System.out.println("Collision between "+ECS.mTeam.has(a)+":"+teamA+" and "+ECS.mTeam.has(b)+":"+teamB);
+        if(diffTeams&&ECS.mDamager.has(a)&&ECS.mHealth.has(b)){
+            ECS.mHealth.get(b).addDamage(ECS.mDamager.get(a).amount,ECS.mDamager.get(a).type,a);
             if(ECS.mProjectile.has(a)&&ECS.mProjectile.get(a).destroyOnHit)entityWorld.delete(a);
         }
 

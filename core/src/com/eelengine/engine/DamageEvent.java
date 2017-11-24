@@ -5,13 +5,17 @@ import com.artemis.annotations.EntityId;
 public class DamageEvent {
     int amt;
     int type;
-//    @EntityId
-//    int source;
-    //int team;
+    //@EntityId
+    int source;
+    int team;
 
-    public DamageEvent(int amt, int type) {
+    public DamageEvent(int amt, int type, int source) {
         this.amt = amt;
         this.type = type;
-        //this.team = team;
+        this.source = source;
+    }
+
+    public boolean isType(short type){
+        return (this.type&type)!=0;
     }
 }

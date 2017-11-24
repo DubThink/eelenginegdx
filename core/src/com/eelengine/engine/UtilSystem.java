@@ -1,6 +1,5 @@
 package com.eelengine.engine;
 
-import bpw.Util;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
@@ -22,6 +21,6 @@ public class UtilSystem extends IteratingSystem {
     protected void process(int e) {
         if(mProjectile.has(e)&&mTransform.has(e)&&
                 !Etil.inBounds(mTransform.get(e).pos,-40,-40,40,40))
-            ;//world.delete(e); //FIXME
+            world.delete(e);
     }
 }

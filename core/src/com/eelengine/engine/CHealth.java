@@ -36,15 +36,15 @@ public class CHealth extends Component {
         return this;
     }
 
-    public CHealth damage(int amt){
-        damageEvents.add(new DamageEvent(amt,0));
+    public CHealth addDamage(int amt,int source){
+        damageEvents.add(new DamageEvent(amt,0,source));
         return this;
     }
-    public CHealth damage(int amt,int type){
-        damageEvents.add(new DamageEvent(amt,type));
+    public CHealth addDamage(int amt, int type,int source){
+        damageEvents.add(new DamageEvent(amt,type,source));
         return this;
     }
-    public CHealth damage(DamageEvent event){
+    public CHealth addDamage(DamageEvent event){
         damageEvents.add(event);
         return this;
     }

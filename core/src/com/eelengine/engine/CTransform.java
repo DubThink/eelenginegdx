@@ -4,10 +4,10 @@ import com.artemis.Component;
 import com.badlogic.gdx.math.Vector2;
 
 public class CTransform extends Component {
-    Vector2 pos=new Vector2(0,0);
-    Vector2 scl=new Vector2(1,1);
-    float rot=0;
-    boolean rotLockedToPhysics=true;
+    public Vector2 pos=new Vector2(0,0);
+    public Vector2 scl=new Vector2(1,1);
+    public float rot=0;
+    public boolean rotLockedToPhysics=true;
 
     /**
      * Points the up direction at the velocity

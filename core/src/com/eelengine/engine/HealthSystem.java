@@ -17,6 +17,7 @@ public class HealthSystem extends IteratingSystem {
     SpriteBatch debugBatch;
     CamController camController;
     ComponentMapper<CHealth> mHealth; // injected automatically.
+    ComponentMapper<CTeam> mTeam; // injected automatically.
 
     public HealthSystem(SpriteBatch debugBatch,CamController camController) {
         super(Aspect.all(CHealth.class));
@@ -40,6 +41,9 @@ public class HealthSystem extends IteratingSystem {
         CHealth cHealth = mHealth.get(e);
         while (!cHealth.damageEvents.isEmpty()) {
             DamageEvent event = cHealth.damageEvents.poll();
+            int otherTeam = mTeam.has(event.source)?mTeam.get(event.source).team:0;
+            int team = mTeam.has(e)?mTeam.get(e).team:0;
+            if(team==otherTeam&&team!=0)continue; // Continue if teams are the same and not 0
             cHealth.health -= event.amt;
         }
         if (cHealth.health <= 0)world.delete(e);
