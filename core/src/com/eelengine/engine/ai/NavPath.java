@@ -14,8 +14,8 @@ public class NavPath {
     Tendril headTendril;
     Navigation navigation;
     CTransform targetTransform=null;
-    float targetX;
-    float targetY;
+    public float targetX;
+    public float targetY;
     ArrayList<Cell> cellChain;
     public NavPath(Navigation navigation,Tendril headTendril, float targetX, float targetY) {
         this.headTendril = headTendril;
@@ -23,7 +23,7 @@ public class NavPath {
         this.targetX = targetX;
         this.targetY = targetY;
         cellChain =new ArrayList<>();
-        headTendril.buildNodeChain(cellChain);
+        headTendril.buildCellChain(cellChain);
     }
 
     public void setTargetTransform(CTransform targetTransform) {
@@ -35,7 +35,7 @@ public class NavPath {
         Cell destinationCell;
         if(targetTransform!=null) {
             //System.out.println("setting destNode to cell at targetPawn");
-            destinationCell = navigation.getNodeAt(targetTransform.pos);
+            destinationCell = navigation.getCellAt(targetTransform.pos);
         }else {
             destinationCell = cellChain.get(cellChain.size()-1);
         }
@@ -44,7 +44,7 @@ public class NavPath {
         }
 
         //Check if we're in the same cell
-        Cell currentCell =navigation.getNodeAt(x,y);
+        Cell currentCell =navigation.getCellAt(x,y);
         if(destinationCell == currentCell){
             //System.out.println("Last cell");
             return Util.toPoint(x,y, getTargetX(), getTargetY());
@@ -77,11 +77,14 @@ public class NavPath {
         for(int i = 0; i< cellChain.size()-1; i++){
             Cell cell1 = cellChain.get(i);
             Cell cell2 = cellChain.get(i+1);
-            renderer.setColor(0,1,0,0);
+            renderer.setColor(0,1,0,1);
+//            System.out.printf("%.3f %.3f %.3f %.3f\n",cell1.centerX(), cell1.centerY(), cell2.centerX(), cell2.centerY());
             renderer.line(cell1.centerX(), cell1.centerY(), cell2.centerX(), cell2.centerY());
         }
         //renderer.fill(0,255,0,100);
-        renderer.ellipse(getTargetX(),getTargetY(),20,20);
+        System.out.println("To "+getTargetX()+" "+getTargetY());
+        // -.1f because gdx draws ellipses by their bottom corner ?!?!?!?!?!?!?
+        renderer.ellipse(getTargetX()-.1f,getTargetY()-.1f,.2f,.2f);
         renderer.end();
     }
     public void print(){

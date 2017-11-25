@@ -24,17 +24,17 @@ public class DebugView {
      */
     public static void drawGrid(ShapeRenderer sr, OrthographicCamera camera, boolean quarters){
         sr.set(ShapeRenderer.ShapeType.Line);
-        float num=EelGame.GSCALE*((quarters&&camera.zoom<1)?1f/divisions:1.0f);
+        float num=((quarters&&camera.zoom<1)?1f/divisions:1.0f);
         // unproject does some weird mutator thing where Vector3.Zero causes it to flip out
-        Vector3 startPos=camera.unproject(new Vector3(0,0,0));
-        Vector3 endPos=camera.unproject(new Vector3(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),0));
-
-        for(float i = Util.floor(startPos.x,EelGame.GSCALE); i<=Util.ceil(endPos.x,EelGame.GSCALE);i+=num){
+        Vector3 startPos=camera.unproject(new Vector3(0,0,0)).scl(1/EelGame.GSCALE);
+        Vector3 endPos=camera.unproject(new Vector3(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),0)).scl(1/EelGame.GSCALE);
+        //System.out.println(num+" "+startPos+" "+endPos);
+        for(float i = Util.floor(startPos.x,1); i<=Util.ceil(endPos.x,1);i+=num){
             if(i==0)sr.setColor(0,1,0,.5f);
             else lineColors(sr,i,num);
             sr.line(i,startPos.y,i,endPos.y);
         }
-        for(float i = Util.floor(endPos.y,EelGame.GSCALE); i<=Util.ceil(startPos.y,EelGame.GSCALE);i+=num){
+        for(float i = Util.floor(endPos.y,1); i<=Util.ceil(startPos.y,1);i+=num){
             if(i==0)sr.setColor(1,0,0,.5f);
             else lineColors(sr,i,num);
             sr.line(startPos.x,i,endPos.x,i);

@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.eelengine.engine.ai.NavPath;
 import com.eelengine.engine.ai.Navigation;
 
 import java.text.SimpleDateFormat;
@@ -41,6 +42,7 @@ public class EelGame extends ApplicationAdapter {
     Box2DDebugRenderer debugRenderer;
     Sound screenshotSound;
     Navigation navigation;
+    NavPath navPath;
     int entityCount;
 
 
@@ -51,6 +53,7 @@ public class EelGame extends ApplicationAdapter {
 
     boolean DEV_physics_render =true;
     boolean DEV_draw_grid=true;
+    boolean DEV_draw_nav=true;
     float DEV_time_mod=1f;
     // Temp physics testing
 
@@ -70,6 +73,8 @@ public class EelGame extends ApplicationAdapter {
         FontKit.initFonts();
         debugRenderer = new Box2DDebugRenderer();
         navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
+        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
+                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
 	}
 
     @Override
@@ -169,7 +174,10 @@ public class EelGame extends ApplicationAdapter {
         worldBatch.setProjectionMatrix(camController.getCam().combined);
         interfaceCam.update();
         interfaceBatch.setProjectionMatrix(interfaceCam.combined);
-        shapeRenderer.setProjectionMatrix(camController.getCam().combined);
+        Matrix4 matrix4 = new Matrix4(camController.getCam().combined);
+        matrix4.scl(EelGame.GSCALE);
+        shapeRenderer.setProjectionMatrix(matrix4);
+
 
         // Step ECS
         entityWorld.setDelta(Gdx.graphics.getDeltaTime()*DEV_time_mod);
@@ -180,7 +188,13 @@ public class EelGame extends ApplicationAdapter {
             DebugView.drawGrid(shapeRenderer,camController.getCam(),true);
             shapeRenderer.end();
         }
-
+        if(DEV_draw_nav){
+            navigation.drawCells(shapeRenderer);
+            navPath=navigation.findPath(ECS.mTransform.get(ent).pos,
+                    new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
+            if(navPath!=null)navPath.draw(shapeRenderer);
+            else System.out.println("NO NAV");
+        }
         // Display dev interface
         interfaceBatch.begin();
         if(escapeMenu){
@@ -198,6 +212,7 @@ public class EelGame extends ApplicationAdapter {
                     "Tab to toggle 1/5 speed\n" +
                             "F3+G to toggle grid\n" +
                             "F3+B to toggle physics debug\n" +
+                            "F3+N to toggle nav cell drawing\n" +
                             "F11 to toggle fullscreen\n" +
                             "F12 for screenshot (saved to assets/screenshots)"
                     ,10,Gdx.graphics.getHeight()-168);
@@ -213,8 +228,6 @@ public class EelGame extends ApplicationAdapter {
 
         // Draw physics debug
         if(DEV_physics_render) {
-            Matrix4 matrix4 = new Matrix4(camController.getCam().combined);
-            matrix4.scale(100, 100, 100);
             debugRenderer.render(physicsWorld, matrix4);
         }
         if(Gdx.graphics.getFrameId()%60==0){
@@ -475,6 +488,8 @@ public class EelGame extends ApplicationAdapter {
             if(Gdx.input.isKeyPressed(Input.Keys.F3)){
                 if(keycode==Input.Keys.B) DEV_physics_render =!DEV_physics_render;
                 if(keycode==Input.Keys.G) DEV_draw_grid =!DEV_draw_grid;
+                if(keycode==Input.Keys.N) DEV_draw_nav =!DEV_draw_nav;
+//                if(keycode==Input.Keys.F) EelGame.GSCALE=150-EelGame.GSCALE;
 
             }
             // WASD
@@ -515,9 +530,8 @@ public class EelGame extends ApplicationAdapter {
                 /////////////
             }else if(keycode==Input.Keys.TAB) {
                 DEV_time_mod=1.2f-DEV_time_mod;
-            }
-            else if(keycode==Input.Keys.SPACE) {
-                dynamicBody.setLinearVelocity(0, 20);
+            }else if(keycode==Input.Keys.SPACE) {
+                //dynamicBody.setLinearVelocity(0, 20);
                 return true;
             }else if(keycode== Input.Keys.ENTER){
                 if(escapeMenu)Gdx.app.exit();

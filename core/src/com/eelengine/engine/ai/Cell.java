@@ -1,9 +1,12 @@
 package com.eelengine.engine.ai;
 
 import bpw.Util;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
+
+import static com.badlogic.gdx.graphics.GL20.GL_BLEND;
 
 /**
  * Created by Benjamin on 6/15/2017.
@@ -23,16 +26,23 @@ public class Cell {
     }
     public void draw(ShapeRenderer renderer){
         renderer.begin(ShapeRenderer.ShapeType.Line);
-        renderer.setColor(0,1,1,0);
+        renderer.setColor(0,1,1,1);
 //        renderer.fill(255,70);
-        renderer.rect(x1,y1,x2,y2);
-    }
-    public void draw(ShapeRenderer renderer,float r, float g, float b){
-        renderer.setColor(r,g,b,1);
+        renderer.rect(x1,y1,x2-x1,y2-y1);
+        renderer.end();
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(1,1,1,.2f);
 //        renderer.fill(255,70);
-        renderer.rect(x1,y1,x2,y2);
+        renderer.rect(x1,y1,x2-x1,y2-y1);
+        renderer.end();
     }
+//    public void draw(ShapeRenderer renderer,float r, float g, float b){
+//        renderer.setColor(r,g,b,1);
+////        renderer.fill(255,70);
+//        renderer.rect(x1,y1,x2,y2);
+//    }
     public void drawLinks(ShapeRenderer renderer){
+        renderer.begin(ShapeRenderer.ShapeType.Line);
         renderer.setColor(0,0,1,1);
         for(Cell cell :neighbors){
             renderer.curve(centerX(),centerY(),
@@ -41,6 +51,7 @@ public class Cell {
                     cell.centerX(), cell.centerY(),
                     10);
         }
+        renderer.end();
     }
 
     public float distTo(Cell cell) {
