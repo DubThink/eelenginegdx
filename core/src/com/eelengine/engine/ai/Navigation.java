@@ -130,7 +130,7 @@ public class Navigation {
      * If the coords are integer values, it gets the cell in the positive direction (by adding .5 to x and y)
      * @return
      */
-    public Cell getCellAt(double x, double y){
+    public Cell getCellAt(float x, float y){
         if(x%1==0)x+=.5;
         if(y%1==0)y+=.5;
         for(Cell cell : cells){
@@ -138,6 +138,27 @@ public class Navigation {
         }
         return null;
     }
+    /**
+     * If the coords are integer values, it gets the cell in the positive direction (by adding .5 to x and y)
+     * @return
+     */
+    public Cell getCellNear(float x, float y){
+        if(x%1==0)x+=.5;
+        if(y%1==0)y+=.5;
+        for(Cell cell : cells){
+            if(cell.pointIn(x,y))return cell;
+        }
+        Cell nearest=null;
+        float dist=Float.MAX_VALUE;
+        for(Cell cell : cells){
+            if(cell.distTo2(x,y)<dist){
+                dist=cell.distTo2(x,y);
+                nearest=cell;
+            }
+        }
+        return nearest;
+    }
+
     public void removeCell(Cell cell){
         cells.remove(cell);
         for(Cell cell2 : cells) {
@@ -161,12 +182,12 @@ public class Navigation {
     public int maxNavSearchLength=1000;
 
     public NavPath findPath(Vector2 v1,Vector2 v2){
-        System.out.println("Finding path from "+v1+" to "+v2);
+        //System.out.println("Finding path from "+v1+" to "+v2);
 
         return findPath(v1.x,v1.y,v2.x,v2.y);
     }
 
-    public NavPath findPath(double x1, double y1, float x2, float y2){
+    public NavPath findPath(float x1, float y1, float x2, float y2){
         resetCells();
         boolean dbg=false;
         // STEP 1
@@ -267,7 +288,7 @@ class Tendril{
         System.out.println("Tendril links to cell "+ cell.id+" with length "+getLength()+". Total chain length: "+getChainLength());
         if(previous!=null)previous.print();
     }
-    public void buildCellChain(ArrayList<Cell> chain){
+    public void buildCellChain(LinkedList<Cell> chain){
         if(previous!=null)previous.buildCellChain(chain);
         if(cell !=null)chain.add(cell);
     }

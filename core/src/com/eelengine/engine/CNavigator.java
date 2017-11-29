@@ -13,6 +13,18 @@ public class CNavigator extends Component{
     NavPath path;
     @EntityId
     int targetEnt=-1;
-    Vector2 target=null;
+    Vector2 targetPoint=null;
     short targetMode=NONE;
+    Vector2 desiredMove =new Vector2(0,0);
+    public CNavigator setMode(short mode){
+        targetMode=mode;
+        return this;
+    }
+
+    /**
+     * NOTE: returns the same Vector2 instance each time
+     */
+    public Vector2 getDesiredMove(){
+        return desiredMove;
+    }
 }

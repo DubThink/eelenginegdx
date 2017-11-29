@@ -4,6 +4,7 @@ import bpw.Util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 
 import static com.badlogic.gdx.graphics.GL20.GL_BLEND;
@@ -60,8 +61,25 @@ public class Cell {
                 Util.halfBetween(cell.x1, cell.x2), Util.halfBetween(cell.y1, cell.y2)
         );
     }
+
+    /**
+     * distance squared
+     */
+    public float distTo2(Cell cell) {
+        return Util.dist2(
+                Util.halfBetween(x1, x2), Util.halfBetween(y1, y2),
+                Util.halfBetween(cell.x1, cell.x2), Util.halfBetween(cell.y1, cell.y2)
+        );
+    }
     public float distTo(float x, float y){
         return Util.dist(Util.halfBetween(x1,x2), Util.halfBetween(y1,y2),x,y);
+    }
+
+    /**
+     * distance squared
+     */
+    public float distTo2(float x, float y){
+        return Util.dist2(Util.halfBetween(x1,x2), Util.halfBetween(y1,y2),x,y);
     }
     public float centerX(){
         return Util.halfBetween(x1,x2);
@@ -103,5 +121,19 @@ public class Cell {
             if(tendril.getChainLength()>newTendril.getChainLength())tendril.previous=newTendril.previous;
             return false;
         }
+    }
+    @Override
+    public String toString() {
+        return String.format("Cell#%d (%d, %d)x(%d, %d)",id,x1,y1,x2,y2);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Cell))return false;
+        Cell o=(Cell)obj;
+        return x1==o.x1&&
+                y1==o.y1&&
+                x2==o.x2&&
+                y2==o.y2;
     }
 }

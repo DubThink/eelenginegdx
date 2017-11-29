@@ -42,7 +42,7 @@ public class EelGame extends ApplicationAdapter {
     Box2DDebugRenderer debugRenderer;
     Sound screenshotSound;
     Navigation navigation;
-    NavPath navPath;
+//    NavPath navPath;
     int entityCount;
 
 
@@ -69,12 +69,12 @@ public class EelGame extends ApplicationAdapter {
         screenshotSound=Gdx.audio.newSound(Gdx.files.internal("interface/camera-shutter.wav"));
         setupRendering();
         setupPhysics();
+        navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
         setupECS();
         FontKit.initFonts();
         debugRenderer = new Box2DDebugRenderer();
-        navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
-        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
-                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
+//        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
+//                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
 	}
 
     @Override
@@ -178,23 +178,26 @@ public class EelGame extends ApplicationAdapter {
         matrix4.scl(EelGame.GSCALE);
         shapeRenderer.setProjectionMatrix(matrix4);
 
-
-        // Step ECS
-        entityWorld.setDelta(Gdx.graphics.getDeltaTime()*DEV_time_mod);
-        entityWorld.process();
         // Draw grid
         if (DEV_draw_grid) {
             shapeRenderer.begin();
             DebugView.drawGrid(shapeRenderer,camController.getCam(),true);
             shapeRenderer.end();
         }
-        if(DEV_draw_nav){
+
+        if(DEV_draw_nav) {
             navigation.drawCells(shapeRenderer);
-            navPath=navigation.findPath(ECS.mTransform.get(ent).pos,
-                    new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
-            if(navPath!=null)navPath.draw(shapeRenderer);
-            else System.out.println("NO NAV");
         }
+
+        // Step ECS
+        entityWorld.setDelta(Gdx.graphics.getDeltaTime()*DEV_time_mod);
+        entityWorld.process();
+//            navPath=navigation.findPath(ECS.mTransform.get(ent).pos,
+//                    new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
+//            if(navPath!=null)navPath.draw(shapeRenderer);
+////            else System.out.println("NO NAV");
+            entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
+//        }
         // Display dev interface
         interfaceBatch.begin();
         if(escapeMenu){
@@ -237,6 +240,7 @@ public class EelGame extends ApplicationAdapter {
 
 	int ent;
     CInput entInput;
+    CNavigator entNavigator;
 	@Override
 	public void dispose () {
         System.out.println("CLEANING UP FOR EXIT");
@@ -339,6 +343,7 @@ public class EelGame extends ApplicationAdapter {
                 })
                 .with(WorldConfigurationBuilder.Priority.LOWEST,new PhysicsSystem())
                 .with(new MovementInputSystem())
+                .with(new NavigationSystem(navigation,shapeRenderer))
                 .build();
         //entityConfig.
         entityWorld=new com.artemis.World(entityConfig);
@@ -402,6 +407,8 @@ public class EelGame extends ApplicationAdapter {
                 .set(40);
         ECS.mDamager.create(ent)
                 .set(100);
+        entNavigator=ECS.mNavigator.create(ent)
+                .setMode(CNavigator.POINT);
 
         //for(int i=0;i<10;i+=2)makeBloob(i);
 
