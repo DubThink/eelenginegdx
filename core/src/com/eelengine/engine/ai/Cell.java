@@ -1,9 +1,13 @@
 package com.eelengine.engine.ai;
 
 import bpw.Util;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import java.security.cert.Certificate;
 import java.util.ArrayList;
+
+import static com.badlogic.gdx.graphics.GL20.GL_BLEND;
 
 /**
  * Created by Benjamin on 6/15/2017.
@@ -23,16 +27,23 @@ public class Cell {
     }
     public void draw(ShapeRenderer renderer){
         renderer.begin(ShapeRenderer.ShapeType.Line);
-        renderer.setColor(0,1,1,0);
+        renderer.setColor(0,1,1,1);
 //        renderer.fill(255,70);
-        renderer.rect(x1,y1,x2,y2);
-    }
-    public void draw(ShapeRenderer renderer,float r, float g, float b){
-        renderer.setColor(r,g,b,1);
+        renderer.rect(x1,y1,x2-x1,y2-y1);
+        renderer.end();
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setColor(1,1,1,.2f);
 //        renderer.fill(255,70);
-        renderer.rect(x1,y1,x2,y2);
+        renderer.rect(x1,y1,x2-x1,y2-y1);
+        renderer.end();
     }
+//    public void draw(ShapeRenderer renderer,float r, float g, float b){
+//        renderer.setColor(r,g,b,1);
+////        renderer.fill(255,70);
+//        renderer.rect(x1,y1,x2,y2);
+//    }
     public void drawLinks(ShapeRenderer renderer){
+        renderer.begin(ShapeRenderer.ShapeType.Line);
         renderer.setColor(0,0,1,1);
         for(Cell cell :neighbors){
             renderer.curve(centerX(),centerY(),
@@ -41,6 +52,7 @@ public class Cell {
                     cell.centerX(), cell.centerY(),
                     10);
         }
+        renderer.end();
     }
 
     public float distTo(Cell cell) {
@@ -49,8 +61,25 @@ public class Cell {
                 Util.halfBetween(cell.x1, cell.x2), Util.halfBetween(cell.y1, cell.y2)
         );
     }
+
+    /**
+     * distance squared
+     */
+    public float distTo2(Cell cell) {
+        return Util.dist2(
+                Util.halfBetween(x1, x2), Util.halfBetween(y1, y2),
+                Util.halfBetween(cell.x1, cell.x2), Util.halfBetween(cell.y1, cell.y2)
+        );
+    }
     public float distTo(float x, float y){
         return Util.dist(Util.halfBetween(x1,x2), Util.halfBetween(y1,y2),x,y);
+    }
+
+    /**
+     * distance squared
+     */
+    public float distTo2(float x, float y){
+        return Util.dist2(Util.halfBetween(x1,x2), Util.halfBetween(y1,y2),x,y);
     }
     public float centerX(){
         return Util.halfBetween(x1,x2);
@@ -92,5 +121,19 @@ public class Cell {
             if(tendril.getChainLength()>newTendril.getChainLength())tendril.previous=newTendril.previous;
             return false;
         }
+    }
+    @Override
+    public String toString() {
+        return String.format("Cell#%d (%d, %d)x(%d, %d)",id,x1,y1,x2,y2);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Cell))return false;
+        Cell o=(Cell)obj;
+        return x1==o.x1&&
+                y1==o.y1&&
+                x2==o.x2&&
+                y2==o.y2;
     }
 }

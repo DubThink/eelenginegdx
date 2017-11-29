@@ -23,6 +23,9 @@ public class CInput extends Component {
     private int _on =0;
     private int _up =0;
 
+
+    public boolean enabled=true;
+
     public CInput down(int command){
         _down |=command;
         _on |=command;

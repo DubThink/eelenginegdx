@@ -1,6 +1,8 @@
 package com.eelengine.engine.ai;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
@@ -73,7 +75,8 @@ public class Navigation {
             System.err.println("Unable to load nav file \""+file+"\"");
         }
     }
-    public void drawNodes(ShapeRenderer renderer){
+    public void drawCells(ShapeRenderer renderer){
+        Gdx.gl.glEnable(GL20.GL_BLEND);
         for(Cell cell : cells){
             cell.draw(renderer);
         }
@@ -81,11 +84,11 @@ public class Navigation {
             cell.drawLinks(renderer);
         }
     }
-    public void printNodes(){
+    public void printCells(){
         for(Cell cell : cells)
             System.out.println(cell.toDataString());
     }
-    public void saveNodes(String filename){
+    public void saveCells(String filename){
         try {
             FileWriter writer = new FileWriter(filename);
             writer.write("// EelGame Nav file\n");
@@ -115,19 +118,19 @@ public class Navigation {
         }
         return true;
     }
-    public void makeNode(int x1, int y1, int x2, int y2){
+    public void makeCell(int x1, int y1, int x2, int y2){
         int newid=nextID++;
         cells.add(new Cell(newid,x1,y1,x2,y2));
     }
 
-    public Cell getNodeAt(Vector2 pos){
-        return getNodeAt(pos.x,pos.y);
+    public Cell getCellAt(Vector2 pos){
+        return getCellAt(pos.x,pos.y);
     }
     /**
      * If the coords are integer values, it gets the cell in the positive direction (by adding .5 to x and y)
      * @return
      */
-    public Cell getNodeAt(double x, double y){
+    public Cell getCellAt(float x, float y){
         if(x%1==0)x+=.5;
         if(y%1==0)y+=.5;
         for(Cell cell : cells){
@@ -135,7 +138,28 @@ public class Navigation {
         }
         return null;
     }
-    public void removeNode(Cell cell){
+    /**
+     * If the coords are integer values, it gets the cell in the positive direction (by adding .5 to x and y)
+     * @return
+     */
+    public Cell getCellNear(float x, float y){
+        if(x%1==0)x+=.5;
+        if(y%1==0)y+=.5;
+        for(Cell cell : cells){
+            if(cell.pointIn(x,y))return cell;
+        }
+        Cell nearest=null;
+        float dist=Float.MAX_VALUE;
+        for(Cell cell : cells){
+            if(cell.distTo2(x,y)<dist){
+                dist=cell.distTo2(x,y);
+                nearest=cell;
+            }
+        }
+        return nearest;
+    }
+
+    public void removeCell(Cell cell){
         cells.remove(cell);
         for(Cell cell2 : cells) {
             cell2.removeNeighbor(cell);
@@ -157,14 +181,19 @@ public class Navigation {
     // PATHFINDING
     public int maxNavSearchLength=1000;
 
-    public NavPath findPath(double x1, double y1, float x2, float y2){
-        resetNodes();
-        boolean dbg=true;
+    public NavPath findPath(Vector2 v1,Vector2 v2){
+        //System.out.println("Finding path from "+v1+" to "+v2);
+
+        return findPath(v1.x,v1.y,v2.x,v2.y);
+    }
+
+    public NavPath findPath(float x1, float y1, float x2, float y2){
+        resetCells();
+        boolean dbg=false;
         // STEP 1
         // find start and end cells
-        Cell startCell =getNodeAt(x1,y1);
-        Cell endCell =getNodeAt(x2,y2);
-        //TODO use getNodeNear so nav doesn't break on border cases
+        Cell startCell = getCellNear(x1,y1);
+        Cell endCell = getCellNear(x2,y2);
         if(startCell ==null|| endCell ==null)return null;
         if(startCell == endCell){
             //TODO return simple nav
@@ -193,7 +222,7 @@ public class Navigation {
         }
         return null;
     }
-    private void resetNodes(){
+    private void resetCells(){
         for(Cell cell : cells) cell.tendril=null;
     }
 
@@ -258,8 +287,8 @@ class Tendril{
         System.out.println("Tendril links to cell "+ cell.id+" with length "+getLength()+". Total chain length: "+getChainLength());
         if(previous!=null)previous.print();
     }
-    public void buildNodeChain(ArrayList<Cell> chain){
-        if(previous!=null)previous.buildNodeChain(chain);
+    public void buildCellChain(LinkedList<Cell> chain){
+        if(previous!=null)previous.buildCellChain(chain);
         if(cell !=null)chain.add(cell);
     }
 }

@@ -4,6 +4,7 @@ import bpw.Util;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Encapsulates an orthographic camera and controls zoom and position of the camera
@@ -82,5 +83,10 @@ public class CamController {
     }
     public void changeZoomLevel(int i){
         zoomLevel= Util.clamp(zoomLevel+i,ZOOM_MIN,ZOOM_MAX);
+    }
+    public Vector2 screenToWorld(float screenX, float screenY){
+        Vector3 wx=cam.unproject(new Vector3(screenX,screenY,0));
+        wx.scl(1/EelGame.GSCALE);
+        return new Vector2(wx.x,wx.y);
     }
 }
