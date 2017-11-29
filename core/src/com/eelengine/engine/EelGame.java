@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.eelengine.engine.ai.NavPath;
 import com.eelengine.engine.ai.Navigation;
 
 import java.text.SimpleDateFormat;
@@ -342,7 +341,7 @@ public class EelGame extends ApplicationAdapter {
                     }
                 })
                 .with(WorldConfigurationBuilder.Priority.LOWEST,new PhysicsSystem())
-                .with(new MovementInputSystem())
+                .with(new MovementSystem())
                 .with(new NavigationSystem(navigation,shapeRenderer))
                 .build();
         //entityConfig.
@@ -499,6 +498,12 @@ public class EelGame extends ApplicationAdapter {
 //                if(keycode==Input.Keys.F) EelGame.GSCALE=150-EelGame.GSCALE;
 
             }
+            // Zoom keys
+            else if(keycode==Input.Keys.MINUS){
+                camController.changeZoomLevel(1);
+            }else if(keycode==Input.Keys.EQUALS){
+                camController.changeZoomLevel(-1);
+            }
             // WASD
             else if(keycode==Input.Keys.W){
                 entInput.down(CInput.UP);
@@ -506,16 +511,18 @@ public class EelGame extends ApplicationAdapter {
                 entInput.down(CInput.LEFT);
             }else if(keycode==Input.Keys.S){
                 entInput.down(CInput.DOWN);
-            }else if(keycode==Input.Keys.D){
+            }else if(keycode==Input.Keys.D) {
                 entInput.down(CInput.RIGHT);
+            }else if(keycode==Input.Keys.Q){
+                entInput.enabled=!entInput.enabled;
             }
             else if(keycode==Input.Keys.Z){
                 /////////////
                 // TEST SPACE
-                Body body=statics.get(statics.size()-1);
-                if(body.getType()==BodyDef.BodyType.DynamicBody)
-                    body.setType(BodyDef.BodyType.StaticBody);
-                else body.setType(BodyDef.BodyType.DynamicBody);
+//                Body body=statics.get(statics.size()-1);
+//                if(body.getType()==BodyDef.BodyType.DynamicBody)
+//                    body.setType(BodyDef.BodyType.StaticBody);
+//                else body.setType(BodyDef.BodyType.DynamicBody);
 
                 /////////////
             }else if(keycode==Input.Keys.X) {

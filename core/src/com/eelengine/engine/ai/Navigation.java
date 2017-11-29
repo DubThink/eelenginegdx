@@ -192,9 +192,8 @@ public class Navigation {
         boolean dbg=false;
         // STEP 1
         // find start and end cells
-        Cell startCell = getCellAt(x1,y1);
-        Cell endCell = getCellAt(x2,y2);
-        //TODO use getCellNear so nav doesn't break on border cases
+        Cell startCell = getCellNear(x1,y1);
+        Cell endCell = getCellNear(x2,y2);
         if(startCell ==null|| endCell ==null)return null;
         if(startCell == endCell){
             //TODO return simple nav

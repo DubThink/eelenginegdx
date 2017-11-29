@@ -52,8 +52,10 @@ public class NavigationSystem extends IteratingSystem {
         renderer.begin(ShapeRenderer.ShapeType.Line);
         renderer.setColor(Color.RED);
         if (navigator.desiredMove.len2()!=0) {
-            //System.out.println("next vector:" + navigator.desiredMove);
-            renderer.line(transform.pos, navigator.desiredMove.add(transform.pos));
+//            System.out.println("next vector:" + navigator.desiredMove);
+            renderer.line(transform.pos.x,transform.pos.y,
+                    transform.pos.x+navigator.desiredMove.x,
+                    transform.pos.y+navigator.desiredMove.y);
         } else {
             renderer.circle(transform.pos.x, transform.pos.y, .2f);
         }
