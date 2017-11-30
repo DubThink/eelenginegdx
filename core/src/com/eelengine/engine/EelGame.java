@@ -259,7 +259,7 @@ public class EelGame extends ApplicationAdapter {
         COneTex cOneTex =ECS.mGraphics.create(e);
         CTransform cTransform = ECS.mTransform.create(e)
                 .setPos(x,y)
-                .setScale(1.5f)
+                .setScale(.9f)
                 .setRot((float)Math.random()*Util.TWO_PI_F);
         cOneTex.texture=img;
 
@@ -267,7 +267,7 @@ public class EelGame extends ApplicationAdapter {
         pc.buildBody(physicsWorld);
         pc.body.setType(BodyDef.BodyType.DynamicBody);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(.5f,.5f);
+        shape.setAsBox(.3f,.3f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
@@ -381,6 +381,7 @@ public class EelGame extends ApplicationAdapter {
             }
         });
 
+        // PLAYER/TEST CHARACTER
         ent=entityWorld.create();
 
         COneTex cOneTex =ECS.mGraphics.create(ent);
@@ -388,12 +389,12 @@ public class EelGame extends ApplicationAdapter {
         entInput = ECS.mInput.create(ent);
         cOneTex.texture=img;
         cTransform.pos.set(2,10);
-        cTransform.setScale(2.5f);
+        cTransform.setScale(1.25f);
         CPhysics pc=ECS.mPhysics.create(ent);
         pc.buildBody(physicsWorld);
         pc.body.setType(BodyDef.BodyType.DynamicBody);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1,1);
+        shape.setAsBox(.5f,.5f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
