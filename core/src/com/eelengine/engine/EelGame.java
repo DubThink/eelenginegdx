@@ -315,7 +315,8 @@ public class EelGame extends ApplicationAdapter {
         //pc.body.setLinearDamping(10);
         pc.body.setAngularDamping(1);
         pc.setFilter(PHYS.ONE,~PHYS.PLAYERTEAM);
-        ECS.mProjectile.create(e);
+        ECS.mProjectile.create(e)
+                .setLifetime(10);
         ECS.mDamager.create(e)
                 .set(10);
     }

@@ -19,8 +19,12 @@ public class UtilSystem extends IteratingSystem {
 
     @Override
     protected void process(int e) {
-        if(mProjectile.has(e)&&mTransform.has(e)&&
-                !Etil.inBounds(mTransform.get(e).pos,-40,-40,40,40))
+        mProjectile.get(e).age+=world.delta;
+        if(mProjectile.get(e).lifetime>0&&mProjectile.get(e).lifetime<=mProjectile.get(e).age){
             world.delete(e);
+        } else if(/*mProjectile.has(e)&&*/mTransform.has(e)&&
+            !Etil.inBounds(mTransform.get(e).pos,-40,-40,40,40)) {
+            world.delete(e);
+        }
     }
 }
