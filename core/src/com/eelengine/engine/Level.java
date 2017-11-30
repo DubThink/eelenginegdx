@@ -30,7 +30,7 @@ public class Level {
         myBodyDef.position.set(x1,y1);
         Body body=physicsWorld.createBody(myBodyDef);
         PolygonShape shape=new PolygonShape();
-        shape.setAsBox(x2-x1,y2-y1, Vector2.Zero,rot);
+        shape.setAsBox((x2-x1)/2,(y2-y1)/2, new Vector2(x1-x2,y1-y2).scl(0.5f),rot);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
