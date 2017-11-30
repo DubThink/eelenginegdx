@@ -41,6 +41,7 @@ public class EelGame extends ApplicationAdapter {
     Box2DDebugRenderer debugRenderer;
     Sound screenshotSound;
     Navigation navigation;
+    Level currentLevel;
 //    NavPath navPath;
     int entityCount;
 
@@ -72,6 +73,7 @@ public class EelGame extends ApplicationAdapter {
         setupECS();
         FontKit.initFonts();
         debugRenderer = new Box2DDebugRenderer();
+        currentLevel=new Level(physicsWorld);
 //        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
 //                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
 	}
@@ -519,10 +521,8 @@ public class EelGame extends ApplicationAdapter {
             else if(keycode==Input.Keys.Z){
                 /////////////
                 // TEST SPACE
-//                Body body=statics.get(statics.size()-1);
-//                if(body.getType()==BodyDef.BodyType.DynamicBody)
-//                    body.setType(BodyDef.BodyType.StaticBody);
-//                else body.setType(BodyDef.BodyType.DynamicBody);
+                Vector2 mouseLoc=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
+                currentLevel.addWall(mouseLoc.x,mouseLoc.y,mouseLoc.x+5,mouseLoc.y+.25f);
 
                 /////////////
             }else if(keycode==Input.Keys.X) {

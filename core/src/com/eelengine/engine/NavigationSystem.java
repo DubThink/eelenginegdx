@@ -6,6 +6,7 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.eelengine.engine.ai.Navigation;
+import com.sun.istack.internal.NotNull;
 
 /**
  * Updates the physics system based on transform.
@@ -16,7 +17,7 @@ public class NavigationSystem extends IteratingSystem {
 //    ComponentMapper<CPhysics> mPhysics; // injected automatically.
     ShapeRenderer renderer;
     Navigation navigation;
-    public NavigationSystem(Navigation navigation,ShapeRenderer renderer) {
+    public NavigationSystem(@NotNull Navigation navigation, ShapeRenderer renderer) {
         super(Aspect.all(CNavigator.class,CTransform.class));
         if(navigation==null)throw new NullPointerException("navigation must not be null");
         this.navigation=navigation;
