@@ -45,6 +45,8 @@ public class Editor {
             brush.render(worldBatch,new Color(.2f,.2f,.0f,.4f));
         }
         worldBatch.end();
+        Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
+        snap(wp);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for(Brush brush:brushes){
             if(brush==selected)continue;
@@ -59,8 +61,7 @@ public class Editor {
             selected.render(shapeRenderer,Color.ORANGE,selIdx,altSelIdx,camController.getZoomFactor());
         }
 
-        Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
-        snap(wp);
+
         if(selected!=null&&mouseDown&&!shiftKey){
             if(selIdx>=0) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -101,7 +102,7 @@ public class Editor {
         mouseDown=true;
         Vector2 wp=camController.screenToWorld(screenX,screenY);
         startPos.set(wp);
-        snap(wp);
+        //snap(wp);
         //check selected brush first
 
         if(selected!=null) {
@@ -120,14 +121,8 @@ public class Editor {
         //if that fails, check for a vertex
         for(Brush brush:brushes){
             if(brush.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
-                if(!shiftKey){
-                    selected=brush;
-                    mSelected.clear();
-                    mSelected.add(selected);
-                    selIdx = selected.getNearestVertIdx(wp.x, wp.y);
-                }else{
-                    mSelected.add(brush);
-                }
+                selected=brush;
+                selIdx = selected.getNearestVertIdx(wp.x, wp.y);
                 return;
             }
         }
@@ -144,18 +139,7 @@ public class Editor {
         }
         selIdx=-1;
         altSelIdx=-1;
-        if(nearest==null){
-            selected=null;
-            mSelected.clear();
-        }
-        if(!shiftKey){
-            selected=nearest;
-            mSelected.clear();
-            mSelected.add(selected);
-            selIdx = selected.getNearestVertIdx(wp.x, wp.y);
-        }else{
-            mSelected.add(nearest);
-        }
+        selected=nearest;
     }
 
     public void mouseUp(int screenX, int screenY,int button){

@@ -194,8 +194,11 @@ public class Brush {
         c=new Vector2(c).sub(pos);
         int n=0;
         Vector2 d=new Vector2(10000f,10000f);
+        System.out.println("-");
         for(int i=0;i<verts.size();i++){
-            if(Util.intersect(verts.get(i),verts.get((i+1)%verts.size()),c,d))n++;
+            boolean intersect=Util.intersect(verts.get(i),verts.get((i+1)%verts.size()),c,d);
+            if(intersect)n++;
+            System.out.println(verts.get(i)+" "+verts.get((i+1)%verts.size())+" "+c+" "+d+" "+intersect);
         }
         return n%2==1;
     }
