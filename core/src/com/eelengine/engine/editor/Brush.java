@@ -13,23 +13,29 @@ import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.math.Vector2;
 import com.eelengine.engine.EelGame;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Brush {
+public class Brush implements Serializable {
+
     private ArrayList<Vector2> verts=new ArrayList<>();
-    private boolean floatArrayFresh=false;
-    private float[] _floatArray;
+    private transient boolean floatArrayFresh=false;
+    private transient float[] _floatArray;
     public boolean hidden=false;
 
-    private boolean polyFresh=false;
-    private EarClippingTriangulator earClipper=new EarClippingTriangulator();
-    private PolygonRegion polygonRegion;
+    private static EarClippingTriangulator earClipper=new EarClippingTriangulator();
+    private transient PolygonRegion polygonRegion=null;
 
     Vector2 pos=new Vector2(0,0);
 //    PolygonSpriteBatch polyBatch = new PolygonSpriteBatch(); // To assign at the beginning
-    Texture textureSolid;
-
+    private static Texture textureSolid;
+    public static void init(){
+        Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pix.setColor(0xDEADBEFF); // DE is red, AD is green and BE is blue.
+        pix.fill();
+        textureSolid = new Texture(pix);
+    }
 //    public Brush(Brush toCopy){
 //        this();
 //        hidden=toCopy.hidden;
@@ -52,26 +58,17 @@ public class Brush {
     }
 
     public Brush(Vector2 ... verts){
-        this();
         Collections.addAll(this.verts,verts);
-    }
-
-
-    public Brush() {
-        Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pix.setColor(0xDEADBEFF); // DE is red, AD is green and BE is blue.
-        pix.fill();
-        textureSolid = new Texture(pix);
     }
 
     public void render(PolygonSpriteBatch batch, Color fill){
         boolean renderActive=batch.isDrawing();
-        if(!polyFresh){
+        //if(polygonRegion==null){ //TODO make efficient
             polygonRegion=new PolygonRegion(new TextureRegion(textureSolid),
                     getFloatArray(),
                     earClipper.computeTriangles(getFloatArray()).toArray());
             //poly=new PolygonSprite(polygonRegion);
-        }
+        //}
         if(!renderActive)batch.begin();
 //        for(float f:polygonRegion.getVertices())
 //            System.out.print(f+", ");
@@ -80,7 +77,8 @@ public class Brush {
 //            System.out.print(f+", ");
 //        System.out.println();
         batch.setColor(fill);
-        batch.draw(polygonRegion,pos.x*EelGame.GSCALE,pos.y*EelGame.GSCALE,0,0,
+        batch.draw(polygonRegion,
+                pos.x*EelGame.GSCALE,pos.y*EelGame.GSCALE,0,0,
                 polygonRegion.getRegion().getRegionWidth(),
                 polygonRegion.getRegion().getRegionHeight(),
                 EelGame.GSCALE,EelGame.GSCALE,0);
@@ -234,5 +232,14 @@ public class Brush {
         if(a==0&&b==verts.size())return true;
         if(b==0&&a==verts.size())return true;
         return a-b==-1||a-b==1;
+    }
+
+    @Override
+    public String toString() {
+        String s="Brush[";
+        for(Vector2 v:verts){
+            s+="("+v.x+","+v.y+"),";
+        }
+        return s+"]";
     }
 }

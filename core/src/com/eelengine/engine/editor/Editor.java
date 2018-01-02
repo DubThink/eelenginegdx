@@ -13,6 +13,7 @@ import com.eelengine.engine.Etil;
 import com.eelengine.engine.FontKit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 
 public class Editor {
@@ -49,7 +50,7 @@ public class Editor {
         snap(wp);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for(Brush brush:brushes){
-            if(brush==selected)continue;
+            if(mSelected.contains(brush))continue;
 //            if(brush.isPointIn(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())))
 //                brush.render(shapeRenderer,Color.GREEN,-1,camController.getZoomFactor());
 //            else
@@ -291,5 +292,13 @@ public class Editor {
                 }
             }
         }
+    }
+
+    public ArrayList<Brush> getBrushes() {
+        return brushes;
+    }
+
+    public void addBrushes(ArrayList<Brush> brushes){
+        this.brushes.addAll(brushes);
     }
 }
