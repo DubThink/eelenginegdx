@@ -87,6 +87,10 @@ public class Util {
     public static double dist2(double x1, double y1, double x2, double y2){
         return Math.pow(x2-x1,2)+Math.pow(y2-y1,2);
     }
+    public static Vector2 halfBetween(Vector2 a, Vector2 b){
+        return new Vector2(halfBetween(a.x,b.x),halfBetween(a.y,b.y));
+    }
+
     public static float halfBetween(float a, float b){
         return a+((b-a)/2.0f);
     }

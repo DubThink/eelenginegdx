@@ -9,22 +9,29 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.eelengine.engine.CamController;
+import com.eelengine.engine.Etil;
 import com.eelengine.engine.FontKit;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Editor {
-    ArrayList<Brush> brushes=new ArrayList<>();
-    Brush selected=null;
-    int selIdx=-1;
+    private ArrayList<Brush> brushes=new ArrayList<>();
+    private HashSet<Brush> mSelected=new HashSet<>();
+    private boolean multiSelected=false;
+    private Brush selected=null;
+    private int selIdx=-1;
+    //Brush altSelected=null;
+    private int altSelIdx=-1;
     boolean snapOn=true;
     public int snapLevel=-2;
     float selectThreshold=0.12f;
-    private float mouseDownX=0,mouseDownY=0;
+    private float mouseDownX=0, mouseDownY=0;
+    private Vector2 startPos=new Vector2();
     private boolean mouseDown=false;
     public CamController camController;
-    String errormsg="";
-    float errorCooldown=0;
+    private String errormsg="";
+    private float errorCooldown=0;
 
     public Editor(CamController camController) {
         this.camController = camController;
@@ -44,25 +51,32 @@ public class Editor {
 //            if(brush.isPointIn(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())))
 //                brush.render(shapeRenderer,Color.GREEN,-1,camController.getZoomFactor());
 //            else
-                brush.render(shapeRenderer,Color.YELLOW,-1,camController.getZoomFactor());
+                brush.render(shapeRenderer,Color.YELLOW,-1,-1,camController.getZoomFactor());
         }
         shapeRenderer.end();
         if(selected!=null){
             selected.render(worldBatch,new Color(.4f,.0f,.0f,.5f));
-            selected.render(shapeRenderer,Color.ORANGE,selIdx,camController.getZoomFactor());
+            selected.render(shapeRenderer,Color.ORANGE,selIdx,altSelIdx,camController.getZoomFactor());
         }
 
         Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
         snap(wp);
-        if(selected!=null&&selIdx>=0&&mouseDown){
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.CYAN);
-            shapeRenderer.line(selected.getVert(selIdx-1),wp);
-            shapeRenderer.line(selected.getVert(selIdx+1),wp);
-            float screenScale=camController.getZoomFactor()/30;
-            shapeRenderer.rect(wp.x-screenScale,wp.y-screenScale,
-                    screenScale*2,screenScale*2);
-            shapeRenderer.end();
+        if(selected!=null&&mouseDown&&!shiftKey){
+            if(selIdx>=0) {
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                shapeRenderer.setColor(Color.CYAN);
+                shapeRenderer.line(new Vector2(selected.getVert(selIdx - 1)).add(selected.pos), wp);
+                shapeRenderer.line(new Vector2(selected.getVert(selIdx + 1)).add(selected.pos), wp);
+                float screenScale = camController.getZoomFactor() / 30;
+                shapeRenderer.rect(wp.x - screenScale, wp.y - screenScale,
+                        screenScale * 2, screenScale * 2);
+                shapeRenderer.end();
+            }else{
+                Vector2 wp2=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
+                Vector2 dp=new Vector2(wp2.x-startPos.x,wp2.y-startPos.y);
+                snap(dp);
+                selected.render(shapeRenderer,Color.CYAN,-1,-1,camController.getZoomFactor(),dp);
+            }
         }
         // -------- UI -------- //
         interfaceBatch.begin();
@@ -86,9 +100,18 @@ public class Editor {
         mouseDownY=screenY;
         mouseDown=true;
         Vector2 wp=camController.screenToWorld(screenX,screenY);
+        startPos.set(wp);
         snap(wp);
         //check selected brush first
+
         if(selected!=null) {
+            if(shiftKey){
+                if(selected.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
+                    altSelIdx = selected.getNearestVertIdx(wp.x, wp.y);
+                    return;
+                }
+            }
+            altSelIdx=-1;
             if(selected.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
                 selIdx = selected.getNearestVertIdx(wp.x, wp.y);
                 return;
@@ -97,8 +120,14 @@ public class Editor {
         //if that fails, check for a vertex
         for(Brush brush:brushes){
             if(brush.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
-                selected=brush;
-                selIdx = selected.getNearestVertIdx(wp.x, wp.y);
+                if(!shiftKey){
+                    selected=brush;
+                    mSelected.clear();
+                    mSelected.add(selected);
+                    selIdx = selected.getNearestVertIdx(wp.x, wp.y);
+                }else{
+                    mSelected.add(brush);
+                }
                 return;
             }
         }
@@ -114,15 +143,35 @@ public class Editor {
                 nearest=brush;
         }
         selIdx=-1;
-        selected=nearest;
+        altSelIdx=-1;
+        if(nearest==null){
+            selected=null;
+            mSelected.clear();
+        }
+        if(!shiftKey){
+            selected=nearest;
+            mSelected.clear();
+            mSelected.add(selected);
+            selIdx = selected.getNearestVertIdx(wp.x, wp.y);
+        }else{
+            mSelected.add(nearest);
+        }
     }
+
     public void mouseUp(int screenX, int screenY,int button){
         if(button!=0)return; //ignore left clicks
         mouseDown=false;
         if(Math.abs(mouseDownX-screenX)<10&&Math.abs(mouseDownY-screenY)<10)return;
         Vector2 wp=camController.screenToWorld(screenX,screenY);
+        Vector2 dp=new Vector2(wp.x-startPos.x,wp.y-startPos.y);
+        snap(dp);
         snap(wp);
-        if(selected!=null&&selIdx>=0)selected.setVert(wp.x,wp.y,selIdx);
+        if(selected!=null){
+            if(selIdx>=0)selected.setVert(wp.x,wp.y,selIdx);
+            else{
+                selected.pos.add(dp);
+            }
+        }
     }
     /** returns false if brush already exists */
     public boolean addBrush(Brush brush){
@@ -151,7 +200,7 @@ public class Editor {
         ArrayList<Body> ret=new ArrayList<>();
         for(Brush brush:brushes) {
             BodyDef myBodyDef = new BodyDef();
-            myBodyDef.position.set(0, 0);
+            myBodyDef.position.set(brush.pos);
             Body body = world.createBody(myBodyDef);
             PolygonShape shape = new PolygonShape();
             shape.set(brush.getFloatArray());
@@ -165,23 +214,26 @@ public class Editor {
         return ret;
     }
 
-    public void shiftDown(){}
-    public void shiftUp(){}
+    private boolean shiftKey=false;//,ctrlKey=false;
+    public void shiftDown(){shiftKey=true;}
+    public void shiftUp(){shiftKey=false;}
+//    public void ctrlDown(){}
+//    public void ctrlUp(){}
     public void error(String errormsg){
         this.errormsg=errormsg;
         this.errorCooldown=6;
     }
-    public void addVert(){
-        if(selected!=null) {
-            if(selected.getCount()>=8) {
-                error("Cannot have a brush with more than 8 verts");
-            }else {
-                Vector2 wp = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
-                snap(wp);
-                selected.addVert(wp);
-            }
-        }
-    }
+//    public void addVert(){
+//        if(selected!=null) {
+//            if(selected.getCount()>=8) {
+//                error("Cannot have a brush with more than 8 verts");
+//            }else {
+//                Vector2 wp = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
+//                snap(wp);
+//                selected.addVert(wp);
+//            }
+//        }
+//    }
 
     public void delete(){
         if(selected!=null){
@@ -196,6 +248,37 @@ public class Editor {
             else{
                 brushes.remove(selected);
                 selected=null;
+            }
+        }
+    }
+    public void centerOrigin(){
+        if(shiftKey){
+            for(Brush brush:brushes)brush.centerOrigin();
+        }
+        else if(selected!=null)selected.centerOrigin();
+    }
+
+    public void split(){
+        if(selected!=null&&altSelIdx>=0){
+            int a=selIdx;
+            int b=altSelIdx;
+            if(a>b){//swap so b is greatest
+                int tmp=a;
+                a=b;
+                b=tmp;
+            }
+            if(!selected.areNeighbors(selIdx,altSelIdx)){
+                {
+                    brushes.add(new Brush(selected.getFloatArray(),a,b));
+                    for(int i=a+1;i<b;i++)selected.removeVert(a+1);
+                }
+            }else{ // are neighbors, try subdivide
+                if(selected.getCount()>=8) {
+                    error("Cannot have a brush with more than 8 verts");
+                }else {
+                    Vector2 half=new Vector2(Util.halfBetween(selected.getVert(a),selected.getVert(b)));
+                    selected.addVert(half,a+1);
+                }
             }
         }
     }

@@ -32,12 +32,12 @@ import java.util.Date;
 public class EelGame extends ApplicationAdapter {
     // CONSTANTS
     public static final float GSCALE=100;
-	PolygonSpriteBatch worldBatch;
-	SpriteBatch interfaceBatch;
-	ShapeRenderer shapeRenderer;
-	com.artemis.World entityWorld;
-	Texture img,img2;
-	Texture bkdimg;
+    PolygonSpriteBatch worldBatch;
+    SpriteBatch interfaceBatch;
+    ShapeRenderer shapeRenderer;
+    com.artemis.World entityWorld;
+    Texture img,img2;
+    Texture bkdimg;
     OrthographicCamera interfaceCam;
     CamController camController;
     Viewport viewport;
@@ -45,7 +45,7 @@ public class EelGame extends ApplicationAdapter {
     Sound screenshotSound;
     Navigation navigation;
     Level currentLevel;
-//    NavPath navPath;
+    //    NavPath navPath;
     int entityCount;
     Editor editor=null;
     boolean editorEnabled =false;
@@ -64,8 +64,8 @@ public class EelGame extends ApplicationAdapter {
     // Temp physics testing
 
 
-	@Override
-	public void create () {
+    @Override
+    public void create () {
         img = new Texture(Gdx.files.internal("Eel_E_64x.png"),true);
         img2 = new Texture(Gdx.files.internal("blic_32x.png"),true);
         img.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
@@ -82,7 +82,7 @@ public class EelGame extends ApplicationAdapter {
         currentLevel=new Level(physicsWorld);
 //        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
 //                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
-	}
+    }
 
     @Override
     public void resize(int width,int height){
@@ -164,8 +164,8 @@ public class EelGame extends ApplicationAdapter {
         }
         shapeRenderer.identity();
     }
-	@Override
-	public void render () {
+    @Override
+    public void render () {
         handleInput();
 
         // clear graphics
@@ -203,7 +203,7 @@ public class EelGame extends ApplicationAdapter {
 //                    new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
 //            if(navPath!=null)navPath.draw(shapeRenderer);
 ////            else System.out.println("NO NAV");
-            entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
+        entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
 //        }
 
         // Editor
@@ -248,19 +248,19 @@ public class EelGame extends ApplicationAdapter {
         if(Gdx.graphics.getFrameId()%60==0){
             makeBloob((int)((Math.random()-0.5)*40),(int)((Math.random()-0.5)*40));
         }
-	}
+    }
 
-	int ent;
+    int ent;
     CInput entInput;
     CNavigator entNavigator;
-	@Override
-	public void dispose () {
+    @Override
+    public void dispose () {
         System.out.println("CLEANING UP FOR EXIT");
         entityWorld.dispose();
-		worldBatch.dispose();
-		physicsWorld.dispose();
-		img.dispose();
-		FontKit.dispose();
+        worldBatch.dispose();
+        physicsWorld.dispose();
+        img.dispose();
+        FontKit.dispose();
         System.out.println("EXITING");
     }
 
@@ -474,7 +474,7 @@ public class EelGame extends ApplicationAdapter {
     }
 
     void setupRendering(){
-	    // Renderers
+        // Renderers
         worldBatch = new PolygonSpriteBatch();
         interfaceBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
@@ -520,6 +520,10 @@ public class EelGame extends ApplicationAdapter {
 
         @Override
         public boolean keyDown(int keycode) {
+            if(keycode==Input.Keys.SHIFT_LEFT){
+                editor.shiftDown();
+            }
+
             if (keycode == Input.Keys.ESCAPE) {
                 escapeMenu = !escapeMenu;
             }else if (Gdx.input.isKeyPressed(Input.Keys.F3)) {
@@ -568,8 +572,7 @@ public class EelGame extends ApplicationAdapter {
                 screenshotSound.play();
             }else if(editor!=null&&editorEnabled){
                 editorKeyDown(keycode);
-            }
-            gameKeyDown(keycode);
+            }else gameKeyDown(keycode);
             return true;
         }
 
@@ -585,8 +588,12 @@ public class EelGame extends ApplicationAdapter {
                 tempWorld=editor.buildStatics(physicsWorld);
             }else if(keycode == Input.Keys.BACKSPACE||keycode == Input.Keys.FORWARD_DEL||keycode == Input.Keys.X){
                 editor.delete();
-            }else if(keycode == Input.Keys.A){
-                editor.addVert();
+//            }else if(keycode == Input.Keys.A){
+//                editor.addVert();
+            }else if(keycode == Input.Keys.O){
+                editor.centerOrigin();
+            }else if(keycode == Input.Keys.S){
+                editor.split();
             }
         }
 
@@ -617,6 +624,10 @@ public class EelGame extends ApplicationAdapter {
         }
         @Override
         public boolean keyUp(int keycode) {
+            if(keycode==Input.Keys.SHIFT_LEFT){
+                editor.shiftUp();
+            }
+
             if (keycode == Input.Keys.W) {
                 entInput.up(CInput.UP);
             } else if (keycode == Input.Keys.A) {
@@ -677,4 +688,4 @@ public class EelGame extends ApplicationAdapter {
             return false;
         }
     }
-}
+}  
