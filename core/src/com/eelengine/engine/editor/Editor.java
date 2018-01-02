@@ -56,9 +56,9 @@ public class Editor {
                 brush.render(shapeRenderer,Color.YELLOW,-1,-1,camController.getZoomFactor());
         }
         shapeRenderer.end();
-        if(selected!=null){
-            selected.render(worldBatch,new Color(.4f,.0f,.0f,.5f));
-            selected.render(shapeRenderer,Color.ORANGE,selIdx,altSelIdx,camController.getZoomFactor());
+        for(Brush brush:mSelected){
+            brush.render(worldBatch,new Color(.4f,.0f,.0f,.5f));
+            brush.render(shapeRenderer,Color.ORANGE,selIdx,altSelIdx,camController.getZoomFactor());
         }
 
 
@@ -76,7 +76,8 @@ public class Editor {
                 Vector2 wp2=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
                 Vector2 dp=new Vector2(wp2.x-startPos.x,wp2.y-startPos.y);
                 snap(dp);
-                selected.render(shapeRenderer,Color.CYAN,-1,-1,camController.getZoomFactor(),dp);
+                for(Brush brush:mSelected)
+                    brush.render(shapeRenderer,Color.CYAN,-1,-1,camController.getZoomFactor(),dp);
             }
         }
         // -------- UI -------- //
@@ -103,9 +104,9 @@ public class Editor {
         Vector2 wp=camController.screenToWorld(screenX,screenY);
         startPos.set(wp);
         //snap(wp);
-        //check selected brush first
 
-        if(selected!=null) {
+        //check selected brush's verts first
+        if(selected!=null&&mSelected.size()<=1) {
             if(shiftKey){
                 if(selected.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
                     altSelIdx = selected.getNearestVertIdx(wp.x, wp.y);
@@ -120,9 +121,15 @@ public class Editor {
         }
         //if that fails, check for a vertex
         for(Brush brush:brushes){
+            if(mSelected.size()>1&&mSelected.contains(brush))continue; // Don't select a vert of a multi-selection
             if(brush.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
                 selected=brush;
-                selIdx = selected.getNearestVertIdx(wp.x, wp.y);
+                if(!shiftKey) {
+                    mSelected.clear();
+                    selIdx = selected.getNearestVertIdx(wp.x, wp.y);
+                }
+                mSelected.add(selected);
+
                 return;
             }
         }
@@ -137,9 +144,17 @@ public class Editor {
             if(brush.getDistToNearestVert2(wp.x,wp.y)<ndist)
                 nearest=brush;
         }
-        selIdx=-1;
-        altSelIdx=-1;
-        selected=nearest;
+
+        if(nearest==null){
+            // absolutely nothing was selected
+            mSelected.clear();
+        } else {
+            selIdx=-1;
+            altSelIdx=-1;
+            selected=nearest;
+            if(!shiftKey&&!mSelected.contains(nearest))mSelected.clear();
+            mSelected.add(nearest);
+        }
     }
 
     public void mouseUp(int screenX, int screenY,int button){
@@ -153,7 +168,8 @@ public class Editor {
         if(selected!=null){
             if(selIdx>=0)selected.setVert(wp.x,wp.y,selIdx);
             else{
-                selected.pos.add(dp);
+                for(Brush brush:mSelected)
+                    brush.pos.add(dp);
             }
         }
     }
@@ -173,6 +189,8 @@ public class Editor {
     public void selectBrushByNum(int num){
         if(num<0||num>=brushes.size())return;
         selected=brushes.get(num);
+        mSelected.clear();
+        mSelected.add(selected);
     }
     void snap(Vector2 v){
         if(snapOn){
@@ -230,7 +248,8 @@ public class Editor {
                 }
             }
             else{
-                brushes.remove(selected);
+                for(Brush brush:mSelected)brushes.remove(brush);
+                mSelected.clear();
                 selected=null;
             }
         }
@@ -239,7 +258,12 @@ public class Editor {
         if(shiftKey){
             for(Brush brush:brushes)brush.centerOrigin();
         }
-        else if(selected!=null)selected.centerOrigin();
+        else{
+            if(mSelected.size()<=1&&selected!=null&&selIdx>=0){
+                selected.setOrigin(new Vector2(selected.getVert(selIdx)));
+            }
+            else for(Brush brush:mSelected)brush.centerOrigin();
+        }
     }
 
     public void split(){
@@ -261,6 +285,8 @@ public class Editor {
                     error("Cannot have a brush with more than 8 verts");
                 }else {
                     Vector2 half=new Vector2(Util.halfBetween(selected.getVert(a),selected.getVert(b)));
+                    half.add(selected.pos);
+                    System.out.println(selected.getVert(a)+" "+selected.getVert(b)+" "+half);
                     selected.addVert(half,a+1);
                 }
             }

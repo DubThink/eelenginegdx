@@ -194,11 +194,11 @@ public class Brush {
         c=new Vector2(c).sub(pos);
         int n=0;
         Vector2 d=new Vector2(10000f,10000f);
-        System.out.println("-");
+//        System.out.println("-");
         for(int i=0;i<verts.size();i++){
             boolean intersect=Util.intersect(verts.get(i),verts.get((i+1)%verts.size()),c,d);
             if(intersect)n++;
-            System.out.println(verts.get(i)+" "+verts.get((i+1)%verts.size())+" "+c+" "+d+" "+intersect);
+//            System.out.println(verts.get(i)+" "+verts.get((i+1)%verts.size())+" "+c+" "+d+" "+intersect);
         }
         return n%2==1;
     }
@@ -218,9 +218,13 @@ public class Brush {
         }
         sum.scl(1f/verts.size());
 //        System.out.println("new center: "+sum);
-        pos.add(sum);
+        setOrigin(sum);
+    }
+
+    public void setOrigin(Vector2 origin){
+        pos.add(origin);
         for(Vector2 vert:verts){
-            vert.sub(sum);
+            vert.sub(origin);
         }
         floatArrayFresh=false;
     }
