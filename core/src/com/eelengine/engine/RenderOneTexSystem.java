@@ -7,6 +7,7 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 
@@ -17,8 +18,8 @@ public class RenderOneTexSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.
     ComponentMapper<COneTex> mGraphics; // injected automatically.
     ComponentMapper<CHealth> mHealth; // injected automatically.
-    SpriteBatch renderBatch;
-    public RenderOneTexSystem(SpriteBatch renderBatch) {
+    PolygonSpriteBatch renderBatch;
+    public RenderOneTexSystem(PolygonSpriteBatch renderBatch) {
         super(Aspect.all(COneTex.class,CTransform.class));
         assert renderBatch!=null;
         this.renderBatch=renderBatch;

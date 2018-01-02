@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
  * @author Benjamin Welsh
  */
 public class FontKit {
-    static BitmapFont SysSmall, SysMedium, SysLarge, SysHuge;
+    public static BitmapFont SysSmall, SysMedium, SysLarge, SysHuge;
     public static void initFonts(){
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arial.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();

@@ -87,6 +87,10 @@ public class Util {
     public static double dist2(double x1, double y1, double x2, double y2){
         return Math.pow(x2-x1,2)+Math.pow(y2-y1,2);
     }
+    public static Vector2 halfBetween(Vector2 a, Vector2 b){
+        return new Vector2(halfBetween(a.x,b.x),halfBetween(a.y,b.y));
+    }
+
     public static float halfBetween(float a, float b){
         return a+((b-a)/2.0f);
     }
@@ -186,21 +190,21 @@ public class Util {
      * two lines of length 0 cannot intersect.
      * @return
      */
-//    public static boolean intersect(Point a, Point b, Point c, Point d){
-//        double denom=(d.y-c.y)*(b.x-a.x)-(d.x-c.x)*(b.y-a.y);
-//        double ua=(d.x-c.x)*(a.y-c.y)-(d.y-c.y)*(a.x-c.x);
-//        double ub=(b.x-a.x)*(a.y-c.y)-(b.y-a.y)*(a.x-c.x);
-//        if(denom==0){
-//            if(ua==0&&ub==0){
-//                return Util.aabb(a.x,a.y,b.x,b.y,c.x,c.y,d.x,d.y);
-//            }
-//            // Parallel
-//            //println("FF",ua, ub);
-//        }
-//        ua/=denom;
-//        ub/=denom;
-//        return (0<ua&&ua<1&&0<ub&&ub<1);
-//    }
+    public static boolean intersect(Vector2 a, Vector2 b, Vector2 c, Vector2 d){
+        double denom=(d.y-c.y)*(b.x-a.x)-(d.x-c.x)*(b.y-a.y);
+        double ua=(d.x-c.x)*(a.y-c.y)-(d.y-c.y)*(a.x-c.x);
+        double ub=(b.x-a.x)*(a.y-c.y)-(b.y-a.y)*(a.x-c.x);
+        if(denom==0){
+            if(ua==0&&ub==0){
+                return Util.aabb(a.x,a.y,b.x,b.y,c.x,c.y,d.x,d.y);
+            }
+            // Parallel
+            //println("FF",ua, ub);
+        }
+        ua/=denom;
+        ub/=denom;
+        return (0<ua&&ua<1&&0<ub&&ub<1);
+    }
 //    /**
 //     * True if line (a,b) intersects (c,d) inclusive;
 //     * If one line is length 0 and on the other line, returns true;
