@@ -9,20 +9,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.eelengine.engine.CamController;
-import com.eelengine.engine.Etil;
 import com.eelengine.engine.FontKit;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 
 public class Editor {
-    private ArrayList<Brush> brushes=new ArrayList<>();
+    private LevelSource source=new LevelSource();
     private HashSet<Brush> mSelected=new HashSet<>();
-    private boolean multiSelected=false;
     private Brush selected=null;
     private int selIdx=-1;
-    //Brush altSelected=null;
     private int altSelIdx=-1;
     boolean snapOn=true;
     public int snapLevel=-2;
@@ -41,7 +37,7 @@ public class Editor {
     public void render(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch){
         // -------- RENDER brushes -------- //
         worldBatch.begin();
-        for(Brush brush:brushes){
+        for(Brush brush: source.brushes){
             if(brush==selected)continue;
             brush.render(worldBatch,new Color(.2f,.2f,.0f,.4f));
         }
@@ -49,7 +45,7 @@ public class Editor {
         Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
         snap(wp);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for(Brush brush:brushes){
+        for(Brush brush: source.brushes){
             if(mSelected.contains(brush))continue;
 //            if(brush.isPointIn(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())))
 //                brush.render(shapeRenderer,Color.GREEN,-1,camController.getZoomFactor());
@@ -61,7 +57,6 @@ public class Editor {
             brush.render(worldBatch,new Color(.4f,.0f,.0f,.5f));
             brush.render(shapeRenderer,Color.ORANGE,selIdx,altSelIdx,camController.getZoomFactor());
         }
-
 
         if(selected!=null&&mouseDown&&!shiftKey){
             if(selIdx>=0) {
@@ -121,7 +116,7 @@ public class Editor {
             }
         }
         //if that fails, check for a vertex
-        for(Brush brush:brushes){
+        for(Brush brush: source.brushes){
             if(mSelected.size()>1&&mSelected.contains(brush))continue; // Don't select a vert of a multi-selection
             if(brush.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
                 selected=brush;
@@ -137,7 +132,7 @@ public class Editor {
         // if that fails, check for a Brush
         Brush nearest=null;
         float ndist=1*camController.getZoomFactor();
-        for(Brush brush:brushes){
+        for(Brush brush: source.brushes){
             if(brush.isPointIn(wp)){
                 nearest=brush;
                 break;
@@ -148,6 +143,9 @@ public class Editor {
 
         if(nearest==null){
             // absolutely nothing was selected
+            selected=null;
+            selIdx=-1;
+            altSelIdx=-1;
             mSelected.clear();
         } else {
             selIdx=-1;
@@ -176,24 +174,24 @@ public class Editor {
     }
     /** returns false if brush already exists */
     public boolean addBrush(Brush brush){
-        if(!brushes.contains(brush)){
-            brushes.add(brush);
+        if(!source.brushes.contains(brush)){
+            source.brushes.add(brush);
             return true;
         }else return false;
     }
     public void addBrush(float[] verts){
-        brushes.add(new Brush(verts));
+        source.brushes.add(new Brush(verts));
     }
     public void addBrush(Vector2 ... verts){
-        brushes.add(new Brush(verts));
+        source.brushes.add(new Brush(verts));
     }
     public void selectBrushByNum(int num){
-        if(num<0||num>=brushes.size())return;
-        selected=brushes.get(num);
+        if(num<0||num>= source.brushes.size())return;
+        selected= source.brushes.get(num);
         mSelected.clear();
         mSelected.add(selected);
     }
-    void snap(Vector2 v){
+    private void snap(Vector2 v){
         if(snapOn){
             v.set(Util.round(v.x,(float)Math.pow(2,snapLevel)),Util.round(v.y,(float)Math.pow(2,snapLevel)));
         }
@@ -201,7 +199,7 @@ public class Editor {
 
     public ArrayList<Body> buildStatics(World world){
         ArrayList<Body> ret=new ArrayList<>();
-        for(Brush brush:brushes) {
+        for(Brush brush: source.brushes) {
             BodyDef myBodyDef = new BodyDef();
             myBodyDef.position.set(brush.pos);
             Body body = world.createBody(myBodyDef);
@@ -249,7 +247,7 @@ public class Editor {
                 }
             }
             else{
-                for(Brush brush:mSelected)brushes.remove(brush);
+                for(Brush brush:mSelected) source.brushes.remove(brush);
                 mSelected.clear();
                 selected=null;
             }
@@ -257,7 +255,7 @@ public class Editor {
     }
     public void centerOrigin(){
         if(shiftKey){
-            for(Brush brush:brushes)brush.centerOrigin();
+            for(Brush brush: source.brushes)brush.centerOrigin();
         }
         else{
             if(mSelected.size()<=1&&selected!=null&&selIdx>=0){
@@ -278,7 +276,7 @@ public class Editor {
             }
             if(!selected.areNeighbors(selIdx,altSelIdx)){
                 {
-                    brushes.add(new Brush(selected.getFloatArray(),a,b));
+                    source.brushes.add(new Brush(selected.getFloatArray(),a,b));
                     for(int i=a+1;i<b;i++)selected.removeVert(a+1);
                 }
             }else{ // are neighbors, try subdivide
@@ -294,11 +292,24 @@ public class Editor {
         }
     }
 
-    public ArrayList<Brush> getBrushes() {
-        return brushes;
+    public void selectAll(){
+        if(mSelected.size()== source.brushes.size()){
+            mSelected.clear();
+            selected=null;
+        }else{
+            mSelected.addAll(source.brushes);
+        }
     }
-
-    public void addBrushes(ArrayList<Brush> brushes){
-        this.brushes.addAll(brushes);
+    public void setSource(LevelSource source){
+        if(source!=null){
+            this.source=source;
+            mSelected.clear();
+            selected=null;
+            selIdx=-1;
+            altSelIdx=-1;
+        }
+    }
+    public LevelSource getSource() {
+        return source;
     }
 }

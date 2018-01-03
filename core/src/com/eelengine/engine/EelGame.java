@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.eelengine.engine.ai.Navigation;
 import com.eelengine.engine.editor.Brush;
 import com.eelengine.engine.editor.Editor;
+import com.eelengine.engine.editor.LevelIO;
 import com.eelengine.engine.editor.LevelSerializer;
 
 import java.io.EOFException;
@@ -91,7 +92,6 @@ public class EelGame extends ApplicationAdapter {
     }
 
     private void setup() {
-        Brush.init();
     }
 
     @Override
@@ -586,8 +586,15 @@ public class EelGame extends ApplicationAdapter {
             return true;
         }
 
+
         public void editorKeyDown(int keycode) {
-            if (keycode == Input.Keys.LEFT_BRACKET) {
+            if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
+                if(keycode == Input.Keys.S) {
+                    LevelIO.saveLevelSource(Gdx.files.internal("testEnv.lvlsrc"),editor.getSource());
+                }else if(keycode == Input.Keys.O){
+                    editor.setSource(LevelIO.loadLevelSource(Gdx.files.internal("testEnv.lvlsrc")));
+                }
+            }else if (keycode == Input.Keys.LEFT_BRACKET) {
                 editor.snapLevel++;
             }else if (keycode == Input.Keys.RIGHT_BRACKET) {
                 editor.snapLevel--;
@@ -604,34 +611,12 @@ public class EelGame extends ApplicationAdapter {
                 editor.centerOrigin();
             }else if(keycode == Input.Keys.S){
                 editor.split();
-            }else if(keycode == Input.Keys.COMMA){
-                LevelSerializer serializer=new LevelSerializer(Gdx.files.internal("bob.geom"));
-                serializer.serializeBrushes(editor.getBrushes());
-                serializer.saveOut();
-            }else if(keycode == Input.Keys.PERIOD){
-                try {
-                    FileInputStream fileIn = new FileInputStream(Gdx.files.internal("bob.geom").file());
-                    ObjectInputStream in = new ObjectInputStream(fileIn);
-                    int ct=0;
-                    try {
-                        while (true) {
-                            System.out.println(editor.addBrush((Brush) in.readObject()));
-                            ct++;
-                        }
-                    }catch (EOFException e){}
-                    System.out.println("Loaded "+ct+" brushes");
-                    in.close();
-                    fileIn.close();
-                } catch (IOException i) {
-                    i.printStackTrace();
-                } catch (ClassNotFoundException c) {
-                    System.out.println("Employee class not found");
-                    c.printStackTrace();
-                }
             }else if(keycode == Input.Keys.D){
-                for(Brush brush:editor.getBrushes()){
+                for(Brush brush:editor.getSource().brushes){
                     System.out.println(brush);
                 }
+            }else if(keycode == Input.Keys.A){
+                editor.selectAll();
             }
         }
 
