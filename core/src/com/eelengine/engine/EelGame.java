@@ -9,6 +9,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
@@ -16,6 +17,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -45,6 +50,8 @@ public class EelGame extends ApplicationAdapter {
     SpriteBatch interfaceBatch;
     ShapeRenderer shapeRenderer;
     Box2DDebugRenderer debugRenderer;
+    private Stage stage;
+    private Table table;
 
     // VIEW
     OrthographicCamera interfaceCam;
@@ -96,6 +103,32 @@ public class EelGame extends ApplicationAdapter {
         //new TextureRegion(assetSystem.get("sig.png",Texture.class));//
 
         setupRendering();
+
+        stage = new Stage();
+
+        table = new Table();
+        table.setFillParent(true);
+        stage.addActor(table);
+        //table.setDebug(true);
+
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.local("skin/tracer-ui.atlas"));
+        Skin skin=new Skin(Gdx.files.internal("skin/tracer-ui.json"),atlas);
+        table.add(new Label("hello world",skin));
+        List list=new List(skin);
+        list.setItems("Edit","play");
+        list.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                List l=(List)actor;
+                if(l.getSelected()=="Edit"){
+                    editorEnabled = true;
+                    if (editor == null) setupEditor();
+                }else editorEnabled=false;
+            }
+        });
+        table.add(list);
+        table.add(new TextArea("hi",skin));
+
         setupPhysics();
         navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
         setupECS();
@@ -116,6 +149,7 @@ public class EelGame extends ApplicationAdapter {
         interfaceCam.setToOrtho(false,width,height);
         viewport.setScreenSize(width,height);
         viewport.update(width, height,true);
+        stage.getViewport().update(width, height,true);
     }
 
     boolean fullscreen=true;
@@ -224,6 +258,16 @@ public class EelGame extends ApplicationAdapter {
         if(Gdx.graphics.getFrameId()%60==0){
             makeBloob((int)((Math.random()-0.5)*40),(int)((Math.random()-0.5)*40));
         }
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
+//        ImGui imgui = ImGui.INSTANCE;
+//        float[] f = {0f};
+//        imgui.text("Hello, world %d", 123);
+//        if(imgui.button("OK")) {
+//            // react
+//        }
+//        imgui.inputText("string", buf);
+//        imgui.sliderFloat("float", f, 0f, 1f);
     }
 
     int ent;
@@ -236,6 +280,7 @@ public class EelGame extends ApplicationAdapter {
         worldBatch.dispose();
         physicsWorld.dispose();
         img.dispose();
+        assetSystem.clear();
         FontKit.dispose();
         System.out.println("EXITING");
     }
@@ -483,7 +528,7 @@ public class EelGame extends ApplicationAdapter {
                 new Vector2(4,3));
         editor.selectBrushByNum(2);
     }
-    class InputCore extends InputAdapter {
+    class InputCore implements InputProcessor {
 
         CamController camController;
 
@@ -491,11 +536,32 @@ public class EelGame extends ApplicationAdapter {
             this.camController = camController;
         }
 
-// I deleted useless methods for the sake of keeping this short.
+        @Override
+        public boolean keyTyped(char character) {
+            return stage.keyTyped(character);
+        }
 
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            return stage.touchDragged(screenX, screenY, pointer);
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            return stage.mouseMoved(screenX,screenY);
+        }
 
         @Override
         public boolean keyDown(int keycode) {
+//            for(Actor actor: stage.getActors()){
+//                if(actor instanceof TextArea)((TextArea)actor).
+//            }
+            //table.
+            if(stage.keyDown(keycode)){
+                if (keycode == Input.Keys.ESCAPE)
+                    stage.unfocusAll();
+                return true;
+            }
             if(keycode==Input.Keys.SHIFT_LEFT){
                 editor.shiftDown();
             }
@@ -523,7 +589,6 @@ public class EelGame extends ApplicationAdapter {
                 DEV_time_mod = 1.2f - DEV_time_mod;
             } else if (keycode == Input.Keys.SPACE) {
                 //dynamicBody.setLinearVelocity(0, 20);
-                return true;
             } else if (keycode == Input.Keys.ENTER) {
                 if (escapeMenu) Gdx.app.exit();
                 else camController.setPos(0, 0);
@@ -554,7 +619,7 @@ public class EelGame extends ApplicationAdapter {
             }else if(editor!=null&&editorEnabled){
                 editorKeyDown(keycode);
             }else gameKeyDown(keycode);
-            return true;
+            return false;
         }
 
 
@@ -630,8 +695,8 @@ public class EelGame extends ApplicationAdapter {
                 entInput.up(CInput.DOWN);
             } else if (keycode == Input.Keys.D) {
                 entInput.up(CInput.RIGHT);
-            } else return false;
-            return true; // aaa
+            }
+            return stage.keyUp(keycode); // aaa
         }
 
         @Override
@@ -643,15 +708,19 @@ public class EelGame extends ApplicationAdapter {
                 camController.changeZoomLevel(-1);
             }
 
-            return false;
+            return stage.scrolled(amount);
 
         }
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            if(stage.touchDown(screenX, screenY, pointer, button)){
+                System.out.println("input handled by ui");
+                return false;
+            }
             if (editorEnabled) {
                 editor.mouseDown(screenX, screenY, button);
-                return true;
+                return stage.touchDown(screenX, screenY, pointer, button);
             }
             // origin top left
             Vector3 wx = camController.getCam().unproject(new Vector3(screenX, screenY, 0));
@@ -675,9 +744,12 @@ public class EelGame extends ApplicationAdapter {
 
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            if(stage.touchUp(screenX, screenY, pointer, button)){
+                System.out.println("input handled by ui");
+                return false;
+            }
             if (editorEnabled) {
                 editor.mouseUp(screenX, screenY, button);
-                return true;
             }
             return false;
         }
