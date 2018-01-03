@@ -6,6 +6,8 @@ import com.artemis.utils.IntBag;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -29,6 +31,10 @@ import com.eelengine.engine.ai.Navigation;
 import com.eelengine.engine.editor.Brush;
 import com.eelengine.engine.editor.Editor;
 import com.eelengine.engine.editor.LevelIO;
+import glm_.vec2.Vec2;
+import imgui.ImGui;
+import imgui.impl.LwjglGL3;
+import uno.glfw.GlfwWindow;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -137,6 +143,9 @@ public class EelGame extends ApplicationAdapter {
         currentLevel=new Level(physicsWorld);
 //        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
 //                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
+//        Lwjgl3Window a=((Lwjgl3Graphics)Gdx.graphics).getWindow();
+//        long l=0;
+//        LwjglGL3.window=new GlfwWindow(l);
     }
 
     private void setup() {
@@ -263,11 +272,11 @@ public class EelGame extends ApplicationAdapter {
 //        ImGui imgui = ImGui.INSTANCE;
 //        float[] f = {0f};
 //        imgui.text("Hello, world %d", 123);
-//        if(imgui.button("OK")) {
+//        if(imgui.button("OK",new Vec2(100,100))) {
 //            // react
 //        }
-//        imgui.inputText("string", buf);
-//        imgui.sliderFloat("float", f, 0f, 1f);
+        //imgui.inputText("string", buf);
+        //imgui.sliderFloat("float", f, 0f, 1f);
     }
 
     int ent;
@@ -507,8 +516,9 @@ public class EelGame extends ApplicationAdapter {
         // Fullscreen
         Graphics.Monitor currMonitor = Gdx.graphics.getMonitor();
         Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode(currMonitor);
-        Gdx.graphics.setFullscreenMode(displayMode);
         Gdx.graphics.setResizable(false);
+
+        Gdx.graphics.setFullscreenMode(displayMode);
         Gdx.input.setInputProcessor(new InputCore(camController));
     }
 
