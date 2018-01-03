@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 
 /**
- * Simple sprite renderer
+ * Simple region renderer
  */
 public class RenderOneTexSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.

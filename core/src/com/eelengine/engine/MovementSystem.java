@@ -7,7 +7,7 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Simple sprite renderer
+ * Simple region renderer
  */
 public class MovementSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.

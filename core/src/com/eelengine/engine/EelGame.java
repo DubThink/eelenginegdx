@@ -4,10 +4,12 @@ import bpw.Util;
 import com.artemis.*;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -22,12 +24,7 @@ import com.eelengine.engine.ai.Navigation;
 import com.eelengine.engine.editor.Brush;
 import com.eelengine.engine.editor.Editor;
 import com.eelengine.engine.editor.LevelIO;
-import com.eelengine.engine.editor.LevelSerializer;
 
-import java.io.EOFException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,30 +35,45 @@ import java.util.Date;
 public class EelGame extends ApplicationAdapter {
     // CONSTANTS
     public static final float GSCALE=100;
-    PolygonSpriteBatch worldBatch;
-    SpriteBatch interfaceBatch;
-    ShapeRenderer shapeRenderer;
-    com.artemis.World entityWorld;
-    Texture img,img2;
-    Texture bkdimg;
-    OrthographicCamera interfaceCam;
-    CamController camController;
-    Viewport viewport;
-    Box2DDebugRenderer debugRenderer;
-    Sound screenshotSound;
-    Navigation navigation;
-    Level currentLevel;
-    //    NavPath navPath;
-    int entityCount;
-    Editor editor=null;
-    boolean editorEnabled =false;
-
-    ArrayList<Body> tempWorld=null; // testing
-
     public static final int VIRTUAL_WIDTH = 1920;
     public static final int VIRTUAL_HEIGHT = 1080;
     public static final int VIRTUAL_WINDOWED_WIDTH = 1600;
     public static final int VIRTUAL_WINDOWED_HEIGHT = 900;
+
+    // RENDERERS
+    PolygonSpriteBatch worldBatch;
+    SpriteBatch interfaceBatch;
+    ShapeRenderer shapeRenderer;
+    Box2DDebugRenderer debugRenderer;
+
+    // VIEW
+    OrthographicCamera interfaceCam;
+    CamController camController;
+    Viewport viewport;
+
+    // ECS
+    com.artemis.World entityWorld;
+
+    // SYSTEMS
+    Sound screenshotSound;
+    Navigation navigation;
+    Level currentLevel;
+    AssetSystem assetSystem=new AssetSystem();
+
+    // EDITING
+    Editor editor=null;
+    boolean editorEnabled =false;
+
+    // TEST ASSETS
+    Texture img,img2;
+    Texture bkdimg;
+    TextureRegion region;
+
+    // TEST MISC
+    int entityCount;
+
+
+    ArrayList<Body> tempWorld=null; // testing
 
     boolean DEV_physics_render =true;
     boolean DEV_draw_grid=true;
@@ -80,6 +92,12 @@ public class EelGame extends ApplicationAdapter {
         bkdimg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         screenshotSound=Gdx.audio.newSound(Gdx.files.internal("interface/camera-shutter.wav"));
         setup();
+        assetSystem.load("sig.png",Texture.class);
+        assetSystem.finishLoading();
+        //new TextureRegion(assetSystem.get("sig.png",Texture.class));//
+        region =new LoadedTextureRegion("sig.png");
+        System.out.println("EEE"+region.getRegionWidth()+" "+region.getRegionHeight());
+
         setupRendering();
         setupPhysics();
         navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
@@ -92,6 +110,7 @@ public class EelGame extends ApplicationAdapter {
     }
 
     private void setup() {
+        LoadedTextureRegion.assetSystem=assetSystem;
     }
 
     @Override
@@ -112,70 +131,9 @@ public class EelGame extends ApplicationAdapter {
 //        dynamicBody.setLinearVelocity(xv,yv);
     }
 
-    void physicsDebugDrawer(Body body, ShapeRenderer shapeRenderer){
-        if(!shapeRenderer.isDrawing()){
-            System.err.println("Trying to draw but the shapeRenderer is disabled");
-            return;
-        }
-        Vector2 v1=new Vector2();
-        Vector2 v2=new Vector2();
-        shapeRenderer.setColor(1,1,0,1);
-        shapeRenderer.identity();
-        shapeRenderer.translate(body.getPosition().x*EelGame.GSCALE,body.getPosition().y*EelGame.GSCALE,0);
-        for(Fixture f:body.getFixtureList()){
-//            System.out.println("debugrender "+f.getType()+" "+f.getShape().getType());
-            switch(f.getType()){
-                case Circle:
-                    CircleShape circleShape=(CircleShape)f.getShape();
-                    shapeRenderer.circle(circleShape.getPosition().x*EelGame.GSCALE,
-                            circleShape.getPosition().y*EelGame.GSCALE,
-                            circleShape.getRadius()*EelGame.GSCALE);
-                    break;
-                case Polygon:
-                    PolygonShape polygonShape=(PolygonShape)f.getShape();
-                    if(polygonShape.getVertexCount()<2)break;
-//                    System.out.println("Drawing poly");
-                    for(int i=0;i<polygonShape.getVertexCount()-1;i++){
-                        polygonShape.getVertex(i,v1);
-                        polygonShape.getVertex(i+1,v2);
-                        shapeRenderer.line(v1.x*EelGame.GSCALE,
-                                v1.y*EelGame.GSCALE,
-                                v2.x*EelGame.GSCALE,
-                                v2.y*EelGame.GSCALE);
-                    }
-                    polygonShape.getVertex(polygonShape.getVertexCount()-1,v1);
-                    polygonShape.getVertex(0,v2);
-                    shapeRenderer.line(v1.x*EelGame.GSCALE,
-                            v1.y*EelGame.GSCALE,
-                            v2.x*EelGame.GSCALE,
-                            v2.y*EelGame.GSCALE);
-                    break;
-                //case Edge:
-
-                case Chain:
-                    ChainShape chainShape=(ChainShape)f.getShape();
-                    if(chainShape.getVertexCount()<2)break;
-//                    System.out.println("Drawing poly");
-                    for(int i=0;i<chainShape.getVertexCount()-1;i++){
-                        chainShape.getVertex(i,v1);
-                        chainShape.getVertex(i+1,v2);
-                        shapeRenderer.line(v1.x*EelGame.GSCALE,
-                                v1.y*EelGame.GSCALE,
-                                v2.x*EelGame.GSCALE,
-                                v2.y*EelGame.GSCALE);
-                    }
-                    chainShape.getVertex(chainShape.getVertexCount()-1,v1);
-                    chainShape.getVertex(0,v2);
-                    shapeRenderer.line(v1.x*EelGame.GSCALE,
-                            v1.y*EelGame.GSCALE,
-                            v2.x*EelGame.GSCALE,
-                            v2.y*EelGame.GSCALE);
-            }
-        }
-        shapeRenderer.identity();
-    }
     @Override
     public void render () {
+        boolean loading=!assetSystem.update();
         handleInput();
 
         // clear graphics
@@ -216,6 +174,14 @@ public class EelGame extends ApplicationAdapter {
         entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
 //        }
 
+        // TEST
+
+        worldBatch.begin();
+        //if(editor!=null&&editor.getSource().sprite!=null)worldBatch.draw(editor.getSource().sprite.region,0,0);
+        worldBatch.draw(region,0,0);
+        worldBatch.end();
+
+
         // Editor
 //        Vector2 ms=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
         if(editorEnabled)editor.render(worldBatch,shapeRenderer,interfaceBatch);
@@ -249,6 +215,7 @@ public class EelGame extends ApplicationAdapter {
             FontKit.SysMedium.setColor(Color.FIREBRICK);
             FontKit.SysMedium.draw(interfaceBatch, "Press ESC for menu", 10, Gdx.graphics.getHeight() - 10);
         }
+        FontKit.SysMedium.draw(interfaceBatch, "Loading ["+assetSystem.getProgress()+"%]", Gdx.graphics.getWidth()-100, 10);
         interfaceBatch.end();
 
         // Draw physics debug
