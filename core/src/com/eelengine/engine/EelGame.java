@@ -67,7 +67,6 @@ public class EelGame extends ApplicationAdapter {
     // TEST ASSETS
     Texture img,img2;
     Texture bkdimg;
-    TextureRegion region;
 
     // TEST MISC
     int entityCount;
@@ -92,11 +91,9 @@ public class EelGame extends ApplicationAdapter {
         bkdimg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         screenshotSound=Gdx.audio.newSound(Gdx.files.internal("interface/camera-shutter.wav"));
         setup();
-        assetSystem.load("sig.png",Texture.class);
-        assetSystem.finishLoading();
+        //assetSystem.load("sig.png",Texture.class);
+        //assetSystem.finishLoading();
         //new TextureRegion(assetSystem.get("sig.png",Texture.class));//
-        region =new LoadedTextureRegion("sig.png");
-        System.out.println("EEE"+region.getRegionWidth()+" "+region.getRegionHeight());
 
         setupRendering();
         setupPhysics();
@@ -177,8 +174,8 @@ public class EelGame extends ApplicationAdapter {
         // TEST
 
         worldBatch.begin();
-        //if(editor!=null&&editor.getSource().sprite!=null)worldBatch.draw(editor.getSource().sprite.region,0,0);
-        worldBatch.draw(region,0,0);
+        if(editor!=null&&editor.getSource().sprite!=null)worldBatch.draw(editor.getSource().sprite.region,0,0);
+        //        //worldBatch.draw(region,0,0);
         worldBatch.end();
 
 
@@ -215,7 +212,8 @@ public class EelGame extends ApplicationAdapter {
             FontKit.SysMedium.setColor(Color.FIREBRICK);
             FontKit.SysMedium.draw(interfaceBatch, "Press ESC for menu", 10, Gdx.graphics.getHeight() - 10);
         }
-        FontKit.SysMedium.draw(interfaceBatch, "Loading ["+assetSystem.getProgress()+"%]", Gdx.graphics.getWidth()-100, 10);
+        FontKit.SysMedium.setColor(Color.TEAL);
+        FontKit.SysMedium.draw(interfaceBatch, "Loading ["+(int)assetSystem.getProgress()*100+"%]", Gdx.graphics.getWidth()-140, 20);
         interfaceBatch.end();
 
         // Draw physics debug
@@ -509,6 +507,9 @@ public class EelGame extends ApplicationAdapter {
                 if (keycode == Input.Keys.N) DEV_draw_nav = !DEV_draw_nav;
 //                if(keycode==Input.Keys.F) EelGame.GSCALE=150-EelGame.GSCALE;
 
+            }else if (keycode == Input.Keys.F5) {
+            }
+            else if (keycode == Input.Keys.F6) {
             }
             // Zoom keys
             else if (keycode == Input.Keys.MINUS) {

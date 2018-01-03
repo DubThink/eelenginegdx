@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.io.*;
 
 public class LoadedTextureRegion extends TextureRegion implements Externalizable, Loadable{
+    private static final long serialVersionUID = 1L;
     public static AssetSystem assetSystem;
     private static Texture nullTex= _makeNullTex();
     private static Texture _makeNullTex(){
@@ -18,7 +19,8 @@ public class LoadedTextureRegion extends TextureRegion implements Externalizable
     private static final int NONE=0;
     private static final int FULL=1;
 
-    private int buildMode=NONE;
+    private transient int buildMode=NONE;
+    public LoadedTextureRegion(){super();}
     public LoadedTextureRegion(String name) {
         super();
         buildMode=FULL;
@@ -27,25 +29,24 @@ public class LoadedTextureRegion extends TextureRegion implements Externalizable
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(assetSystem.getAssetFileName(getTexture()));
         out.writeFloat(getU());
         out.writeFloat(getV());
         out.writeFloat(getU2());
         out.writeFloat(getV2());
         out.writeInt(getRegionWidth());
         out.writeInt(getRegionHeight());
-        out.writeUTF(assetSystem.getAssetFileName(getTexture()));
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        getTexFromFile(in.readUTF());
         setU(in.readFloat());
         setV(in.readFloat());
         setU2(in.readFloat());
         setV2(in.readFloat());
         setRegionWidth(in.readInt());
         setRegionHeight(in.readInt());
-        getTexFromFile(in.readUTF());
-
     }
 
     private void getTexFromFile(String file){

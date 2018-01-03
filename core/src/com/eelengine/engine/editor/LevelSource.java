@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class LevelSource implements Serializable {
+    private static final long serialVersionUID = 1L;
     public ArrayList<Brush> brushes=new ArrayList<>();
-    public StaticSprite sprite=new StaticSprite("sig.png");
+    public StaticSprite sprite=null;
 }
