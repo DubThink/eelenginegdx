@@ -17,24 +17,29 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * A physics-oriented serializable polygon class for maps
+ */
 public class Brush implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    public Vector2 pos=new Vector2(0,0);
+    public boolean hidden=false;
 
     private ArrayList<Vector2> verts=new ArrayList<>();
     private transient boolean floatArrayFresh=false;
     private transient float[] _floatArray;
-    public boolean hidden=false;
 
-    private static EarClippingTriangulator earClipper=new EarClippingTriangulator();
     private transient PolygonRegion polygonRegion=null;
 
-    Vector2 pos=new Vector2(0,0);
 //    PolygonSpriteBatch polyBatch = new PolygonSpriteBatch(); // To assign at the beginning
-    private static Texture textureSolid;
-    public static void init(){
+private static EarClippingTriangulator earClipper=new EarClippingTriangulator();
+    private static Texture textureSolid=init();
+    private static Texture init(){
         Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pix.setColor(0xDEADBEFF); // DE is red, AD is green and BE is blue.
         pix.fill();
-        textureSolid = new Texture(pix);
+        return new Texture(pix);
     }
 //    public Brush(Brush toCopy){
 //        this();
@@ -46,7 +51,7 @@ public class Brush implements Serializable {
         for(int i=0;i<verts.length;i+=2)this.verts.add(new Vector2(verts[i],verts[i+1]));
     }
 
-    public Brush(float[] verts, int firstvert,int lastvert){
+    public Brush(float[] verts, int firstvert, int lastvert){
         this();
         if(firstvert<0||firstvert>lastvert||lastvert*2>=verts.length){
             // bad indices
@@ -120,24 +125,33 @@ public class Brush implements Serializable {
         floatArrayFresh=false;
         verts.remove(idx);
     }
-    public Brush addVert(float x, float y){
-        floatArrayFresh=false;
-        verts.add(new Vector2(x-pos.x,y-pos.y));
-        return this;
-    }
 
-    public Brush addVert(Vector2 point){
-        floatArrayFresh=false;
-        verts.add(new Vector2(point.x-pos.x,point.y-pos.y));
-        return this;
-    }
+//    public Brush addVert(float x, float y){
+//        floatArrayFresh=false;
+//        verts.add(new Vector2(x-pos.x,y-pos.y));
+//        return this;
+//    }
+//
+//    public Brush addVert(Vector2 point){
+//        floatArrayFresh=false;
+//        verts.add(new Vector2(point.x-pos.x,point.y-pos.y));
+//        return this;
+//    }
+
+    /**
+     * Adds a new vertex at idx
+     * @return this (for chains)
+     */
     public Brush addVert(Vector2 point,int idx){
         floatArrayFresh=false;
         verts.add(idx,new Vector2(point.x-pos.x,point.y-pos.y));
         return this;
     }
 
-
+    /**
+     * sets the position of vertex idx
+     * does not do anything on bad idx
+     */
     public void setVert(float x, float y, int idx){
         if(idx<0||idx>=verts.size())return;
         floatArrayFresh=false;
@@ -149,9 +163,9 @@ public class Brush implements Serializable {
      * Returns -1 if empty
      */
     public int getNearestVertIdx(float x, float y){
+        if(verts.size()==0)return -1;
         x-=pos.x;
         y-=pos.y;
-        if(verts.size()==0)return -1;
         float dist=Float.MAX_VALUE;
         int idx=0;
         for(int i=0;i<verts.size();i++){
@@ -165,7 +179,9 @@ public class Brush implements Serializable {
         return idx;
     }
 
-
+    /**
+     * Returns the distance to the nearest vertex squared
+     */
     public float getDistToNearestVert2(float x, float y){
         x-=pos.x;
         y-=pos.y;
@@ -176,6 +192,10 @@ public class Brush implements Serializable {
         return dist;
     }
 
+    /**
+     * Returns an array of float values representing the vertices
+     * format [x1, y1, x2, y2, ..., xn, yn]
+     */
     public float[] getFloatArray(){
         if(!floatArrayFresh) {
             _floatArray = new float[verts.size() * 2];
@@ -188,6 +208,9 @@ public class Brush implements Serializable {
         return _floatArray;
     }
 
+    /**
+     * Returns true if point c is in the brush
+     */
     public boolean isPointIn(Vector2 c) {
         c=new Vector2(c).sub(pos);
         int n=0;
@@ -209,6 +232,9 @@ public class Brush implements Serializable {
         return verts.size();
     }
 
+    /**
+     * Moves origin to the center of the brush (calculated as the average of the vertices)
+     */
     public void centerOrigin(){
         Vector2 sum=new Vector2();
         for(Vector2 vert:verts){
@@ -219,6 +245,9 @@ public class Brush implements Serializable {
         setOrigin(sum);
     }
 
+    /**
+     * Sets the origin to a new position without moving brush geometry.
+     */
     public void setOrigin(Vector2 origin){
         pos.add(origin);
         for(Vector2 vert:verts){
@@ -226,6 +255,10 @@ public class Brush implements Serializable {
         }
         floatArrayFresh=false;
     }
+
+    /**
+     * returns true if indices a and be are neighboring vertices
+     */
     public boolean areNeighbors(int a, int b){
 //        System.out.println(a+" "+b+" "+(a-b)+" "+(a-b)%verts.size());
 //        int c=(a-b+verts.size())%verts.size();
