@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.io.*;
 
 public class LoadedTextureRegion extends TextureRegion implements Externalizable, Loadable{
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     public static AssetSystem assetSystem;
     private static Texture nullTex= _makeNullTex();
     private static Texture _makeNullTex(){

@@ -131,6 +131,7 @@ public class EelGame extends ApplicationAdapter {
     @Override
     public void render () {
         boolean loading=!assetSystem.update();
+//        System.out.println(assetSystem.getQueuedAssets()+":"+assetSystem.getLoadedAssets());
         handleInput();
 
         // clear graphics
@@ -213,7 +214,7 @@ public class EelGame extends ApplicationAdapter {
             FontKit.SysMedium.draw(interfaceBatch, "Press ESC for menu", 10, Gdx.graphics.getHeight() - 10);
         }
         FontKit.SysMedium.setColor(Color.TEAL);
-        FontKit.SysMedium.draw(interfaceBatch, "Loading ["+(int)assetSystem.getProgress()*100+"%]", Gdx.graphics.getWidth()-140, 20);
+        FontKit.SysMedium.draw(interfaceBatch, "Loading ["+(int)(assetSystem.getProgress()*100)+"%]", Gdx.graphics.getWidth()-140, 20);
         interfaceBatch.end();
 
         // Draw physics debug
@@ -508,6 +509,8 @@ public class EelGame extends ApplicationAdapter {
 //                if(keycode==Input.Keys.F) EelGame.GSCALE=150-EelGame.GSCALE;
 
             }else if (keycode == Input.Keys.F5) {
+                for(int i=1;i<=128;i++)
+                    assetSystem.load("stress/sig ("+i+").png",Texture.class);
             }
             else if (keycode == Input.Keys.F6) {
             }

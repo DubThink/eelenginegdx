@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Sprite for in-world rendering. Contains transform, so not for use with ECS
  */
 public class StaticSprite implements Serializable{
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6148310914426707245L;
     LoadedTextureRegion region;
     Vector2 pos=new Vector2(0,0);
 
