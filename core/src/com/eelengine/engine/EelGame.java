@@ -32,9 +32,6 @@ import com.eelengine.engine.editor.Brush;
 import com.eelengine.engine.editor.Editor;
 import com.eelengine.engine.editor.LevelIO;
 import glm_.vec2.Vec2;
-import imgui.ImGui;
-import imgui.ImguiKt;
-import imgui.impl.LwjglGL3;
 import uno.glfw.GlfwWindow;
 
 import java.text.SimpleDateFormat;
@@ -144,9 +141,6 @@ public class EelGame extends ApplicationAdapter {
         currentLevel=new Level(physicsWorld);
 //        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
 //                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
-        Lwjgl3Window a=((Lwjgl3Graphics)Gdx.graphics).getWindow();
-        LwjglGL3.INSTANCE.init(new GlfwWindow(a.getWindowHandle()),false);
-        ImGui.INSTANCE.initialize();
     }
 
     private void setup() {
@@ -174,7 +168,6 @@ public class EelGame extends ApplicationAdapter {
 
     @Override
     public void render () {
-        LwjglGL3.INSTANCE.newFrame();
         boolean loading=!assetSystem.update();
 //        System.out.println(assetSystem.getQueuedAssets()+":"+assetSystem.getLoadedAssets());
         handleInput();
@@ -271,22 +264,6 @@ public class EelGame extends ApplicationAdapter {
         }
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
-        ImGui imgui = ImGui.INSTANCE;
-
-        imgui.newFrame();
-        //imgui.set
-        float[] f = {0f};
-        imgui.text("Hello, world %d", 123);
-        boolean[] bol={editorEnabled};
-        editorEnabled=imgui.checkbox("Test 1",bol);
-        if(imgui.button("OK",new Vec2(100,100))) {
-            // react
-        }
-        imgui.text("Hello, asdf %d", 123);
-
-        imgui.render();
-        //imgui.inputText("string", buf);
-        //imgui.sliderFloat("float", f, 0f, 1f);
     }
 
     int ent;

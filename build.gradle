@@ -35,8 +35,8 @@ allprojects {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url 'https://jitpack.io' }
-        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" } // Required since imgui uses version 1.2 of Kotlin
+//        maven { url 'https://jitpack.io' } // imgui
+//        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" } // Required since imgui uses version 1.2 of Kotlin
         jcenter()
     }
     tasks.withType(Javadoc) {
@@ -80,11 +80,11 @@ project(":core") {
         //compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "net.onedaybeard.artemis:artemis-odb:2.1.0"
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows'
-        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos'
-        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux'
+//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows'
+//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos'
+//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux'
 
-        compile "com.github.kotlin-graphics:imgui:-SNAPSHOT"
+//        compile "com.github.kotlin-graphics:imgui:-SNAPSHOT"
     }
     weave {
         classesDir = sourceSets.main.output.classesDir
