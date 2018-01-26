@@ -14,7 +14,7 @@ import com.eelengine.engine.FontKit;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class Editor {
+public class GeomEditor {
     private LevelSource source=new LevelSource();
     private HashSet<Brush> mSelected=new HashSet<>();
     private Brush selected=null;
@@ -30,7 +30,7 @@ public class Editor {
     private String errormsg="";
     private float errorCooldown=0;
 
-    public Editor(CamController camController) {
+    public GeomEditor(CamController camController) {
         this.camController = camController;
     }
 
@@ -79,7 +79,7 @@ public class Editor {
         // -------- UI -------- //
         interfaceBatch.begin();
         FontKit.SysMedium.setColor(Color.TEAL);
-        FontKit.SysMedium.draw(interfaceBatch,"Editor active. Press F9 to toggle.",10, Gdx.graphics.getHeight()-30);
+        FontKit.SysMedium.draw(interfaceBatch,"GeomEditor active. Press F9 to toggle.",10, Gdx.graphics.getHeight()-30);
         FontKit.SysMedium.draw(interfaceBatch,
                 "Snap "+(!snapOn?"off":"increment="+(snapLevel<0?"1/":"")+(int)Math.pow(2,snapLevel<0?-snapLevel:snapLevel)),
                 10, Gdx.graphics.getHeight()-50);

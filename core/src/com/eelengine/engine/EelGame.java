@@ -4,15 +4,11 @@ import bpw.Util;
 import com.artemis.*;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -29,14 +25,15 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.eelengine.engine.ai.Navigation;
 import com.eelengine.engine.editor.Brush;
-import com.eelengine.engine.editor.Editor;
+import com.eelengine.engine.editor.GeomEditor;
 import com.eelengine.engine.editor.LevelIO;
-import glm_.vec2.Vec2;
-import uno.glfw.GlfwWindow;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static com.badlogic.gdx.utils.Align.bottomLeft;
+import static com.badlogic.gdx.utils.Align.topRight;
 
 /**
  * The core class of the engine
@@ -72,7 +69,7 @@ public class EelGame extends ApplicationAdapter {
     AssetSystem assetSystem=new AssetSystem();
 
     // EDITING
-    Editor editor=null;
+    Editor editor;
     boolean editorEnabled =false;
 
     // TEST ASSETS
@@ -111,28 +108,35 @@ public class EelGame extends ApplicationAdapter {
         stage = new Stage();
 
         table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
-        //table.setDebug(true);
+        table.setWidth(400);
+        table.setHeight(800);
 
+        stage.addActor(table);
+        table.setPosition(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),topRight);
+        //table.setDebug(true);
+        Table table1=new Table();
+        table1.top().right();
+        table1.setWidth(200);
+        table1.setHeight(400);
+        table1.setDebug(true);
+        stage.addActor(table1);
         TextureAtlas atlas = new TextureAtlas(Gdx.files.local("skin/tracer-ui.atlas"));
         Skin skin=new Skin(Gdx.files.internal("skin/tracer-ui.json"),atlas);
-        table.add(new Label("hello world",skin));
-        List list=new List(skin);
-        list.setItems("Edit","play");
-        list.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                List l=(List)actor;
-                if(l.getSelected()=="Edit"){
-                    editorEnabled = true;
-                    if (editor == null) setupEditor();
-                }else editorEnabled=false;
-            }
-        });
-        table.add(list);
-        table.add(new TextArea("hi",skin));
+        table1.add(new Label("Test table 1",skin));
 
+//        list.addListener(new ChangeListener() {
+//            @Override
+//            public void changed(ChangeEvent event, Actor actor) {
+//                List l=(List)actor;
+//                if(l.getSelected()=="Edit"){
+//                    editorEnabled = true;
+//                    if (geomEditor == null) setupEditor();
+//                }else editorEnabled=false;
+//            }
+//        });
+
+        setupEditor();
+        editor.buildUI(table,skin);
         setupPhysics();
         navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
         setupECS();
@@ -153,7 +157,7 @@ public class EelGame extends ApplicationAdapter {
         interfaceCam.setToOrtho(false,width,height);
         viewport.setScreenSize(width,height);
         viewport.update(width, height,true);
-        stage.getViewport().update(width, height,true);
+        stage.getViewport().update(width, height,false);
     }
 
     boolean fullscreen=true;
@@ -213,14 +217,14 @@ public class EelGame extends ApplicationAdapter {
         // TEST
 
         worldBatch.begin();
-        if(editor!=null&&editor.getSource().sprite!=null)worldBatch.draw(editor.getSource().sprite.region,0,0);
+        //if(geomEditor !=null&& geomEditor.getSource().sprite!=null)worldBatch.draw(geomEditor.getSource().sprite.region,0,0);
         //        //worldBatch.draw(region,0,0);
         worldBatch.end();
 
 
-        // Editor
+        // GeomEditor
 //        Vector2 ms=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
-        if(editorEnabled)editor.render(worldBatch,shapeRenderer,interfaceBatch);
+        if(editorEnabled) editor.render(worldBatch,shapeRenderer,interfaceBatch);
 
         // Display dev interface
         interfaceBatch.begin();
@@ -510,20 +514,7 @@ public class EelGame extends ApplicationAdapter {
     }
 
     void setupEditor(){
-        if(editor==null)editor=new Editor(camController);
-        editor.addBrush(new Vector2(0,0),
-                new Vector2(0,1),
-                new Vector2(1,1),
-                new Vector2(1,0));
-        editor.addBrush(new Vector2(3,0),
-                new Vector2(3,1),
-                new Vector2(4,1),
-                new Vector2(4,0));
-        editor.addBrush(new Vector2(3,3),
-                new Vector2(3,4),
-                new Vector2(4,4),
-                new Vector2(4,3));
-        editor.selectBrushByNum(2);
+        editor=new Editor(camController);
     }
     class InputCore implements InputProcessor {
 
@@ -591,7 +582,6 @@ public class EelGame extends ApplicationAdapter {
                 else camController.setPos(0, 0);
             } else if (keycode == Input.Keys.F9) {
                 editorEnabled = !editorEnabled;
-                if (editor == null) setupEditor();
             } else if (keycode == Input.Keys.F11) {
                 if (fullscreen) {
                     System.out.println("FULLSCREEN OFF");
@@ -613,45 +603,14 @@ public class EelGame extends ApplicationAdapter {
                 PixmapIO.writePNG(Gdx.files.local("screenshots/screenshot " + sdf.format(new Date()) + ".png"), pixmap);
                 pixmap.dispose();
                 screenshotSound.play();
-            }else if(editor!=null&&editorEnabled){
-                editorKeyDown(keycode);
+            }else if(editorEnabled){
+                editor.keyDown(keycode);
             }else gameKeyDown(keycode);
             return false;
         }
 
 
-        public void editorKeyDown(int keycode) {
-            if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
-                if(keycode == Input.Keys.S) {
-                    LevelIO.saveLevelSource(Gdx.files.internal("testEnv.lvlsrc"),editor.getSource());
-                }else if(keycode == Input.Keys.O){
-                    editor.setSource(LevelIO.loadLevelSource(Gdx.files.internal("testEnv.lvlsrc")));
-                }
-            }else if (keycode == Input.Keys.LEFT_BRACKET) {
-                editor.snapLevel++;
-            }else if (keycode == Input.Keys.RIGHT_BRACKET) {
-                editor.snapLevel--;
-            }else if(keycode == Input.Keys.F8){
-                if(tempWorld!=null){
-                    for(Body body:tempWorld)physicsWorld.destroyBody(body);
-                }
-                tempWorld=editor.buildStatics(physicsWorld);
-            }else if(keycode == Input.Keys.BACKSPACE||keycode == Input.Keys.FORWARD_DEL||keycode == Input.Keys.X){
-                editor.delete();
-//            }else if(keycode == Input.Keys.A){
-//                editor.addVert();
-            }else if(keycode == Input.Keys.O){
-                editor.centerOrigin();
-            }else if(keycode == Input.Keys.S){
-                editor.split();
-            }else if(keycode == Input.Keys.D){
-                for(Brush brush:editor.getSource().brushes){
-                    System.out.println(brush);
-                }
-            }else if(keycode == Input.Keys.A){
-                editor.selectAll();
-            }
-        }
+
 
         public void gameKeyDown(int keycode){
             // WASD
