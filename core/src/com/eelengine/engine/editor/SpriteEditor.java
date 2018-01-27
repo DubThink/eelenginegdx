@@ -29,6 +29,7 @@ public class SpriteEditor extends BaseEditor {
     float mouseDownX=0;
     float mouseDownY=0;
     boolean dragging=false;
+    boolean[] layerVis={true,true,true};
 
     StaticSprite fade=new StaticSprite("semifade_half_black_left.png");
 
@@ -53,6 +54,7 @@ public class SpriteEditor extends BaseEditor {
         dp.scl(-1);
         snap(dp);
         for (int layer = 0; layer < 3; layer++) {
+            if(!layerVis[layer])continue;
             for (StaticSprite sprite : source.getLayer(layer)) {
                 if (sprite.selected&&layer==activeLayer) worldBatch.setColor(warble, warble, 1, warble);
                 else worldBatch.setColor(1, 1, 1, 1);
@@ -99,6 +101,7 @@ public class SpriteEditor extends BaseEditor {
     }
 
     public void addActiveTextureAtMouse(){
+        if(!layerVis[activeLayer])return;
         Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
         snap(wp);
         float x=wp.x+sources.get(selectedSourceIdx).sprite.width()/(2*EelGame.GSCALE);
@@ -118,11 +121,14 @@ public class SpriteEditor extends BaseEditor {
         }else if(button== Input.Buttons.MIDDLE) {
             addActiveTextureAtMouse();
         }else if(button== Input.Buttons.LEFT) {
+            if(!layerVis[activeLayer])return;
             dragging=true;
-            for(StaticSprite sprite:source.getLayer(activeLayer)){
+            StaticSprite sprite;
+            for(int i=0;i<source.getLayer(activeLayer).size();i++){
+                sprite=source.getLayer(activeLayer).get(i);
                 System.out.println(wp+", "+sprite.pos+", "+(sprite.pos.x+sprite.width()/EelGame.GSCALE)+", "+(sprite.pos.x+sprite.height()/EelGame.GSCALE));
-                if(Util.in(wp.x,sprite.pos.x-sprite.width()/EelGame.GSCALE*0.5,(sprite.pos.x+sprite.width()/EelGame.GSCALE))&&
-                        Util.in(wp.y,sprite.pos.y-sprite.height()/EelGame.GSCALE*0.5,(sprite.pos.y+sprite.height()/EelGame.GSCALE))) {
+                if(Util.in(wp.x,sprite.pos.x-sprite.width()/EelGame.GSCALE*0.5,(sprite.pos.x+sprite.width()/EelGame.GSCALE*0.5))&&
+                        Util.in(wp.y,sprite.pos.y-sprite.height()/EelGame.GSCALE*0.5,(sprite.pos.y+sprite.height()/EelGame.GSCALE*0.5))) {
                     sprite.pSelected = sprite.selected;
                     sprite.selected = true;
                 }else if(!shiftKey)sprite.selected=false;
@@ -131,20 +137,24 @@ public class SpriteEditor extends BaseEditor {
     }
 
     public void rotateSelected(){
+        if(!layerVis[activeLayer])return;
         for(StaticSprite sprite:source.getLayer(activeLayer))sprite.rot+=shiftKey?Util.QUARTER_PI_F:-Util.QUARTER_PI_F;
     }
 
     public void deselectAll(){
+        if(!layerVis[activeLayer])return;
         for(StaticSprite sprite:source.getLayer(activeLayer))sprite.selected=false;
     }
 
     public void removeSelected(){
+        if(!layerVis[activeLayer])return;
         source.getLayer(activeLayer).removeIf(sprite -> sprite.selected);
     }
     @Override
     public void mouseUp(int screenX, int screenY, int button) {
         Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
         if(button==Input.Buttons.LEFT) {
+            if(!layerVis[activeLayer])return;
             dragging=false;
             if (Util.dist2(screenX, screenY, mouseDownX, mouseDownY) < 40) {
                 for (StaticSprite sprite : source.getLayer(activeLayer)) {
@@ -222,7 +232,9 @@ public class SpriteEditor extends BaseEditor {
         super.setSource(source);
     }
     public void numKey(int i){
-        if(shiftKey)moveToLayer(i);
+        if(!Util.in(i,0,2))return;
+        if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))layerVis[i]=!layerVis[i];
+        else if(shiftKey)moveToLayer(i);
         else setActiveLayer(i);
     }
     public void setActiveLayer(int i){

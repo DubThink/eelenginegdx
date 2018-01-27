@@ -130,6 +130,11 @@ public class Editor {
 //        if (keycode == Input.Keys.I) {
 //            spriteEditor.loadAssets();
 //        }
+        if (keycode == Input.Keys.LEFT_BRACKET) {
+            spriteEditor.snapLevel++;
+        } else if (keycode == Input.Keys.RIGHT_BRACKET) {
+            spriteEditor.snapLevel--;
+        }
         if (keycode == Input.Keys.TAB) {
             spriteEditor.sidepanel=!spriteEditor.sidepanel;
         }
@@ -156,10 +161,8 @@ public class Editor {
     public void geomKeyDown(int keycode) {
         if (keycode == Input.Keys.LEFT_BRACKET) {
             geomEditor.snapLevel++;
-            spriteEditor.snapLevel++;
         } else if (keycode == Input.Keys.RIGHT_BRACKET) {
             geomEditor.snapLevel--;
-            spriteEditor.snapLevel--;
 //        }else if(keycode == Input.Keys.F8){
 //            if(tempWorld!=null){
 //                for(Body body:tempWorld)physicsWorld.destroyBody(body);
