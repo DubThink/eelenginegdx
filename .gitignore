@@ -24,10 +24,10 @@ www-test/
 /android/libs/x86/
 /android/libs/x86_64/
 /android/gen/
-.idea/
-*.ipr
-*.iws
-*.iml
+#.idea/
+#*.ipr
+#*.iws
+#*.iml
 /android/out/
 com_crashlytics_export_strings.xml
 
@@ -130,3 +130,8 @@ Thumbs.db
 core/assets/screenshots/
 
 core/assets/stress/
+.idea/inspectionProfiles/
+.idea/modules/
+core/out/
+desktop/out/
+/.idea/

@@ -60,7 +60,7 @@ public class LoadedTextureRegion extends TextureRegion implements Externalizable
     @Override
     public void build(String asset) {
         if(buildMode==FULL){
-            System.out.println("building the thing");
+            System.out.println("building "+asset);
             setRegion(assetSystem.get(asset,Texture.class));
         }else{
             setTexture(assetSystem.get(asset,Texture.class));

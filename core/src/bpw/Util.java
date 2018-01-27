@@ -41,6 +41,10 @@ public class Util {
         return Math.min(a,b)<=num&&num<=Math.max(a,b);
     }
 
+    public static boolean inBox(float x, float y, float x1, float y1, float x2, float y2){
+        return in(x,x1,x2)&&in(y,y1,y2);
+    }
+
     public static float min(float a, float b){return a<b?a:b;}
     public static float max(float a, float b){return a>b?a:b;}
 

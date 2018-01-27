@@ -1,0 +1,3 @@
+# locations to load sprites from for the SpriteEditor
+\
+\logos

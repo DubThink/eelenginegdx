@@ -9,6 +9,7 @@ buildscript {
     }
     dependencies {
         classpath "net.onedaybeard.artemis:artemis-odb-gradle-plugin:2.1.0"
+        //classpath "org.lwjgl:lwjgl-stb:3.1.5:natives-windows"
         //classpath 'edu.sc.seis.gradle:launch4j:2.4.2'
     }
 }
@@ -22,7 +23,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "EelEngineGdx"
-        gdxVersion = '1.9.7'
+        gdxVersion = '1.9.8'
         roboVMVersion = '2.3.1'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -34,6 +35,8 @@ allprojects {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+//        maven { url 'https://jitpack.io' } // imgui
+//        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" } // Required since imgui uses version 1.2 of Kotlin
         jcenter()
     }
     tasks.withType(Javadoc) {
@@ -53,13 +56,13 @@ project(":desktop") {
 
     dependencies {
         compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        //compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
+        //compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
+        //compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         
     }
 }
@@ -73,9 +76,15 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
 //        compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        //compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+        //compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "net.onedaybeard.artemis:artemis-odb:2.1.0"
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows'
+//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos'
+//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux'
+
+//        compile "com.github.kotlin-graphics:imgui:-SNAPSHOT"
     }
     weave {
         classesDir = sourceSets.main.output.classesDir
