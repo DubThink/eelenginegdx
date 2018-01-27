@@ -7,22 +7,31 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.eelengine.engine.editor.Brush;
 import com.eelengine.engine.editor.GeomEditor;
 import com.eelengine.engine.editor.LevelIO;
+import com.eelengine.engine.editor.LevelSource;
 
 public class Editor {
+    public static final int OFF=0;
+    public static final int GEOM =1;
+    public static final int SPRITE=2;
+    public int mode=OFF;
     public GeomEditor geomEditor;
+    public SpriteEditor spriteEditor;
     private Table table;
     VerticalGroup pane;
     private int width=180;
     private int exwidth=200;
+    protected LevelSource levelSource;
 
     public Editor(CamController camController) {
         geomEditor=new GeomEditor(camController);
+        spriteEditor=new SpriteEditor();
 
     }
 
@@ -76,6 +85,9 @@ public class Editor {
     }
     public void render(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch){
         geomEditor.render(worldBatch,shapeRenderer,interfaceBatch);
+        spriteEditor.render(worldBatch,shapeRenderer,interfaceBatch);
+        if(mode==SPRITE)spriteEditor.activeRender(worldBatch, shapeRenderer, interfaceBatch);
+        if(mode==GEOM)geomEditor.activeRender(worldBatch, shapeRenderer, interfaceBatch);
     }
     public void shiftDown(){
         geomEditor.shiftDown();
@@ -92,11 +104,29 @@ public class Editor {
     public void keyDown(int keycode) {
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
             if (keycode == Input.Keys.S) {
-                LevelIO.saveLevelSource(Gdx.files.internal("testEnv.lvlsrc"), geomEditor.getSource());
+                LevelIO.saveLevelSource(Gdx.files.internal("testEnv.lvlsrc"), levelSource);
+                return;
             } else if (keycode == Input.Keys.O) {
-                geomEditor.setSource(LevelIO.loadLevelSource(Gdx.files.internal("testEnv.lvlsrc")));
+                levelSource = LevelIO.loadLevelSource(Gdx.files.internal("testEnv.lvlsrc"));
+                System.out.println(levelSource);
+                geomEditor.setSource(levelSource);
+                spriteEditor.setSource(levelSource);
+                System.out.println(levelSource.staticSprites);
+//                StaticSprite sprite = new StaticSprite("test_map.png", 0, 0);
+//                geomEditor.getSource().staticSprites.add(sprite);
+                //geomEditor.getSource().staticSprites.add(new StaticSprite("test_map.png",10,0));
+                return;
             }
-        } else if (keycode == Input.Keys.LEFT_BRACKET) {
+        }
+        if(mode== GEOM)geomKeyDown(keycode);
+        if(mode== SPRITE)spriteKeyDown(keycode);
+
+    }
+    public void spriteKeyDown(int keycode) {
+
+    }
+    public void geomKeyDown(int keycode) {
+        if (keycode == Input.Keys.LEFT_BRACKET) {
             geomEditor.snapLevel++;
         } else if (keycode == Input.Keys.RIGHT_BRACKET) {
             geomEditor.snapLevel--;
@@ -119,6 +149,10 @@ public class Editor {
             }
         } else if (keycode == Input.Keys.A) {
             geomEditor.selectAll();
+        }else if (keycode == Input.Keys.N) {
+            float x=Gdx.input.getX();
+            float y=Gdx.input.getY();
+            geomEditor.addRectBrushAtMouse(1,1);
         }
     }
 }

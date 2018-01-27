@@ -58,8 +58,8 @@ public class GeomEditor {
             brush.render(shapeRenderer,Color.ORANGE,selIdx,altSelIdx,camController.getZoomFactor());
         }
 
-        if(selected!=null&&mouseDown&&!shiftKey){
-            if(selIdx>=0) {
+        if(selected!=null&&mouseDown&&!shiftKey) {
+            if (selIdx >= 0) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                 shapeRenderer.setColor(Color.CYAN);
                 shapeRenderer.line(new Vector2(selected.getVert(selIdx - 1)).add(selected.pos), wp);
@@ -68,29 +68,30 @@ public class GeomEditor {
                 shapeRenderer.rect(wp.x - screenScale, wp.y - screenScale,
                         screenScale * 2, screenScale * 2);
                 shapeRenderer.end();
-            }else{
-                Vector2 wp2=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
-                Vector2 dp=new Vector2(wp2.x-startPos.x,wp2.y-startPos.y);
+            } else {
+                Vector2 wp2 = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
+                Vector2 dp = new Vector2(wp2.x - startPos.x, wp2.y - startPos.y);
                 snap(dp);
-                for(Brush brush:mSelected)
-                    brush.render(shapeRenderer,Color.CYAN,-1,-1,camController.getZoomFactor(),dp);
+                for (Brush brush : mSelected)
+                    brush.render(shapeRenderer, Color.CYAN, -1, -1, camController.getZoomFactor(), dp);
             }
         }
+    }
+    public void activeRender(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch) {
         // -------- UI -------- //
         interfaceBatch.begin();
         FontKit.SysMedium.setColor(Color.TEAL);
-        FontKit.SysMedium.draw(interfaceBatch,"GeomEditor active. Press F9 to toggle.",10, Gdx.graphics.getHeight()-30);
+        FontKit.SysMedium.draw(interfaceBatch, "GeomEditor active. Press F9 to toggle.", 10, Gdx.graphics.getHeight() - 30);
         FontKit.SysMedium.draw(interfaceBatch,
-                "Snap "+(!snapOn?"off":"increment="+(snapLevel<0?"1/":"")+(int)Math.pow(2,snapLevel<0?-snapLevel:snapLevel)),
-                10, Gdx.graphics.getHeight()-50);
-        FontKit.SysMedium.draw(interfaceBatch,"Selected vert #"+selIdx,10, Gdx.graphics.getHeight()-70);
+                "Snap " + (!snapOn ? "off" : "increment=" + (snapLevel < 0 ? "1/" : "") + (int) Math.pow(2, snapLevel < 0 ? -snapLevel : snapLevel)),
+                10, Gdx.graphics.getHeight() - 50);
+        FontKit.SysMedium.draw(interfaceBatch, "Selected vert #" + selIdx, 10, Gdx.graphics.getHeight() - 70);
         FontKit.SysMedium.setColor(Color.SCARLET);
-        if(!errormsg.isEmpty()&&errorCooldown>0){
-            FontKit.SysMedium.draw(interfaceBatch,"Error: "+errormsg,10, 30);
-            errorCooldown-=Gdx.graphics.getDeltaTime();
+        if (!errormsg.isEmpty() && errorCooldown > 0) {
+            FontKit.SysMedium.draw(interfaceBatch, "Error: " + errormsg, 10, 30);
+            errorCooldown -= Gdx.graphics.getDeltaTime();
         }
         interfaceBatch.end();
-
     }
     public void mouseDown(int screenX, int screenY,int button){
         if(button!=0)return; //ignore left clicks
@@ -185,11 +186,20 @@ public class GeomEditor {
     public void addBrush(Vector2 ... verts){
         source.brushes.add(new Brush(verts));
     }
+
     public void selectBrushByNum(int num){
         if(num<0||num>= source.brushes.size())return;
         selected= source.brushes.get(num);
         mSelected.clear();
         mSelected.add(selected);
+    }
+
+    public void addRectBrushAtMouse(float w, float h){
+        Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
+        snap(wp);
+        float x=wp.x;
+        float y=wp.y;
+        source.brushes.add(new Brush(new Vector2(x,y),new Vector2(x+w,y),new Vector2(x+w,y+h),new Vector2(x,y+h)));
     }
     private void snap(Vector2 v){
         if(snapOn){
