@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.eelengine.engine.CamController;
 import com.eelengine.engine.Etil;
-import com.eelengine.engine.editor.*;
 
 public class Editor {
     public static final int OFF=0;
@@ -116,10 +115,10 @@ public class Editor {
                 System.out.println("level source:"+levelSource);
                 geomEditor.setSource(levelSource);
                 spriteEditor.setSource(levelSource);
-                System.out.println(levelSource.staticSprites);
+                System.out.println(levelSource.staticLayer0);
 //                StaticSprite sprite = new StaticSprite("test_map.png", 0, 0);
-//                geomEditor.getSource().staticSprites.add(sprite);
-                //geomEditor.getSource().staticSprites.add(new StaticSprite("test_map.png",10,0));
+//                geomEditor.getSource().staticLayer0.add(sprite);
+                //geomEditor.getSource().staticLayer0.add(new StaticSprite("test_map.png",10,0));
                 return;
             }
         }
@@ -144,6 +143,14 @@ public class Editor {
             spriteEditor.changeTexPage(1);
         }else if (keycode == Input.Keys.PAGE_DOWN) {
             spriteEditor.changeTexPage(-1);
+        }else if (keycode == Input.Keys.NUM_1) {
+            spriteEditor.numKey(0);
+        }else if (keycode == Input.Keys.NUM_2) {
+            spriteEditor.numKey(1);
+        }else if (keycode == Input.Keys.NUM_3) {
+            spriteEditor.numKey(2);
+        }else if (keycode == Input.Keys.R) {
+            spriteEditor.rotateSelected();
         }
     }
     public void geomKeyDown(int keycode) {

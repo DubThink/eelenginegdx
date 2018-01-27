@@ -9,23 +9,22 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.eelengine.engine.CamController;
-import com.eelengine.engine.EelGame;
-import com.eelengine.engine.FontKit;
-import com.eelengine.engine.StaticSprite;
+import com.eelengine.engine.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class SpriteEditor extends BaseEditor {
     private int texPage=0;
     public boolean sidepanel=true;
     int selectedSourceIdx=0;
+    public int activeLayer=0;
 
     float mouseDownX=0;
     float mouseDownY=0;
@@ -45,21 +44,28 @@ public class SpriteEditor extends BaseEditor {
     }
 
     public void render(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch) {
+//        if(source.getLayer(activeLayer).size()>0)source.getLayer(activeLayer).get(0).rot+=0.01;
         worldBatch.begin();
-        float warble=(float)(0.75+.25*Math.sin(0.02*Gdx.graphics.getFrameId()));
+        float warble = (float) (0.75 + .25 * Math.sin(0.02 * Gdx.graphics.getFrameId()));
         Vector2 dp = camController.screenToWorld(mouseDownX, mouseDownY);
-        Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
+        Vector2 wp = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
         dp.sub(wp);
         dp.scl(-1);
         snap(dp);
-        for(StaticSprite sprite:source.staticSprites){
-            if(sprite.selected)worldBatch.setColor(warble,warble,1,warble);
-            else worldBatch.setColor(1,1,1,1);
+        for (int layer = 0; layer < 3; layer++) {
+            for (StaticSprite sprite : source.getLayer(layer)) {
+                if (sprite.selected&&layer==activeLayer) worldBatch.setColor(warble, warble, 1, warble);
+                else worldBatch.setColor(1, 1, 1, 1);
 
-            if(dragging&&sprite.selected)worldBatch.draw(sprite.region,(sprite.pos.x+dp.x)* EelGame.GSCALE,(sprite.pos.y+dp.y)* EelGame.GSCALE);
-            else worldBatch.draw(sprite.region,sprite.pos.x* EelGame.GSCALE,(sprite.pos.y)* EelGame.GSCALE);
+                if (dragging && sprite.selected&&layer==activeLayer){
+                    RenderUtil.renderSprite(worldBatch,sprite.region,
+                            sprite.pos.x + dp.x,sprite.pos.y + dp.y,sprite.rot);
+                }
+                else RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+
+            }
+            worldBatch.setColor(1, 1, 1, 1);
         }
-        worldBatch.setColor(1,1,1,1);
         worldBatch.end();
     }
     public void activeRender(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch) {
@@ -71,7 +77,10 @@ public class SpriteEditor extends BaseEditor {
         FontKit.SysMedium.draw(interfaceBatch, "TAB to toggle side panel.", Gdx.graphics.getWidth()-200, Gdx.graphics.getHeight() - 50);
         FontKit.SysMedium.draw(interfaceBatch,
                 "Snap " + (!snapOn ? "off" : "increment=" + (snapLevel < 0 ? "1/" : "") + (int) Math.pow(2, snapLevel < 0 ? -snapLevel : snapLevel)),
-                Gdx.graphics.getWidth()-100, Gdx.graphics.getHeight() - 50);
+                Gdx.graphics.getWidth()-200, Gdx.graphics.getHeight() - 70);
+        FontKit.SysLarge.setColor(Color.TEAL);
+        FontKit.SysLarge.draw(interfaceBatch, "Layer "+activeLayer, Gdx.graphics.getWidth()-200, Gdx.graphics.getHeight() - 110);
+
         FontKit.SysMedium.setColor(Color.SCARLET);
         if (!errormsg.isEmpty() && errorCooldown > 0) {
             FontKit.SysMedium.draw(interfaceBatch, "Error: " + errormsg, 10, 30);
@@ -92,9 +101,9 @@ public class SpriteEditor extends BaseEditor {
     public void addActiveTextureAtMouse(){
         Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
         snap(wp);
-        float x=wp.x;
-        float y=wp.y;
-        source.staticSprites.add(new StaticSprite(sources.get(selectedSourceIdx).sprite,x,y));
+        float x=wp.x+sources.get(selectedSourceIdx).sprite.width()/(2*EelGame.GSCALE);
+        float y=wp.y+sources.get(selectedSourceIdx).sprite.height()/(2*EelGame.GSCALE);
+        source.getLayer(activeLayer).add(new StaticSprite(sources.get(selectedSourceIdx).sprite,x,y));
     }
 
     @Override
@@ -106,14 +115,14 @@ public class SpriteEditor extends BaseEditor {
         if(screenX<128&&sidepanel) {// on sidebar
             System.out.println(screenY + " " + screenY / 150);
             selectedSourceIdx = texPage + (int) Math.floor((Gdx.graphics.getHeight() - screenY) / 150);
-            System.out.println("Selected source #" + selectedSourceIdx);
         }else if(button== Input.Buttons.MIDDLE) {
             addActiveTextureAtMouse();
         }else if(button== Input.Buttons.LEFT) {
             dragging=true;
-            for(StaticSprite sprite:source.staticSprites){
+            for(StaticSprite sprite:source.getLayer(activeLayer)){
                 System.out.println(wp+", "+sprite.pos+", "+(sprite.pos.x+sprite.width()/EelGame.GSCALE)+", "+(sprite.pos.x+sprite.height()/EelGame.GSCALE));
-                if(Util.in(wp.x,sprite.pos.x,(sprite.pos.x+sprite.width()/EelGame.GSCALE))&&Util.in(wp.y,sprite.pos.y,(sprite.pos.y+sprite.height()/EelGame.GSCALE))) {
+                if(Util.in(wp.x,sprite.pos.x-sprite.width()/EelGame.GSCALE*0.5,(sprite.pos.x+sprite.width()/EelGame.GSCALE))&&
+                        Util.in(wp.y,sprite.pos.y-sprite.height()/EelGame.GSCALE*0.5,(sprite.pos.y+sprite.height()/EelGame.GSCALE))) {
                     sprite.pSelected = sprite.selected;
                     sprite.selected = true;
                 }else if(!shiftKey)sprite.selected=false;
@@ -121,12 +130,16 @@ public class SpriteEditor extends BaseEditor {
         }
     }
 
+    public void rotateSelected(){
+        for(StaticSprite sprite:source.getLayer(activeLayer))sprite.rot+=shiftKey?Util.QUARTER_PI_F:-Util.QUARTER_PI_F;
+    }
+
     public void deselectAll(){
-        for(StaticSprite sprite:source.staticSprites)sprite.selected=false;
+        for(StaticSprite sprite:source.getLayer(activeLayer))sprite.selected=false;
     }
 
     public void removeSelected(){
-        source.staticSprites.removeIf(sprite -> sprite.selected);
+        source.getLayer(activeLayer).removeIf(sprite -> sprite.selected);
     }
     @Override
     public void mouseUp(int screenX, int screenY, int button) {
@@ -134,8 +147,9 @@ public class SpriteEditor extends BaseEditor {
         if(button==Input.Buttons.LEFT) {
             dragging=false;
             if (Util.dist2(screenX, screenY, mouseDownX, mouseDownY) < 40) {
-                for (StaticSprite sprite : source.staticSprites) {
-                    if (Util.inBox(wp.x, wp.y, sprite.pos.x, sprite.pos.y, sprite.pos.x + sprite.width() / EelGame.GSCALE, sprite.pos.y + sprite.height() / EelGame.GSCALE))
+                for (StaticSprite sprite : source.getLayer(activeLayer)) {
+                    if (Util.in(wp.x,sprite.pos.x-sprite.width()/EelGame.GSCALE*0.5,(sprite.pos.x+sprite.width()/EelGame.GSCALE))&&
+                            Util.in(wp.y,sprite.pos.y-sprite.height()/EelGame.GSCALE*0.5,(sprite.pos.y+sprite.height()/EelGame.GSCALE)))
                         sprite.selected = !sprite.pSelected;
                 }
             } else {
@@ -144,7 +158,7 @@ public class SpriteEditor extends BaseEditor {
                 snap(dp);
                 dp.scl(-1);
                 //dragged
-                for (StaticSprite sprite : source.staticSprites) {
+                for (StaticSprite sprite : source.getLayer(activeLayer)) {
                     if(sprite.selected)sprite.pos.add(dp);
                 }
             }
@@ -200,6 +214,32 @@ public class SpriteEditor extends BaseEditor {
         }
         public int height(){
             return sprite.region.getRegionHeight();
+        }
+    }
+
+    @Override
+    public void setSource(LevelSource source) {
+        super.setSource(source);
+    }
+    public void numKey(int i){
+        if(shiftKey)moveToLayer(i);
+        else setActiveLayer(i);
+    }
+    public void setActiveLayer(int i){
+        if(Util.in(i,0,2))activeLayer=i;
+    }
+    public void moveToLayer(int i){
+        if(!Util.in(i,0,2)){
+            System.err.println("WHY YUO DO THIS");
+            return;
+        }
+        Queue<StaticSprite> toMove=new LinkedList<>();
+        for(StaticSprite sprite:source.getLayer(activeLayer)){
+            if(sprite.selected)toMove.add(sprite);
+        }
+        removeSelected();
+        for (StaticSprite sprite; (sprite = toMove.poll()) != null;){
+            source.getLayer(i).add(sprite);
         }
     }
 }

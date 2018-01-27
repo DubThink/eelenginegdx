@@ -23,6 +23,7 @@ public class Util {
 
     public static final float PI_F=3.14159265358979323846f;
     public static final float HALF_PI_F=PI_F/2;
+    public static final float QUARTER_PI_F=PI_F/4;
     public static final float TWO_PI_F=PI_F*2;
 
 
