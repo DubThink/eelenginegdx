@@ -4,6 +4,7 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.eelengine.engine.EelGame;
+import com.eelengine.engine.MailGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -19,7 +20,8 @@ public class DesktopLauncher {
 //        config.addIcon("Eel_E_32x.png", Files.FileType.Internal);
 //        config.addIcon("Eel_invE_16x.png", Files.FileType.Internal);
         //config.stencil=8; // LOOK we can have stencil bits
-        new Lwjgl3Application(new EelGame(), config);
+		//new Lwjgl3Application(new EelGame(), config);
+		new Lwjgl3Application(new MailGame(), config);
         //app.getGraphics().
 	}
 }

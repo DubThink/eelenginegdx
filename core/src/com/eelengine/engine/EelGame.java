@@ -140,7 +140,10 @@ public class EelGame extends ApplicationAdapter {
         testSprite=new StaticSprite("sig.png");
 //        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
 //                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
+        gameCreate();
     }
+
+    public void gameCreate(){};
 
     private void setup() {
         LoadedTextureRegion.assetSystem=assetSystem;
@@ -157,19 +160,11 @@ public class EelGame extends ApplicationAdapter {
 
     boolean fullscreen=true;
     boolean escapeMenu=false;
-    private void handleInput() {
-//        float yv=Gdx.input.isKeyPressed(Input.Keys.W)?1:Gdx.input.isKeyPressed(Input.Keys.S)?-1:0;
-//        float xv=Gdx.input.isKeyPressed(Input.Keys.D)?1:Gdx.input.isKeyPressed(Input.Keys.A)?-1:0;
-//        yv=Gdx.input.isKeyPressed(Input.Keys.W)||Gdx.input.isKeyPressed(Input.Keys.S)?yv:dynamicBody.getLinearVelocity().y;
-//        xv=Gdx.input.isKeyPressed(Input.Keys.A)||Gdx.input.isKeyPressed(Input.Keys.D)?xv:dynamicBody.getLinearVelocity().x;
-//        dynamicBody.setLinearVelocity(xv,yv);
-    }
 
     @Override
     public void render () {
         boolean loading=!assetSystem.update();
 //        System.out.println(assetSystem.getQueuedAssets()+":"+assetSystem.getLoadedAssets());
-        handleInput();
 
         // clear graphics
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -202,6 +197,7 @@ public class EelGame extends ApplicationAdapter {
         // Step ECS
         entityWorld.setDelta(Gdx.graphics.getDeltaTime()*DEV_time_mod);
         entityWorld.process();
+        logicStep();
 //            navPath=navigation.findPath(ECS.mTransform.get(ent).pos,
 //                    new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
 //            if(navPath!=null)navPath.draw(shapeRenderer);
@@ -253,7 +249,7 @@ public class EelGame extends ApplicationAdapter {
             FontKit.SysMedium.draw(interfaceBatch, "Press ESC for menu", 10, Gdx.graphics.getHeight() - 10);
         }
         FontKit.SysMedium.setColor(Color.TEAL);
-        FontKit.SysMedium.draw(interfaceBatch, "Loading ["+(int)(assetSystem.getProgress()*100)+"%]", Gdx.graphics.getWidth()-140, 20);
+        if(loading)FontKit.SysMedium.draw(interfaceBatch, "Loading ["+(int)(assetSystem.getProgress()*100)+"%]", Gdx.graphics.getWidth()-140, 20);
         interfaceBatch.end();
 
         // Draw physics debug
@@ -265,13 +261,16 @@ public class EelGame extends ApplicationAdapter {
 //        }
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
-        try {
-            TimeUnit.MILLISECONDS.sleep(16);
-        }catch (InterruptedException e){
-            throw new  RuntimeException(e);
-        }
+        renderUI();
+//        try {
+//            TimeUnit.MILLISECONDS.sleep(16);
+//        }catch (InterruptedException e){
+//            throw new  RuntimeException(e);
+//        }
 
     }
+    public void logicStep(){}//To Extend
+    public void renderUI(){}//To Extend
 
     int ent;
     CInput entInput;
@@ -289,13 +288,47 @@ public class EelGame extends ApplicationAdapter {
     }
 
     RenderOneTexSystem spriteRenderSystem;
-    void makeBloob(int x,int y){
+    void makeBloob(float x,float y){
         int e=entityWorld.create();
         COneTex cOneTex =ECS.mGraphics.create(e);
         ECS.mTransform.create(e)
                 .setPos(x,y)
                 .setScale(.9f)
                 .setRot((float)Math.random()*Util.TWO_PI_F);
+        cOneTex.texture=img2;
+
+//        CPhysics pc=ECS.mPhysics.create(e);
+//        pc.buildBody(physicsWorld);
+//        pc.body.setType(BodyDef.BodyType.DynamicBody);
+//        PolygonShape shape = new PolygonShape();
+//        shape.setAsBox(.3f,.3f);
+//        FixtureDef fixtureDef = new FixtureDef();
+//        fixtureDef.shape = shape;
+//        fixtureDef.density = 1f;
+//        fixtureDef.restitution=0.5f;
+//        pc.body.createFixture(fixtureDef);
+//        shape.dispose();
+        //pc.body.setLinearDamping(10);
+        //pc.body.setAngularDamping(10);
+//        Vector2 v=new Vector2((float)Math.random()-0.5f,(float)Math.random()-0.5f).setLength((float)Math.random()*8);
+//        pc.body.setLinearVelocity(v);
+//        ECS.mHealth.create(e)
+//                .set(5);
+//        ECS.mDamager.create(e)
+//                .set(5);
+//        ECS.mProjectile.create(e)
+//                .destroyOnHit=true;
+//        ECS.mTeam.create(e)
+//                .set(1);
+        ECS.mTrigger.create(e).addFlags("RED").setRadius(1);
+    }
+
+    void makeMailbox(float x,float y){
+        int e=entityWorld.create();
+        COneTex cOneTex =ECS.mGraphics.create(e);
+        ECS.mTransform.create(e)
+                .setPos(x,y)
+                .setScale(1f);
         cOneTex.texture=img;
 
         CPhysics pc=ECS.mPhysics.create(e);
@@ -325,6 +358,7 @@ public class EelGame extends ApplicationAdapter {
 
     void makeBullet(float x, float y, float tx, float ty){
         int e=entityWorld.create();
+//        ECS.mTrigger.create(e).addFlags("RED").setRadius(2);
         COneTex cOneTex =ECS.mGraphics.create(e);
         CTransform cTransform=ECS.mTransform.create(e)
                 .setScale(1.5f)
@@ -355,6 +389,8 @@ public class EelGame extends ApplicationAdapter {
         ECS.mDamager.create(e)
                 .set(10);
     }
+
+    TriggerSystem triggerSystem;
     /**
      * Sets up the Entity-Component-System structure
      * @pre All subsystems used by ECS should be initialized first
@@ -369,6 +405,7 @@ public class EelGame extends ApplicationAdapter {
                 })
                 .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
                 .with(spriteRenderSystem=new RenderOneTexSystem(worldBatch))
+                .with(triggerSystem=new TriggerSystem())
                 .with(WorldConfigurationBuilder.Priority.LOW,new UtilSystem())
                 .with(WorldConfigurationBuilder.Priority.LOW,new HealthSystem(interfaceBatch,camController))
                 .with(WorldConfigurationBuilder.Priority.LOW - 1, new BaseEntitySystem(Aspect.all()) {
@@ -386,7 +423,7 @@ public class EelGame extends ApplicationAdapter {
         entityWorld=new com.artemis.World(entityConfig);
         ECS.initialize(entityWorld);
         EntitySubscription subscription = entityWorld.getAspectSubscriptionManager().get(Aspect.all(CPhysics.class));
-
+        triggerSystem.setEnabled(false);
         subscription.addSubscriptionListener(new EntitySubscription.SubscriptionListener() {
             ComponentMapper<CPhysics> mPhysics=entityWorld.getMapper(CPhysics.class);
             ComponentMapper<CTransform> mPosition=entityWorld.getMapper(CTransform.class);
@@ -522,6 +559,10 @@ public class EelGame extends ApplicationAdapter {
     void setupEditor(){
         editor=new Editor(camController);
     }
+
+    Vector2 getWorldMouse(){
+        return camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
+    }
     class InputCore implements InputProcessor {
 
         CamController camController;
@@ -624,7 +665,11 @@ public class EelGame extends ApplicationAdapter {
 
         public void gameKeyDown(int keycode){
             // WASD
-            if (keycode == Input.Keys.W) {
+            if (keycode == Input.Keys.G) {
+                System.out.println(triggerSystem.checkFlag("RED",getWorldMouse().x,getWorldMouse().y));
+            }else if (keycode == Input.Keys.M) {
+                makeBloob(getWorldMouse().x,getWorldMouse().y);
+            }else if (keycode == Input.Keys.W) {
                 entInput.down(CInput.UP);
             } else if (keycode == Input.Keys.A) {
                 entInput.down(CInput.LEFT);

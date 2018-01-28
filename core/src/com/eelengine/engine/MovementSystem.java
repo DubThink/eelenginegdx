@@ -44,7 +44,7 @@ public class MovementSystem extends IteratingSystem {
                 coast=!(input.checkOn(CInput.LEFT)||input.checkOn(CInput.RIGHT)||input.checkOn(CInput.UP)||input.checkOn(CInput.DOWN));
 
                 //System.out.printf("Desired angle:%.3f Current angle:%.3f Rate:%.3f\n",desired.angle(),current.angle(),rate);
-                System.out.println(current.angleRad(desired)+" "+rate*1.5);
+//                System.out.println(current.angleRad(desired)+" "+rate*1.5);
                 if(!desired.isZero()&&Util.abs(current.angleRad(desired))<rate*1.5){
                     transform.rot=desired.angle()*Util.DEG_TO_RAD_F;
                     v.set(yMove,xMove);//these don't matter this is only to keep it from moving when both are 0
