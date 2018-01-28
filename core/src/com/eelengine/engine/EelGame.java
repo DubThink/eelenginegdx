@@ -85,7 +85,7 @@ public class EelGame extends ApplicationAdapter {
 
     @Override
     public void create () {
-        img = new Texture(Gdx.files.internal("Eel_E_64x.png"),true);
+        img = new Texture(Gdx.files.internal("test_car_lol.png"),true);
         img2 = new Texture(Gdx.files.internal("blic_32x.png"),true);
         img.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
         img2.setFilter(Texture.TextureFilter.MipMapLinearNearest, Texture.TextureFilter.Linear);
@@ -422,8 +422,10 @@ public class EelGame extends ApplicationAdapter {
         COneTex cOneTex =ECS.mGraphics.create(ent);
         CTransform cTransform = ECS.mTransform.create(ent);
         entInput = ECS.mInput.create(ent);
-        ECS.mMovement.create(ent).setSpeed(4).setVehicular(true).setTurningRate(0.01f);
+        ECS.mMovement.create(ent).setMaxSpeed(4).setVehicular(true);
+
         cOneTex.texture=img;
+        cOneTex.setOffset(0.4f,0.5f);
         cTransform.pos.set(2,10);
         cTransform.setScale(1.25f);
         CPhysics pc=ECS.mPhysics.create(ent);

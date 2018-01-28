@@ -25,10 +25,12 @@ public class MovementSystem extends IteratingSystem {
         CPhysics physics=mPhysics.get(e);
         if(physics.isStunned())return;
         CTransform transform = mTransform.get(e);
+        CMovement movement=mMovement.get(e);
         Vector2 v=new Vector2();
+        boolean coast=false;
         if(mInput.has(e)&&mInput.get(e).enabled) {
             CInput input = mInput.get(e);
-            if(mMovement.get(e).vehicular){
+            if(movement.vehicular){
                 int xMove = 0;
                 if (input.checkOn(CInput.LEFT)) xMove--;
                 if (input.checkOn(CInput.RIGHT)) xMove++;
@@ -38,25 +40,27 @@ public class MovementSystem extends IteratingSystem {
                 Vector2 desired=new Vector2(xMove,yMove);
                 Vector2 current=new Vector2(1,0);
                 current.setAngleRad(transform.rot);
-                float rate=mMovement.get(e).turningRate;
+                float rate=Util.min(movement.turningRate*movement.speed,movement.maxTurningRate)*world.delta;
+                coast=!(input.checkOn(CInput.LEFT)||input.checkOn(CInput.RIGHT)||input.checkOn(CInput.UP)||input.checkOn(CInput.DOWN));
 
-
-                System.out.printf("Desired angle:%.3f Current angle:%.3f\n",desired.angle(),current.angle());
-//                if(Util.abs(desired.angle()-transform.rot)<rate){
-//                    transform.rot=desired.angle()*Util.DEG_TO_RAD_F;
-//                } else
-                    {
-                    //transform.rot%=
-                    //desired.r
-                    float delta=desired.angle()*Util.DEG_TO_RAD_F-transform.rot%Util.TWO_PI_F;
-                    boolean left=delta>0;
+                //System.out.printf("Desired angle:%.3f Current angle:%.3f Rate:%.3f\n",desired.angle(),current.angle(),rate);
+                System.out.println(current.angleRad(desired)+" "+rate*1.5);
+                if(!desired.isZero()&&Util.abs(current.angleRad(desired))<rate*1.5){
+                    transform.rot=desired.angle()*Util.DEG_TO_RAD_F;
+                    v.set(yMove,xMove);//these don't matter this is only to keep it from moving when both are 0
+                } else if(current.dot(desired)<-0.4) {//desired is in opposite direction; set speed to 0
+//                    System.out.println("Decel");
+                    v.setZero();
+                } else {
+                    float delta=desired.angle()-current.angle();
+                    boolean left=delta<0;
                     if (Util.abs(delta) > 180) {
                         left=!left;
                     }
                     //System.out.println("Rotate "+(left?"left":"right"));
                     if(yMove!=0||xMove!=0)transform.rot+=left?-rate:rate;
+                    v.set(yMove,xMove);//these don't matter this is only to keep it from moving when both are 0
                 }
-                v.set(yMove,xMove);//these don't matter this is only to keep it from moving when both are 0
                 v.setAngleRad(transform.rot);
             }else{
                 //NON VEHICULAR MOVEMENT
@@ -77,7 +81,14 @@ public class MovementSystem extends IteratingSystem {
             v.set(mNavigator.get(e).desiredMove);
         }
 
-        v.setLength(mMovement.get(e).speed);
+//        System.out.p rintf("speed %.3f  accel factor %.3f max speed %.3f\n",movement.speed,movement.accel*world.delta,movement.maxSpeed);
+        //System.out.println("coast: "+coast);
+        if(!coast) {
+            if (v.isZero()) movement.speed = Util.max(0, movement.speed - movement.deccel * world.delta);
+            else movement.speed = Util.min(movement.maxSpeed, movement.speed + movement.accel * world.delta);
+        }
+        if(movement.vehicular)v.set(0,1).setAngleRad(transform.rot);
+        v.setLength(movement.speed);
 //        System.out.println("New move v "+v);
         physics.body.setLinearVelocity(v);
 

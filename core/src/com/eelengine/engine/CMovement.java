@@ -8,9 +8,22 @@ import com.artemis.Component;
 public class CMovement extends Component {
     float speed=0;
     boolean vehicular=false;
-    float turningRate=0;
-    public CMovement setSpeed(float speed){
-        this.speed=speed;
+    float turningRate=1.3f; // turning rate in radians per second per unit speed per second
+    float maxSpeed=0;
+    float accel =1.6f;
+    float deccel = 2.5f;
+    float maxTurningRate=1.3f; // max turning rate in radians per second. Not affected by speed
+
+    public CMovement setMaxSpeed(float maxSpeed){
+        this.maxSpeed=maxSpeed;
+        return this;
+    }
+    public CMovement setAccel(float accel){
+        this.accel = accel;
+        return this;
+    }
+    public CMovement setDeccel(float deccel){
+        this.deccel = deccel;
         return this;
     }
 
@@ -21,6 +34,10 @@ public class CMovement extends Component {
 
     public CMovement setTurningRate(float turningRate) {
         this.turningRate = turningRate;
+        return this;
+    }
+    public CMovement setMaxTurningRate(float turningRate) {
+        this.maxTurningRate = turningRate;
         return this;
     }
 }
