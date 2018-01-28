@@ -116,7 +116,7 @@ public class SpriteEditor extends BaseEditor {
         Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
 
         if(screenX<128&&sidepanel) {// on sidebar
-            System.out.println(screenY + " " + screenY / 150);
+            //System.out.println(screenY + " " + screenY / 150);
             selectedSourceIdx = texPage + (int) Math.floor((Gdx.graphics.getHeight() - screenY) / 150);
         }else if(button== Input.Buttons.MIDDLE) {
             addActiveTextureAtMouse();
@@ -126,7 +126,7 @@ public class SpriteEditor extends BaseEditor {
             StaticSprite sprite;
             for(int i=0;i<source.getLayer(activeLayer).size();i++){
                 sprite=source.getLayer(activeLayer).get(i);
-                System.out.println(wp+", "+sprite.pos+", "+(sprite.pos.x+sprite.width()/EelGame.GSCALE)+", "+(sprite.pos.x+sprite.height()/EelGame.GSCALE));
+                //System.out.println(wp+", "+sprite.pos+", "+(sprite.pos.x+sprite.width()/EelGame.GSCALE)+", "+(sprite.pos.x+sprite.height()/EelGame.GSCALE));
                 if(Util.in(wp.x,sprite.pos.x-sprite.width()/EelGame.GSCALE*0.5,(sprite.pos.x+sprite.width()/EelGame.GSCALE*0.5))&&
                         Util.in(wp.y,sprite.pos.y-sprite.height()/EelGame.GSCALE*0.5,(sprite.pos.y+sprite.height()/EelGame.GSCALE*0.5))) {
                     sprite.pSelected = sprite.selected;

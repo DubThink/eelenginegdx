@@ -7,7 +7,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class AssetSystem extends AssetManager{
-    public static boolean debug=true;
+    public static boolean debug=false;
     private Queue<Tuple<String,Loadable>> loadables=new ConcurrentLinkedDeque<>();
 
     public AssetSystem() {
@@ -26,10 +26,7 @@ public class AssetSystem extends AssetManager{
         boolean status = super.update();
         if(status&&loadables.size()>0){
             if(debug)System.out.println("Loaded all assets, building "+loadables.size()+" loadables...");
-            if(debug)System.out.println(this.getProgress());
-            if(debug){
-                for(String s:this.getAssetNames()) System.out.println(s);
-            }
+//            if(debug)System.out.println(this.getProgress());
 
             for (Tuple<String,Loadable> loadable; (loadable = loadables.poll()) != null;){
                 loadable.y.build(loadable.x);
