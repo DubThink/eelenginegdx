@@ -88,8 +88,8 @@ public class Editor {
 
     }
     public void render(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch){
-        geomEditor.render(worldBatch,shapeRenderer,interfaceBatch);
         spriteEditor.render(worldBatch,shapeRenderer,interfaceBatch);
+        geomEditor.render(worldBatch,shapeRenderer,interfaceBatch);
         if(mode==SPRITE)spriteEditor.activeRender(worldBatch, shapeRenderer, interfaceBatch);
         if(mode==GEOM)geomEditor.activeRender(worldBatch, shapeRenderer, interfaceBatch);
     }
