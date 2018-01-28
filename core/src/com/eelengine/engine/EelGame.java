@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.eelengine.engine.ai.Navigation;
 import com.eelengine.engine.editor.Editor;
+import com.eelengine.engine.editor.LevelSource;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ public class EelGame extends ApplicationAdapter {
     boolean DEV_draw_nav=true;
     float DEV_time_mod=1f;
     // Temp physics testing
+
 
 
     @Override
@@ -183,6 +185,15 @@ public class EelGame extends ApplicationAdapter {
         worldBatch.setProjectionMatrix(camController.getCam().combined);
         shapeRenderer.setProjectionMatrix(matrix4);
 
+        worldBatch.begin();
+        for (StaticSprite sprite : editor.getLevelSource().staticLayer0) {
+            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+        }
+//        for (StaticSprite sprite : staticLayer1){
+//            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+//        }
+        worldBatch.end();
+
         // Draw grid
         if (DEV_draw_grid) {
             shapeRenderer.begin();
@@ -202,14 +213,17 @@ public class EelGame extends ApplicationAdapter {
 //                    new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
 //            if(navPath!=null)navPath.draw(shapeRenderer);
 ////            else System.out.println("NO NAV");
-        entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
+//        entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
 //        }
 
         // TEST
         worldBatch.begin();
         //if(geomEditor !=null&& geomEditor.getSource().sprite!=null)worldBatch.draw(geomEditor.getSource().sprite.region,0,0);
         //        //worldBatch.draw(region,0,0);
-        worldBatch.draw(testSprite.region,0,0);
+//        worldBatch.draw(testSprite.region,0,0);
+//        for (StaticSprite sprite : staticLayer0) {
+//            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+//        }
         worldBatch.end();
 
 
@@ -295,7 +309,7 @@ public class EelGame extends ApplicationAdapter {
                 .setPos(x,y)
                 .setScale(.9f)
                 .setRot((float)Math.random()*Util.TWO_PI_F);
-        cOneTex.texture=img2;
+//        cOneTex.texture=img2;
 
 //        CPhysics pc=ECS.mPhysics.create(e);
 //        pc.buildBody(physicsWorld);
@@ -329,7 +343,7 @@ public class EelGame extends ApplicationAdapter {
         ECS.mTransform.create(e)
                 .setPos(x,y)
                 .setScale(1f);
-        cOneTex.texture=img;
+//        cOneTex.texture=img;
 
         CPhysics pc=ECS.mPhysics.create(e);
         pc.buildBody(physicsWorld);
@@ -363,7 +377,7 @@ public class EelGame extends ApplicationAdapter {
         CTransform cTransform=ECS.mTransform.create(e)
                 .setScale(1.5f)
                 .setPos(x,y);
-        cOneTex.texture=img2;
+//        cOneTex.texture=img2;
 //        cTransform.rotLockedToPhysics=false;
 //        cTransform.pointAtVelocity=true;
         CPhysics pc=ECS.mPhysics.create(e);
@@ -452,46 +466,59 @@ public class EelGame extends ApplicationAdapter {
                 }
             }
         });
-
         // PLAYER/TEST CHARACTER
-        ent=entityWorld.create();
-
-        COneTex cOneTex =ECS.mGraphics.create(ent);
-        CTransform cTransform = ECS.mTransform.create(ent);
-        entInput = ECS.mInput.create(ent);
-        ECS.mMovement.create(ent).setMaxSpeed(4).setVehicular(true);
-
-        cOneTex.texture=img;
-        cOneTex.setOffset(0.4f,0.5f);
-        cTransform.pos.set(2,10);
-        cTransform.setScale(1.25f);
-        CPhysics pc=ECS.mPhysics.create(ent);
-        pc.buildBody(physicsWorld);
-        pc.body.setType(BodyDef.BodyType.DynamicBody);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(.5f,.5f);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        pc.body.createFixture(fixtureDef);
-        pc.body.setAngularDamping(10);
-        pc.setFilter(PHYS.PLAYERTEAM,PHYS.ALL);
-        // COLLISION TEST GROUND
-        //pc.body.
-        //
-        shape.dispose();
-        cTransform.rotLockedToPhysics=false;
-        ECS.mHealth.create(ent)
-                .set(40);
-        ECS.mDamager.create(ent)
-                .set(100);
-        entNavigator=ECS.mNavigator.create(ent)
-                .setMode(CNavigator.POINT);
+//        ent=entityWorld.create();
+//
+//        COneTex cOneTex =ECS.mGraphics.create(ent);
+//        CTransform cTransform = ECS.mTransform.create(ent);
+//        entInput = ECS.mInput.create(ent);
+//        ECS.mMovement.create(ent).setMaxSpeed(4).setVehicular(true);
+//
+//        cOneTex.texture=img;
+//        cOneTex.setOffset(0.4f,0.5f);
+//        cTransform.pos.set(2,10);
+//        cTransform.setScale(1.25f);
+//        CPhysics pc=ECS.mPhysics.create(ent);
+//        pc.buildBody(physicsWorld);
+//        pc.body.setType(BodyDef.BodyType.DynamicBody);
+//        PolygonShape shape = new PolygonShape();
+//        shape.setAsBox(.5f,.5f);
+//        FixtureDef fixtureDef = new FixtureDef();
+//        fixtureDef.shape = shape;
+//        fixtureDef.density = 1f;
+//        pc.body.createFixture(fixtureDef);
+//        pc.body.setAngularDamping(10);
+//        pc.setFilter(PHYS.PLAYERTEAM,PHYS.ALL);
+//        // COLLISION TEST GROUND
+//        //pc.body.
+//        //
+//        shape.dispose();
+//        cTransform.rotLockedToPhysics=false;
+//        ECS.mHealth.create(ent)
+//                .set(40);
+//        ECS.mDamager.create(ent)
+//                .set(100);
+//        entNavigator=ECS.mNavigator.create(ent)
+//                .setMode(CNavigator.POINT);
 
         //for(int i=0;i<10;i+=2)makeBloob(i);
 
         // This is part of ecs really. mostly needs to be done after ecs is up
         physicsWorld.setContactListener(new CollisionHandler(entityWorld) );
+    }
+
+
+    ArrayList<StaticSprite> staticLayer0 =new ArrayList<>();
+    ArrayList<StaticSprite> staticLayer1=new ArrayList<>();
+    ArrayList<StaticSprite> staticLayer2=new ArrayList<>();
+
+    public void buildLevelStaticSprites(LevelSource source){
+        staticLayer0.clear();
+        staticLayer0.addAll(source.staticLayer0);
+        staticLayer1.clear();
+        staticLayer1.addAll(source.staticLayer1);
+        staticLayer2.clear();
+        staticLayer2.addAll(source.staticLayer2);
     }
 
     Body dynamicBody,staticBody;
@@ -563,6 +590,35 @@ public class EelGame extends ApplicationAdapter {
     Vector2 getWorldMouse(){
         return camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
     }
+    public void gameKeyDown(int keycode){
+        // WASD
+        if (keycode == Input.Keys.G) {
+            System.out.println(triggerSystem.checkFlag("RED",getWorldMouse().x,getWorldMouse().y));
+        }else if(entInput!=null) {
+            if (keycode == Input.Keys.M) {
+                makeBloob(getWorldMouse().x, getWorldMouse().y);
+            } else if (keycode == Input.Keys.W) {
+                entInput.down(CInput.UP);
+            } else if (keycode == Input.Keys.A) {
+                entInput.down(CInput.LEFT);
+            } else if (keycode == Input.Keys.S) {
+                entInput.down(CInput.DOWN);
+            } else if (keycode == Input.Keys.D) {
+                entInput.down(CInput.RIGHT);
+            }
+        } else if (keycode == Input.Keys.Z) {
+            /////////////
+            // TEST SPACE
+//                Vector2 mouseLoc = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
+//                currentLevel.addWall(mouseLoc.x, mouseLoc.y, mouseLoc.x + 5, mouseLoc.y + .25f);
+            /////////////
+        } else if (keycode == Input.Keys.X) {
+            /////////////
+            // TEST SPACE
+            spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
+        }
+    }
+
     class InputCore implements InputProcessor {
 
         CamController camController;
@@ -661,36 +717,6 @@ public class EelGame extends ApplicationAdapter {
         }
 
 
-
-
-        public void gameKeyDown(int keycode){
-            // WASD
-            if (keycode == Input.Keys.G) {
-                System.out.println(triggerSystem.checkFlag("RED",getWorldMouse().x,getWorldMouse().y));
-            }else if (keycode == Input.Keys.M) {
-                makeBloob(getWorldMouse().x,getWorldMouse().y);
-            }else if (keycode == Input.Keys.W) {
-                entInput.down(CInput.UP);
-            } else if (keycode == Input.Keys.A) {
-                entInput.down(CInput.LEFT);
-            } else if (keycode == Input.Keys.S) {
-                entInput.down(CInput.DOWN);
-            } else if (keycode == Input.Keys.D) {
-                entInput.down(CInput.RIGHT);
-            } else if (keycode == Input.Keys.Q) {
-                entInput.enabled = !entInput.enabled;
-            } else if (keycode == Input.Keys.Z) {
-                /////////////
-                // TEST SPACE
-//                Vector2 mouseLoc = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
-//                currentLevel.addWall(mouseLoc.x, mouseLoc.y, mouseLoc.x + 5, mouseLoc.y + .25f);
-                /////////////
-            } else if (keycode == Input.Keys.X) {
-                /////////////
-                // TEST SPACE
-                spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
-            }
-        }
         @Override
         public boolean keyUp(int keycode) {
             if(keycode==Input.Keys.SHIFT_LEFT){

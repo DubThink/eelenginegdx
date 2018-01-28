@@ -26,6 +26,10 @@ public class Editor {
     private int exwidth=200;
     protected LevelSource levelSource;
 
+    public LevelSource getLevelSource() {
+        return levelSource;
+    }
+
     public Editor(CamController camController) {
         geomEditor=new GeomEditor(camController);
         spriteEditor=new SpriteEditor(camController);
@@ -105,17 +109,15 @@ public class Editor {
         if(mode==GEOM)geomEditor.mouseUp(screenX, screenY, button);
         else if(mode==SPRITE)spriteEditor.mouseUp(screenX, screenY, button);
     }
+
+    public String sourceName="testEnv.lvlsrc";
     public void keyDown(int keycode) {
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
             if (keycode == Input.Keys.S) {
-                LevelIO.saveLevelSource(Gdx.files.internal("testEnv.lvlsrc"), levelSource);
+                saveLevel(sourceName);
                 return;
             } else if (keycode == Input.Keys.O) {
-                levelSource = LevelIO.loadLevelSource(Gdx.files.internal("testEnv.lvlsrc"));
-                System.out.println("level source:"+levelSource);
-                geomEditor.setSource(levelSource);
-                spriteEditor.setSource(levelSource);
-                System.out.println(levelSource.staticLayer0);
+                loadLevel(sourceName);
 //                StaticSprite sprite = new StaticSprite("test_map.png", 0, 0);
 //                geomEditor.getSource().staticLayer0.add(sprite);
                 //geomEditor.getSource().staticLayer0.add(new StaticSprite("test_map.png",10,0));
@@ -125,6 +127,17 @@ public class Editor {
         if(mode== GEOM)geomKeyDown(keycode);
         if(mode== SPRITE)spriteKeyDown(keycode);
 
+    }
+    public void saveLevel(String name){
+        System.out.println("Saving "+name+" to "+Gdx.files.internal(name).path());
+        LevelIO.saveLevelSource(Gdx.files.internal(name), levelSource);
+    }
+    public void loadLevel(String name){
+        levelSource = LevelIO.loadLevelSource(Gdx.files.internal(name));
+        System.out.println("level source: "+name);
+        geomEditor.setSource(levelSource);
+        spriteEditor.setSource(levelSource);
+//        System.out.println(levelSource.staticLayer0);
     }
     public void spriteKeyDown(int keycode) {
 //        if (keycode == Input.Keys.I) {
