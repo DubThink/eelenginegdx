@@ -138,7 +138,8 @@ public class SpriteEditor extends BaseEditor {
 
     public void rotateSelected(){
         if(!layerVis[activeLayer])return;
-        for(StaticSprite sprite:source.getLayer(activeLayer))sprite.rot+=shiftKey?Util.QUARTER_PI_F:-Util.QUARTER_PI_F;
+        for(StaticSprite sprite:source.getLayer(activeLayer))
+            if(sprite.selected)sprite.rot+=shiftKey?Util.QUARTER_PI_F:-Util.QUARTER_PI_F;
     }
 
     public void deselectAll(){

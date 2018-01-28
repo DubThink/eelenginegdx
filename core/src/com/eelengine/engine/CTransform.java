@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 public class CTransform extends Component {
     public Vector2 pos=new Vector2(0,0);
     public Vector2 scl=new Vector2(1,1);
-    public float rot=0;
+    public float rot=0; // In radians!
     public boolean rotLockedToPhysics=true;
 
     /**

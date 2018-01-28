@@ -27,6 +27,7 @@ import com.eelengine.engine.editor.Editor;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The core class of the engine
@@ -259,11 +260,17 @@ public class EelGame extends ApplicationAdapter {
         if(DEV_physics_render) {
             debugRenderer.render(physicsWorld, matrix4);
         }
-        if(Gdx.graphics.getFrameId()%60==0){
-            makeBloob((int)((Math.random()-0.5)*40),(int)((Math.random()-0.5)*40));
-        }
+//        if(Gdx.graphics.getFrameId()%60==0){
+//            makeBloob((int)((Math.random()-0.5)*40),(int)((Math.random()-0.5)*40));
+//        }
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
+        try {
+            TimeUnit.MILLISECONDS.sleep(16);
+        }catch (InterruptedException e){
+            throw new  RuntimeException(e);
+        }
+
     }
 
     int ent;
@@ -415,6 +422,7 @@ public class EelGame extends ApplicationAdapter {
         COneTex cOneTex =ECS.mGraphics.create(ent);
         CTransform cTransform = ECS.mTransform.create(ent);
         entInput = ECS.mInput.create(ent);
+        ECS.mMovement.create(ent).setSpeed(4).setVehicular(true).setTurningRate(0.01f);
         cOneTex.texture=img;
         cTransform.pos.set(2,10);
         cTransform.setScale(1.25f);

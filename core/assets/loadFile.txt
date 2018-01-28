@@ -1,3 +1,7 @@
 # locations to load sprites from for the SpriteEditor
+\sprites\objects
+\sprites\map
+\sprites\interface
+\sprites
 \
 \logos

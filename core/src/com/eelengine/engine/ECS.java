@@ -19,6 +19,7 @@ public class ECS {
     public static ComponentMapper<CHealth> mHealth;
     public static ComponentMapper<CTeam> mTeam;
     public static ComponentMapper<CNavigator> mNavigator;
+    public static ComponentMapper<CMovement> mMovement;
 
 //    public static Archetype Bullet;
     /**
@@ -35,6 +36,7 @@ public class ECS {
         mHealth=entityWorld.getMapper(CHealth.class);
         mTeam=entityWorld.getMapper(CTeam.class);
         mNavigator=entityWorld.getMapper(CNavigator.class);
+        mMovement=entityWorld.getMapper(CMovement.class);
 
         //        Bullet=new ArchetypeBuilder()
 //                .add(CDamager.class)
