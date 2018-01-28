@@ -192,6 +192,9 @@ public class EelGame extends ApplicationAdapter {
         for (StaticSprite sprite : editor.getLevelSource().staticLayer0) {
             RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
         }
+        for (StaticSprite sprite : editor.getLevelSource().staticLayer1) {
+            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+        }
 //        for (StaticSprite sprite : staticLayer1){
 //            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
 //        }
@@ -227,6 +230,9 @@ public class EelGame extends ApplicationAdapter {
 //        for (StaticSprite sprite : staticLayer0) {
 //            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
 //        }
+        for (StaticSprite sprite : editor.getLevelSource().staticLayer2) {
+            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+        }
         worldBatch.end();
 
 
