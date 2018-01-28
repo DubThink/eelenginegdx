@@ -48,7 +48,7 @@ public class MovementSystem extends IteratingSystem {
                 if(!desired.isZero()&&Util.abs(current.angleRad(desired))<rate*1.5){
                     transform.rot=desired.angle()*Util.DEG_TO_RAD_F;
                     v.set(yMove,xMove);//these don't matter this is only to keep it from moving when both are 0
-                } else if(current.dot(desired)<-0.4) {//desired is in opposite direction; set speed to 0
+                } else if(current.dot(desired)<-0.75) {//desired is in opposite direction; set speed to 0
 //                    System.out.println("Decel");
                     v.setZero();
                 } else {
@@ -65,7 +65,7 @@ public class MovementSystem extends IteratingSystem {
             }else{
                 //NON VEHICULAR MOVEMENT
                 //System.out.println(transform.rotLockedToPhysics+" "+transform.rot);
-                if (physics.body.getLinearVelocity().len2() > 0.5) // TODO make controlled by a component param (or remove)
+                if (physics.body.getLinearVelocity().len2() > 0.1) // TODO make controlled by a component param (or remove)
                     transform.rot = physics.body.getLinearVelocity().angle() * Util.DEG_TO_RAD_F;
                 int xMove = 0;
                 if (input.checkOn(CInput.LEFT)) xMove--;
@@ -76,7 +76,7 @@ public class MovementSystem extends IteratingSystem {
                 v.set(xMove, yMove);
             }
         }else if(mNavigator.has(e)){
-            if (physics.body.getLinearVelocity().len2() > 0.5) // TODO make controlled by a component param (or remove)
+            if (physics.body.getLinearVelocity().len2() > 0.1) // TODO make controlled by a component param (or remove)
                 transform.rot = physics.body.getLinearVelocity().angle() * Util.DEG_TO_RAD_F;
             v.set(mNavigator.get(e).desiredMove);
         }
@@ -92,6 +92,7 @@ public class MovementSystem extends IteratingSystem {
             if (movement.vehicular) v.set(0, 1).setAngleRad(transform.rot);
 
             v.setLength(movement.speed);
+            physics.body.setTransform(physics.body.getWorldCenter(),transform.rot);
         }else{
             v.setLength(movement.maxSpeed);
         }

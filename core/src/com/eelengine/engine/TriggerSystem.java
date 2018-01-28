@@ -39,7 +39,7 @@ public class TriggerSystem extends BaseEntitySystem {
     public int checkFlag(String flag, float x, float y){
         IntBag actives = subscription.getEntities();
         int[] ids = actives.getData();
-        System.out.printf("Number of trigger entities %d. world loc %.3f,%.3f\n",actives.size(),x,y);
+//        System.out.printf("Number of trigger entities %d. world loc %.3f,%.3f\n",actives.size(),x,y);
         for (int i = 0, s = actives.size(); s > i; i++) {
             Vector2 pos=mTransform.get(ids[i]).pos;
             CTrigger trigger=mTrigger.get(ids[i]);

@@ -2,17 +2,17 @@ package com.eelengine.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-
-import java.io.File;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 public class MailGame extends EelGame {
     LoadedTextureRegion moneyIcon;
     int car;
     int player;
-    boolean playerActive=false;
+    boolean playerActive=true;
     String levelToBuild=null;
     public MailGame() {
     }
@@ -33,24 +33,46 @@ public class MailGame extends EelGame {
         }else {
             System.err.println("ERROR: Unable to load level "+levelToBuild);
         }
-
+        editor.geomEditor.buildStatics(physicsWorld);
         moneyIcon=new LoadedTextureRegion("sprites/interface/dollas.png");
         car=JamEntityBuilder.makeCar(entityWorld,new Texture(Gdx.files.internal("sprites/objects/car.png"),true),physicsWorld);
         entInput=ECS.mInput.get(car);
-        player=JamEntityBuilder.makePlayer(entityWorld,new Texture(Gdx.files.internal("bambito.png"),true),physicsWorld);
+        player=JamEntityBuilder.makePlayer(entityWorld,new Texture(Gdx.files.internal("sprites/objects/Mailman.png"),true),physicsWorld);
+    }
+
+    @Override
+    public void logicStep() {
+        // Update controls
+        entInput=ECS.mInput.get(playerActive?player:car);
+        ECS.mInput.get(car).enabled=!playerActive;
+
+        if(!freeCam){
+            Vector2 camPos=ECS.mTransform.get(playerActive?player:car).pos;
+            camController.setPos(camPos.x*GSCALE,camPos.y*GSCALE);
+            camController.setZoomLevel(playerActive?-2:0);
+        }
     }
 
     @Override
     public void renderUI() {
         float width=Gdx.graphics.getWidth();
         float height=Gdx.graphics.getHeight();
+        float topThird=2*height/3;
         interfaceBatch.begin();
-        GlyphLayout layout = new GlyphLayout(JamFontKit.SysMonolithic,"GAEM");
-        JamFontKit.SysMonolithic.draw(interfaceBatch,"GAEM", Gdx.graphics.getWidth()/2-layout.width/2,Gdx.graphics.getHeight()/2+layout.height/2);
+//        renderCentered(interfaceBatch,JamFontKit.SysMonolithic,playerActive+"",width/2,height/2);
         interfaceBatch.draw(moneyIcon,0,0);
 
+        if(playerActive&&triggerSystem.checkFlag("CAR",ECS.mTransform.get(player).pos)!=-1){
+            renderCentered(interfaceBatch,JamFontKit.SysLarge,"T to enter vehicle",width/2, topThird);
+        }
+        if(!playerActive)renderCentered(interfaceBatch,JamFontKit.SysLarge,"T to exit vehicle",width/2, topThird);
         interfaceBatch.end();
         super.renderUI();
+    }
+
+    public void renderCentered(SpriteBatch batch, BitmapFont font, String text, float x, float y){
+        GlyphLayout layout = new GlyphLayout(font,text);
+        font.draw(batch,text,x-layout.width/2,y+layout.height/2);
     }
 
     @Override
@@ -62,10 +84,21 @@ public class MailGame extends EelGame {
     @Override
     public void gameKeyDown(int keycode) {
         if(keycode==Input.Keys.T){
-            playerActive=!playerActive;
-            entInput=ECS.mInput.get(playerActive?player:car);
-            ECS.mInput.get(car).enabled=!playerActive;
-        }
+            if(playerActive){
+                if(triggerSystem.checkFlag("CAR",ECS.mTransform.get(player).pos)==-1)return;
+                // stash the player far far away
+                ECS.mPhysics.get(player).body.setTransform(-1000,0,0);
+                playerActive=false;
+                ECS.mInput.get(player).clearOn();
+            }else{
+                // bring the player to the car
+                ECS.mPhysics.get(player).body.setTransform(ECS.mTransform.get(car).pos,0);
+                playerActive=true;
+                ECS.mInput.get(car).clearOn();
+            }
+        }else if(keycode==Input.Keys.C){
+            freeCam =!freeCam;
+        }else
         super.gameKeyDown(keycode);
     }
 }
