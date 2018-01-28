@@ -238,6 +238,8 @@ public class EelGame extends ApplicationAdapter {
                             "F3+G to toggle grid\n" +
                             "F3+B to toggle physics debug\n" +
                             "F3+N to toggle nav cell drawing\n" +
+                            "F9 geometry editor\n" +
+                            "F10 sprite editor\n" +
                             "F11 to toggle fullscreen\n" +
                             "F12 for screenshot (saved to assets/screenshots)"
                     ,10,Gdx.graphics.getHeight()-168);
