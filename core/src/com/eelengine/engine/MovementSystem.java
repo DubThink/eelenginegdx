@@ -83,12 +83,18 @@ public class MovementSystem extends IteratingSystem {
 
 //        System.out.p rintf("speed %.3f  accel factor %.3f max speed %.3f\n",movement.speed,movement.accel*world.delta,movement.maxSpeed);
         //System.out.println("coast: "+coast);
-        if(!coast) {
-            if (v.isZero()) movement.speed = Util.max(0, movement.speed - movement.deccel * world.delta);
-            else movement.speed = Util.min(movement.maxSpeed, movement.speed + movement.accel * world.delta);
+        if(movement.vehicular) {
+            if (!coast) {
+                if (v.isZero()) movement.speed = Util.max(0, movement.speed - movement.deccel * world.delta);
+                else movement.speed = Util.min(movement.maxSpeed, movement.speed + movement.accel * world.delta);
+            }
+
+            if (movement.vehicular) v.set(0, 1).setAngleRad(transform.rot);
+
+            v.setLength(movement.speed);
+        }else{
+            v.setLength(movement.maxSpeed);
         }
-        if(movement.vehicular)v.set(0,1).setAngleRad(transform.rot);
-        v.setLength(movement.speed);
 //        System.out.println("New move v "+v);
         physics.body.setLinearVelocity(v);
 

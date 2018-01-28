@@ -21,7 +21,11 @@ public class DesktopLauncher {
 //        config.addIcon("Eel_invE_16x.png", Files.FileType.Internal);
         //config.stencil=8; // LOOK we can have stencil bits
 		//new Lwjgl3Application(new EelGame(), config);
-		new Lwjgl3Application(new MailGame(), config);
-        //app.getGraphics().
+//		System.out.println("ARG: "+arg.length);
+		if(arg.length==1)
+			new Lwjgl3Application(new MailGame(arg[0]), config);
+		else
+			new Lwjgl3Application(new MailGame(), config);
+		//app.getGraphics().
 	}
 }
