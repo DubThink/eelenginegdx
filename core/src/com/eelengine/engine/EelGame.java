@@ -78,8 +78,8 @@ public class EelGame extends ApplicationAdapter {
     ArrayList<Body> tempWorld=null; // testing
 
     boolean DEV_physics_render =true;
-    boolean DEV_draw_grid=true;
-    boolean DEV_draw_nav=true;
+    boolean DEV_draw_grid=false;
+    boolean DEV_draw_nav=false;
     float DEV_time_mod=1f;
     // Temp physics testing
 
@@ -162,6 +162,7 @@ public class EelGame extends ApplicationAdapter {
 
     boolean fullscreen=true;
     boolean escapeMenu=false;
+    boolean freeCam =false;
 
     @Override
     public void render () {
@@ -175,8 +176,10 @@ public class EelGame extends ApplicationAdapter {
         // // Step physics
 
         // Update camera systems
-        camController.setViewGrabbed(Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
-        camController.updatePan(-Gdx.input.getDeltaX(),Gdx.input.getDeltaY());
+        if(freeCam) {
+            camController.setViewGrabbed(Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
+            camController.updatePan(-Gdx.input.getDeltaX(), Gdx.input.getDeltaY());
+        }else camController.setViewGrabbed(false);
         camController.update();
         interfaceCam.update();
         interfaceBatch.setProjectionMatrix(interfaceCam.combined);
@@ -737,11 +740,12 @@ public class EelGame extends ApplicationAdapter {
 
         @Override
         public boolean scrolled(int amount) {
-
-            if (amount == 1) {
-                camController.changeZoomLevel(1);
-            } else if (amount == -1) {
-                camController.changeZoomLevel(-1);
+            if(freeCam) {
+                if (amount == 1) {
+                    camController.changeZoomLevel(1);
+                } else if (amount == -1) {
+                    camController.changeZoomLevel(-1);
+                }
             }
 
             return stage.scrolled(amount);

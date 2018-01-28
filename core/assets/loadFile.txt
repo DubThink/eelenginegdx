@@ -3,5 +3,3 @@
 \sprites\map
 \sprites\interface
 \sprites
-\
-\logos
