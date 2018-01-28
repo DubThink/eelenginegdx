@@ -29,6 +29,26 @@ public class LevelIO {
         return null;
     }
 
+    public static void saveLevelData(FileHandle handle, LevelData source){
+        saveObject(handle,source);
+    }
+    public static LevelData loadLevelData(FileHandle handle){
+        try {
+            FileInputStream fileIn = new FileInputStream(handle.file());
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            try {
+                return (LevelData) in.readObject();
+            } catch (ClassNotFoundException c) {
+                System.err.println("LevelData file is not valid: "+c);
+            }
+            in.close();
+            fileIn.close();
+        } catch (IOException i) {
+            System.err.println("Unable to load LevelData file: "+i);
+        }
+        return null;
+    }
+
     public static void saveLoadedTextureRegion(FileHandle handle, LoadedTextureRegion region){
         saveObject(handle,region);
     }
