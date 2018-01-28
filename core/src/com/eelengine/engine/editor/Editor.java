@@ -190,9 +190,7 @@ public class Editor {
         } else if (keycode == Input.Keys.S) {
             geomEditor.split();
         } else if (keycode == Input.Keys.D) {
-            for (Brush brush : geomEditor.getSource().brushes) {
-                System.out.println(brush);
-            }
+            geomEditor.duplicate();
         } else if (keycode == Input.Keys.A) {
             geomEditor.selectAll();
         }else if (keycode == Input.Keys.N) {

@@ -294,4 +294,10 @@ public class GeomEditor extends BaseEditor {
             mSelected.addAll(source.brushes);
         }
     }
+
+    public void duplicate() {
+        if(selected!=null){
+            source.brushes.add(new Brush(selected.getFloatArray(),selected.pos));
+        }
+    }
 }

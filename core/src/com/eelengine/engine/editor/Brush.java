@@ -46,6 +46,12 @@ private static EarClippingTriangulator earClipper=new EarClippingTriangulator();
 //        hidden=toCopy.hidden;
 //    }
 
+    public Brush(float[] verts, Vector2 pos){
+        this();
+        for(int i=0;i<verts.length;i+=2)this.verts.add(new Vector2(verts[i],verts[i+1]));
+        this.pos.set(pos);
+    }
+
     public Brush(float[] verts){
         this();
         for(int i=0;i<verts.length;i+=2)this.verts.add(new Vector2(verts[i],verts[i+1]));
