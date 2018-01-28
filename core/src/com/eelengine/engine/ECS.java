@@ -20,6 +20,7 @@ public class ECS {
     public static ComponentMapper<CTeam> mTeam;
     public static ComponentMapper<CNavigator> mNavigator;
     public static ComponentMapper<CMovement> mMovement;
+    public static ComponentMapper<CTrigger> mTrigger;
 
 //    public static Archetype Bullet;
     /**
@@ -37,6 +38,7 @@ public class ECS {
         mTeam=entityWorld.getMapper(CTeam.class);
         mNavigator=entityWorld.getMapper(CNavigator.class);
         mMovement=entityWorld.getMapper(CMovement.class);
+        mTrigger=entityWorld.getMapper(CTrigger.class);
 
         //        Bullet=new ArchetypeBuilder()
 //                .add(CDamager.class)
