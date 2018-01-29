@@ -1,5 +1,5 @@
-# locations to load sprites from for the SpriteEditor
-\sprites\objects
-\sprites\map
-\sprites\interface
-\sprites
+# locations to load sprites from for the SpriteEditor (forward slashes only for cross-platform portability)
+/sprites/objects
+/sprites/map
+/sprites/interface
+/sprites
