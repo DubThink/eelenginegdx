@@ -199,6 +199,9 @@ public class GeomEditor extends BaseEditor {
     public ArrayList<Body> buildStatics(World world){
         ArrayList<Body> ret=new ArrayList<>();
         for(Brush brush: source.brushes) {
+            if(brush.getCount()>8||brush.getCount()<3){// TODO clean these brushes
+                continue;
+            }
             BodyDef myBodyDef = new BodyDef();
             myBodyDef.position.set(brush.pos);
             Body body = world.createBody(myBodyDef);
