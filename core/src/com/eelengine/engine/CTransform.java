@@ -25,7 +25,7 @@ public class CTransform extends Component {
         return this;
     }
     public CTransform setPos(Vector2 pos) {
-        this.pos = pos;
+        this.pos.set(pos);
         return this;
     }
 

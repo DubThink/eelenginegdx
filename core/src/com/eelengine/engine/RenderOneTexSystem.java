@@ -24,7 +24,7 @@ public class RenderOneTexSystem extends IteratingSystem {
         assert renderBatch!=null;
         this.renderBatch=renderBatch;
     }
-
+    
     @Override
     protected void begin() {
         renderBatch.begin();

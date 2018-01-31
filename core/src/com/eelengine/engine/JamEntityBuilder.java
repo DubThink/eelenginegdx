@@ -1,7 +1,7 @@
 package com.eelengine.engine;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -67,6 +67,12 @@ public class JamEntityBuilder {
         //
         shape.dispose();
         cTransform.rotLockedToPhysics=false;
+        return ent;
+    }
+    public static int makeMailbox(com.artemis.World entityWorld, Vector2 pos){
+        int ent=entityWorld.create();
+        ECS.mTransform.create(ent).setPos(pos);
+        ECS.mMailbox.create(ent);
         return ent;
     }
 }

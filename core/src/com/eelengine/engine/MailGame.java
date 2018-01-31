@@ -1,5 +1,6 @@
 package com.eelengine.engine;
 
+import com.artemis.ComponentMapper;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,8 +10,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.eelengine.engine.editor.LevelData;
 import com.eelengine.engine.editor.LevelIO;
+import com.eelengine.engine.editor.MailboxSrc;
 
 public class MailGame extends EelGame {
+    public static ComponentMapper<CMailbox> mMailbox;
+
+    int activeZone=1;
     LoadedTextureRegion moneyIcon;
     int car;
     int player;
@@ -26,6 +31,7 @@ public class MailGame extends EelGame {
     }
     @Override
     public void gameCreate() {
+        mMailbox=entityWorld.getMapper(CMailbox.class);
         JamFontKit.initFonts();
         // build level
         //setupEditor();
@@ -111,7 +117,24 @@ public class MailGame extends EelGame {
             }
         }else if(keycode==Input.Keys.C){
             freeCam =!freeCam;
+        }else if(keycode==Input.Keys.M&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
+            if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)){
+                buildMailboxes();
+            }else{
+                System.out.println(levelData);
+                System.out.println(levelData.mailboxSrcs);
+                levelData.mailboxSrcs.add(new MailboxSrc(getWorldMouse(),1));
+            }
         }else
         super.gameKeyDown(keycode);
+    }
+    public void buildMailboxes(){
+        System.out.printf("Building %d Mailboxes\n",levelData.mailboxSrcs.size());
+        mailSystem.clearAll();
+        for(MailboxSrc src:levelData.mailboxSrcs){
+            if(src.zone<=activeZone){
+                JamEntityBuilder.makeMailbox(entityWorld,src.location);
+            }
+        }
     }
 }

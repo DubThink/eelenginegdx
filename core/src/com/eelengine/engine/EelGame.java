@@ -414,6 +414,7 @@ public class EelGame extends ApplicationAdapter {
     }
 
     TriggerSystem triggerSystem;
+    MailSystem mailSystem;
     /**
      * Sets up the Entity-Component-System structure
      * @pre All subsystems used by ECS should be initialized first
@@ -429,6 +430,7 @@ public class EelGame extends ApplicationAdapter {
                 .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
                 .with(spriteRenderSystem=new RenderOneTexSystem(worldBatch))
                 .with(triggerSystem=new TriggerSystem())
+                .with(mailSystem=new MailSystem(worldBatch,camController))
                 .with(WorldConfigurationBuilder.Priority.LOW,new UtilSystem())
                 .with(WorldConfigurationBuilder.Priority.LOW,new HealthSystem(interfaceBatch,camController))
                 .with(WorldConfigurationBuilder.Priority.LOW - 1, new BaseEntitySystem(Aspect.all()) {
