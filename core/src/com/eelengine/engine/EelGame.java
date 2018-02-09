@@ -430,6 +430,7 @@ public class EelGame extends ApplicationAdapter {
                 .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
                 .with(spriteRenderSystem=new RenderOneTexSystem(worldBatch))
                 .with(triggerSystem=new TriggerSystem())
+                .with(new AnimSystem())
                 .with(mailSystem=new MailSystem(worldBatch,camController))
                 .with(WorldConfigurationBuilder.Priority.LOW,new UtilSystem())
                 .with(WorldConfigurationBuilder.Priority.LOW,new HealthSystem(interfaceBatch,camController))
@@ -771,22 +772,21 @@ public class EelGame extends ApplicationAdapter {
                 return stage.touchDown(screenX, screenY, pointer, button);
             }
             // origin top left
-            Vector3 wx = camController.getCam().unproject(new Vector3(screenX, screenY, 0));
-            wx.scl(1 / EelGame.GSCALE);
+            clickEvent(getWorldMouse());
             //return super.touchDown(screenX, screenY, pointer, button);
 //            System.out.println(String.format("Button: (%d,%d) world (%.3f,%.3f) ptr: %d button: %d",
 //                    screenX,screenY,wx.x,wx.y,pointer, button));
-            if (button == 0) {
-//                System.out.println("##"+ECS.mTransform.get(ent).pos+" "+wx+"##");
-                // S T R E S S T E S T
-//                for(int i=-6;i<=6;i++)
-//                    for(int j=-6;j<=6;j++)
-                int i = 0, j = 0;
-                makeBullet(ECS.mTransform.get(ent).pos.x + i, ECS.mTransform.get(ent).pos.y + j, wx.x + i, wx.y + j);
-            }
-            if (button == 2) {
-                statics.add(makeThing(wx.x, wx.y, false));
-            }
+//            if (button == 0) {
+////                System.out.println("##"+ECS.mTransform.get(ent).pos+" "+wx+"##");
+//                // S T R E S S T E S T
+////                for(int i=-6;i<=6;i++)
+////                    for(int j=-6;j<=6;j++)
+//                int i = 0, j = 0;
+//                makeBullet(ECS.mTransform.get(ent).pos.x + i, ECS.mTransform.get(ent).pos.y + j, wx.x + i, wx.y + j);
+//            }
+//            if (button == 2) {
+//                statics.add(makeThing(wx.x, wx.y, false));
+//            }
             return false;
         }
 
@@ -801,5 +801,8 @@ public class EelGame extends ApplicationAdapter {
             }
             return false;
         }
+    }
+    public void clickEvent(Vector2 wp){
+
     }
 }  

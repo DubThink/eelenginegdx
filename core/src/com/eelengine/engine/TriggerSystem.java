@@ -25,7 +25,12 @@ public class TriggerSystem extends BaseEntitySystem {
 //        if(physics.isStunned())physics.stunnedFor= Util.max(0,physics.stunnedFor-world.getDelta());
 //        physics.body.setTransform(transform.pos,transform.rotLockedToPhysics?transform.rot:physics.body.getAngle());
     }
-
+    /**
+     * Tests if point (x,y) overlaps a trigger with the specified flag
+     * @param flag the flag to check
+     * @param vec world pos
+     * @return The first entity with the given flag
+     */
     public int checkFlag(String flag, Vector2 vec){
         return checkFlag(flag,vec.x,vec.y);
     }

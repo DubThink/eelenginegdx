@@ -22,6 +22,7 @@ public class ECS {
     public static ComponentMapper<CMovement> mMovement;
     public static ComponentMapper<CTrigger> mTrigger;
     public static ComponentMapper<CMailbox> mMailbox;
+    public static ComponentMapper<CAnim> mAnim;
 
 //    public static Archetype Bullet;
     /**
@@ -41,6 +42,7 @@ public class ECS {
         mMovement=entityWorld.getMapper(CMovement.class);
         mTrigger=entityWorld.getMapper(CTrigger.class);
         mMailbox=entityWorld.getMapper(CMailbox.class);
+        mAnim=entityWorld.getMapper(CAnim.class);
         //        Bullet=new ArchetypeBuilder()
 //                .add(CDamager.class)
 //                .add(CProjectile.class)

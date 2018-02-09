@@ -32,6 +32,8 @@ public class MailGame extends EelGame {
     @Override
     public void gameCreate() {
         mMailbox=entityWorld.getMapper(CMailbox.class);
+        System.out.println("IS THERE: "+Gdx.files.internal("sprites/interface/mail_not.png").exists());
+        entityWorld.getSystem(MailSystem.class).mailPopup=new Texture(Gdx.files.internal("sprites/interface/mail_not.png"));
         JamFontKit.initFonts();
         // build level
         //setupEditor();
@@ -54,7 +56,8 @@ public class MailGame extends EelGame {
         moneyIcon=new LoadedTextureRegion("sprites/interface/dollas.png");
         car=JamEntityBuilder.makeCar(entityWorld,new Texture(Gdx.files.internal("sprites/objects/car.png"),true),physicsWorld);
         entInput=ECS.mInput.get(car);
-        player=JamEntityBuilder.makePlayer(entityWorld,new Texture(Gdx.files.internal("sprites/objects/Mailman.png"),true),physicsWorld);
+
+        player=JamEntityBuilder.makePlayer(entityWorld,physicsWorld);
     }
 
     @Override
@@ -83,6 +86,9 @@ public class MailGame extends EelGame {
             renderCentered(interfaceBatch,JamFontKit.SysLarge,"T to enter vehicle",width/2, topThird);
         }
         if(!playerActive)renderCentered(interfaceBatch,JamFontKit.SysLarge,"T to exit vehicle",width/2, topThird);
+
+        int mb=triggerSystem.checkFlag("MAILBOX",getWorldMouse());
+        if(mb>-1)renderCentered(interfaceBatch,JamFontKit.SysLarge,"Mailbox",width/2,40);
         interfaceBatch.end();
         super.renderUI();
     }
@@ -96,6 +102,14 @@ public class MailGame extends EelGame {
     public void dispose() {
         super.dispose();
         JamFontKit.dispose();
+    }
+
+    @Override
+    public void clickEvent(Vector2 wp) {
+        super.clickEvent(wp);
+        int mb=triggerSystem.checkFlag("MAILBOX",wp);
+        if(mb==-1)return;
+        ECS.mMailbox.get(mb).mailCt++;
     }
 
     @Override
