@@ -28,10 +28,10 @@ import com.eelengine.engine.editor.LevelSource;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The core class of the engine
+ * LONG BOI
  */
 public class EelGame extends ApplicationAdapter {
     // CONSTANTS
@@ -42,12 +42,17 @@ public class EelGame extends ApplicationAdapter {
     public static final int VIRTUAL_WINDOWED_HEIGHT = 900;
 
     // RENDERERS
-    PolygonSpriteBatch worldBatch;
-    SpriteBatch interfaceBatch;
-    ShapeRenderer shapeRenderer;
-    Box2DDebugRenderer debugRenderer;
+    PolygonSpriteBatch worldBatch; // The primary batch for rendering to worldspace
+    SpriteBatch interfaceBatch; // Screenspace
+    ShapeRenderer shapeRenderer; // Debug renderer (worldspace)
+    Box2DDebugRenderer debugRenderer; // Physics debug renderer object
     private Stage stage;
     private Table table;
+
+    // RENDER SOURCES
+    ArrayList<StaticSprite> staticLayer0 =new ArrayList<>();
+    ArrayList<StaticSprite> staticLayer1=new ArrayList<>();
+    ArrayList<StaticSprite> staticLayer2=new ArrayList<>();
 
     // VIEW
     OrthographicCamera interfaceCam;
@@ -56,11 +61,16 @@ public class EelGame extends ApplicationAdapter {
 
     // ECS
     com.artemis.World entityWorld;
+    RenderOneTexSystem spriteRenderSystem;
+    TriggerSystem triggerSystem;
+    MailSystem mailSystem;
+
+    // PHYSICS
+    World physicsWorld;
 
     // SYSTEMS
     Sound screenshotSound;
     Navigation navigation;
-    Level currentLevel;
     AssetSystem assetSystem=new AssetSystem();
 
     // EDITING
@@ -74,17 +84,23 @@ public class EelGame extends ApplicationAdapter {
     // TEST MISC
     int entityCount;
 
-
-    ArrayList<Body> tempWorld=null; // testing
-
+    // DEV SWITCHES
     boolean DEV_physics_render =true;
     boolean DEV_draw_grid=false;
     boolean DEV_draw_nav=false;
     float DEV_time_mod=1f;
-    // Temp physics testing
 
+    // VISUAL ELEMENT SWITCHES
+    boolean fullscreen=true;
+    boolean escapeMenu=false;
+    boolean freeCam =false;
 
+    // ENTITY CONTROL
+    CInput playerInput;
 
+    /**
+     * Runs on start- the setup function
+     */
     @Override
     public void create () {
         img = new Texture(Gdx.files.internal("test_car_lol.png"),true);
@@ -94,10 +110,8 @@ public class EelGame extends ApplicationAdapter {
         bkdimg = new Texture(Gdx.files.internal("semifade_half_black_left.png"));
         bkdimg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         screenshotSound=Gdx.audio.newSound(Gdx.files.internal("interface/camera-shutter.wav"));
+
         setup();
-        //assetSystem.load("sig.png",Texture.class);
-        //assetSystem.finishLoading();
-        //new TextureRegion(assetSystem.get("sig.png",Texture.class));//
 
         setupRendering();
 
@@ -116,6 +130,7 @@ public class EelGame extends ApplicationAdapter {
 //        table1.setHeight(400);
 //        //table1.setDebug(true);
 //        stage.addActor(table1);
+
         TextureAtlas atlas = new TextureAtlas(Gdx.files.local("skin/tracer-ui.atlas"));
         Skin skin=new Skin(Gdx.files.internal("skin/tracer-ui.json"),atlas);
 //        table1.add(new Label("Test table 1",skin));
@@ -138,14 +153,16 @@ public class EelGame extends ApplicationAdapter {
         setupECS();
         FontKit.initFonts();
         debugRenderer = new Box2DDebugRenderer();
-        currentLevel=new Level(physicsWorld);
         testSprite=new StaticSprite("sig.png");
 //        navPath=navigation.findPath(ECS.mTransform.get(ent).pos,new Vector2(
 //                camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
-        gameCreate();
+        gameCreate(); // Call the overrided init function
     }
 
-    public void gameCreate(){};
+    /**
+     * Initializer function for games to override
+     */
+    public void gameCreate(){}
 
     private void setup() {
         LoadedTextureRegion.assetSystem=assetSystem;
@@ -159,10 +176,6 @@ public class EelGame extends ApplicationAdapter {
         viewport.update(width, height,true);
         stage.getViewport().update(width, height,false);
     }
-
-    boolean fullscreen=true;
-    boolean escapeMenu=false;
-    boolean freeCam =false;
 
     @Override
     public void render () {
@@ -295,9 +308,6 @@ public class EelGame extends ApplicationAdapter {
     public void logicStep(){}//To Extend
     public void renderUI(){}//To Extend
 
-    int ent;
-    CInput entInput;
-    CNavigator entNavigator;
     @Override
     public void dispose () {
         System.out.println("CLEANING UP FOR EXIT");
@@ -310,7 +320,6 @@ public class EelGame extends ApplicationAdapter {
         System.out.println("EXITING");
     }
 
-    RenderOneTexSystem spriteRenderSystem;
     void makeBloob(float x,float y){
         int e=entityWorld.create();
         COneTex cOneTex =ECS.mGraphics.create(e);
@@ -413,8 +422,6 @@ public class EelGame extends ApplicationAdapter {
                 .set(10);
     }
 
-    TriggerSystem triggerSystem;
-    MailSystem mailSystem;
     /**
      * Sets up the Entity-Component-System structure
      * @pre All subsystems used by ECS should be initialized first
@@ -483,7 +490,7 @@ public class EelGame extends ApplicationAdapter {
 //
 //        COneTex cOneTex =ECS.mGraphics.create(ent);
 //        CTransform cTransform = ECS.mTransform.create(ent);
-//        entInput = ECS.mInput.create(ent);
+//        playerInput = ECS.mInput.create(ent);
 //        ECS.mMovement.create(ent).setMaxSpeed(4).setVehicular(true);
 //
 //        cOneTex.texture=img;
@@ -519,11 +526,6 @@ public class EelGame extends ApplicationAdapter {
         physicsWorld.setContactListener(new CollisionHandler(entityWorld) );
     }
 
-
-    ArrayList<StaticSprite> staticLayer0 =new ArrayList<>();
-    ArrayList<StaticSprite> staticLayer1=new ArrayList<>();
-    ArrayList<StaticSprite> staticLayer2=new ArrayList<>();
-
     public void buildLevelStaticSprites(LevelSource source){
         staticLayer0.clear();
         staticLayer0.addAll(source.staticLayer0);
@@ -533,9 +535,6 @@ public class EelGame extends ApplicationAdapter {
         staticLayer2.addAll(source.staticLayer2);
     }
 
-    Body dynamicBody,staticBody;
-    ArrayList<Body> statics=new ArrayList<Body>();
-    World physicsWorld;
     void setupPhysics(){
         //Box2D.init();
 
@@ -599,35 +598,28 @@ public class EelGame extends ApplicationAdapter {
         editor=new Editor(camController);
     }
 
+    /**
+     * Convenience function to return mouse pos in world coords
+     * @return mouse position in world coordinates
+     */
     Vector2 getWorldMouse(){
         return camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
     }
+
     public void gameKeyDown(int keycode){
         // WASD
-        if (keycode == Input.Keys.G) {
-            System.out.println(triggerSystem.checkFlag("RED",getWorldMouse().x,getWorldMouse().y));
-        }else if(entInput!=null) {
+        if(playerInput !=null) {
             if (keycode == Input.Keys.M) {
                 makeBloob(getWorldMouse().x, getWorldMouse().y);
             } else if (keycode == Input.Keys.W) {
-                entInput.down(CInput.UP);
+                playerInput.down(CInput.UP);
             } else if (keycode == Input.Keys.A) {
-                entInput.down(CInput.LEFT);
+                playerInput.down(CInput.LEFT);
             } else if (keycode == Input.Keys.S) {
-                entInput.down(CInput.DOWN);
+                playerInput.down(CInput.DOWN);
             } else if (keycode == Input.Keys.D) {
-                entInput.down(CInput.RIGHT);
+                playerInput.down(CInput.RIGHT);
             }
-        } else if (keycode == Input.Keys.Z) {
-            /////////////
-            // TEST SPACE
-//                Vector2 mouseLoc = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
-//                currentLevel.addWall(mouseLoc.x, mouseLoc.y, mouseLoc.x + 5, mouseLoc.y + .25f);
-            /////////////
-        } else if (keycode == Input.Keys.X) {
-            /////////////
-            // TEST SPACE
-            spriteRenderSystem.setEnabled(!spriteRenderSystem.isEnabled());
         }
     }
 
@@ -736,13 +728,13 @@ public class EelGame extends ApplicationAdapter {
             }
 
             if (keycode == Input.Keys.W) {
-                entInput.up(CInput.UP);
+                playerInput.up(CInput.UP);
             } else if (keycode == Input.Keys.A) {
-                entInput.up(CInput.LEFT);
+                playerInput.up(CInput.LEFT);
             } else if (keycode == Input.Keys.S) {
-                entInput.up(CInput.DOWN);
+                playerInput.up(CInput.DOWN);
             } else if (keycode == Input.Keys.D) {
-                entInput.up(CInput.RIGHT);
+                playerInput.up(CInput.RIGHT);
             }
             return stage.keyUp(keycode); // aaa
         }

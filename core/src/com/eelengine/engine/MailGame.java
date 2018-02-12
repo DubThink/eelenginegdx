@@ -55,7 +55,7 @@ public class MailGame extends EelGame {
         editor.geomEditor.buildStatics(physicsWorld);
         moneyIcon=new LoadedTextureRegion("sprites/interface/dollas.png");
         car=JamEntityBuilder.makeCar(entityWorld,new Texture(Gdx.files.internal("sprites/objects/car.png"),true),physicsWorld);
-        entInput=ECS.mInput.get(car);
+        playerInput =ECS.mInput.get(car);
 
         player=JamEntityBuilder.makePlayer(entityWorld,physicsWorld);
     }
@@ -63,7 +63,7 @@ public class MailGame extends EelGame {
     @Override
     public void logicStep() {
         // Update controls
-        entInput=ECS.mInput.get(playerActive?player:car);
+        playerInput =ECS.mInput.get(playerActive?player:car);
         ECS.mInput.get(car).enabled=!playerActive;
 
         if(!freeCam){
