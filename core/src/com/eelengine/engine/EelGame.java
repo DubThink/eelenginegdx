@@ -33,7 +33,7 @@ import java.util.Date;
  * The core class of the engine
  * LONG BOI
  */
-public class EelGame extends ApplicationAdapter {
+public class EelGame extends ApplicationAdapter implements InputProcessor {
     // CONSTANTS
     public static final float GSCALE=128;
     public static final int VIRTUAL_WIDTH = 1920;
@@ -53,7 +53,7 @@ public class EelGame extends ApplicationAdapter {
     ArrayList<StaticSprite> staticLayer0 =new ArrayList<>();
     ArrayList<StaticSprite> staticLayer1=new ArrayList<>();
     ArrayList<StaticSprite> staticLayer2=new ArrayList<>();
-
+    // two iterators running towards each other like romantic lovers on a beach
     // VIEW
     OrthographicCamera interfaceCam;
     CamController camController;
@@ -591,7 +591,7 @@ public class EelGame extends ApplicationAdapter {
         Gdx.graphics.setResizable(false);
 
         Gdx.graphics.setFullscreenMode(displayMode);
-        Gdx.input.setInputProcessor(new InputCore(camController));
+        Gdx.input.setInputProcessor(this);
     }
 
     void setupEditor(){
@@ -623,178 +623,147 @@ public class EelGame extends ApplicationAdapter {
         }
     }
 
-    class InputCore implements InputProcessor {
+    // ----- INPUT PROCESSOR ----- //
 
-        CamController camController;
+    @Override
+    public boolean keyTyped(char character) {
+        return stage.keyTyped(character);
+    }
 
-        InputCore(CamController camController) {
-            this.camController = camController;
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return stage.touchDragged(screenX, screenY, pointer);
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return stage.mouseMoved(screenX,screenY);
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        if(stage.keyDown(keycode)){
+            if (keycode == Input.Keys.ESCAPE)
+                stage.unfocusAll();
+            return true;
+        }
+        if(keycode==Input.Keys.SHIFT_LEFT){
+            editor.shiftDown();
         }
 
-        @Override
-        public boolean keyTyped(char character) {
-            return stage.keyTyped(character);
-        }
-
-        @Override
-        public boolean touchDragged(int screenX, int screenY, int pointer) {
-            return stage.touchDragged(screenX, screenY, pointer);
-        }
-
-        @Override
-        public boolean mouseMoved(int screenX, int screenY) {
-            return stage.mouseMoved(screenX,screenY);
-        }
-
-        @Override
-        public boolean keyDown(int keycode) {
-//            for(Actor actor: stage.getActors()){
-//                if(actor instanceof TextArea)((TextArea)actor).
-//            }
-            //table.
-            if(stage.keyDown(keycode)){
-                if (keycode == Input.Keys.ESCAPE)
-                    stage.unfocusAll();
-                return true;
-            }
-            if(keycode==Input.Keys.SHIFT_LEFT){
-                editor.shiftDown();
-            }
-
-            if (keycode == Input.Keys.ESCAPE) {
-                escapeMenu = !escapeMenu;
-            }else if (Gdx.input.isKeyPressed(Input.Keys.F3)) {
-                if (keycode == Input.Keys.B) DEV_physics_render = !DEV_physics_render;
-                if (keycode == Input.Keys.G) DEV_draw_grid = !DEV_draw_grid;
-                if (keycode == Input.Keys.N) DEV_draw_nav = !DEV_draw_nav;
+        if (keycode == Input.Keys.ESCAPE) {
+            escapeMenu = !escapeMenu;
+        }else if (Gdx.input.isKeyPressed(Input.Keys.F3)) {
+            if (keycode == Input.Keys.B) DEV_physics_render = !DEV_physics_render;
+            if (keycode == Input.Keys.G) DEV_draw_grid = !DEV_draw_grid;
+            if (keycode == Input.Keys.N) DEV_draw_nav = !DEV_draw_nav;
 //                if(keycode==Input.Keys.F) EelGame.GSCALE=150-EelGame.GSCALE;
 
-            }else if (keycode == Input.Keys.F5) {
-                for(int i=1;i<=128;i++)
-                    assetSystem.load("stress/sig ("+i+").png",Texture.class);
-            }
-            else if (keycode == Input.Keys.F6) {
-            }
-            // Zoom keys
-            else if (keycode == Input.Keys.MINUS) {
-                camController.changeZoomLevel(1);
-            } else if (keycode == Input.Keys.EQUALS) {
-                camController.changeZoomLevel(-1);
-            }else if (keycode == Input.Keys.F1) {
-                DEV_time_mod = 1.2f - DEV_time_mod;
-            } else if (keycode == Input.Keys.SPACE) {
-                //dynamicBody.setLinearVelocity(0, 20);
-            } else if (keycode == Input.Keys.ENTER) {
-                if (escapeMenu) Gdx.app.exit();
-                else camController.setPos(0, 0);
-            } else if (keycode == Input.Keys.F9) {
-                if(editor.mode==Editor.GEOM)editor.mode=Editor.OFF;
-                else editor.mode=Editor.GEOM;
-            } else if (keycode == Input.Keys.F10) {
-                if(editor.mode==Editor.SPRITE)editor.mode=Editor.OFF;
-                else editor.mode=Editor.SPRITE;
-            } else if (keycode == Input.Keys.F11) {
-                if (fullscreen) {
-                    System.out.println("FULLSCREEN OFF");
-                    Gdx.graphics.setWindowedMode(VIRTUAL_WINDOWED_WIDTH, VIRTUAL_WINDOWED_HEIGHT);
-                    fullscreen = false;
-                } else {
-                    System.out.println("FULLSCREEN ON");
-                    Graphics.Monitor currMonitor = Gdx.graphics.getMonitor();
-                    Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode(currMonitor);
-                    Gdx.graphics.setFullscreenMode(displayMode);
-                    fullscreen = true;
-                }
-            } else if (keycode == Input.Keys.F12) {
-                byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), true);
-                Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
-                BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH_mm_ss_SSS");
-                System.out.println(Gdx.files.getLocalStoragePath());
-                PixmapIO.writePNG(Gdx.files.local("screenshots/screenshot " + sdf.format(new Date()) + ".png"), pixmap);
-                pixmap.dispose();
-                screenshotSound.play();
-            }else if(editor.mode!=Editor.OFF){
-                editor.keyDown(keycode);
-            }else gameKeyDown(keycode);
-            return false;
+        }else if (keycode == Input.Keys.F5) {
+            for(int i=1;i<=128;i++)
+                assetSystem.load("stress/sig ("+i+").png",Texture.class);
         }
-
-
-        @Override
-        public boolean keyUp(int keycode) {
-            if(keycode==Input.Keys.SHIFT_LEFT){
-                editor.shiftUp();
-            }
-
-            if (keycode == Input.Keys.W) {
-                playerInput.up(CInput.UP);
-            } else if (keycode == Input.Keys.A) {
-                playerInput.up(CInput.LEFT);
-            } else if (keycode == Input.Keys.S) {
-                playerInput.up(CInput.DOWN);
-            } else if (keycode == Input.Keys.D) {
-                playerInput.up(CInput.RIGHT);
-            }
-            return stage.keyUp(keycode); // aaa
+        else if (keycode == Input.Keys.F6) {
         }
-
-        @Override
-        public boolean scrolled(int amount) {
-            if(freeCam) {
-                if (amount == 1) {
-                    camController.changeZoomLevel(1);
-                } else if (amount == -1) {
-                    camController.changeZoomLevel(-1);
-                }
+        // Zoom keys
+        else if (keycode == Input.Keys.MINUS) {
+            camController.changeZoomLevel(1);
+        } else if (keycode == Input.Keys.EQUALS) {
+            camController.changeZoomLevel(-1);
+        }else if (keycode == Input.Keys.F1) {
+            DEV_time_mod = 1.2f - DEV_time_mod;
+        } else if (keycode == Input.Keys.SPACE) {
+            //dynamicBody.setLinearVelocity(0, 20);
+        } else if (keycode == Input.Keys.ENTER) {
+            if (escapeMenu) Gdx.app.exit();
+            else camController.setPos(0, 0);
+        } else if (keycode == Input.Keys.F9) {
+            if(editor.mode==Editor.GEOM)editor.mode=Editor.OFF;
+            else editor.mode=Editor.GEOM;
+        } else if (keycode == Input.Keys.F10) {
+            if(editor.mode==Editor.SPRITE)editor.mode=Editor.OFF;
+            else editor.mode=Editor.SPRITE;
+        } else if (keycode == Input.Keys.F11) {
+            if (fullscreen) {
+                System.out.println("FULLSCREEN OFF");
+                Gdx.graphics.setWindowedMode(VIRTUAL_WINDOWED_WIDTH, VIRTUAL_WINDOWED_HEIGHT);
+                fullscreen = false;
+            } else {
+                System.out.println("FULLSCREEN ON");
+                Graphics.Monitor currMonitor = Gdx.graphics.getMonitor();
+                Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode(currMonitor);
+                Gdx.graphics.setFullscreenMode(displayMode);
+                fullscreen = true;
             }
-
-            return stage.scrolled(amount);
-
-        }
-
-        @Override
-        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            if(stage.touchDown(screenX, screenY, pointer, button)){
-                System.out.println("input handled by ui");
-                return false;
-            }
-            if (editor.mode!=Editor.OFF) {
-                editor.mouseDown(screenX, screenY, button);
-                return stage.touchDown(screenX, screenY, pointer, button);
-            }
-            // origin top left
-            clickEvent(getWorldMouse());
-            //return super.touchDown(screenX, screenY, pointer, button);
-//            System.out.println(String.format("Button: (%d,%d) world (%.3f,%.3f) ptr: %d button: %d",
-//                    screenX,screenY,wx.x,wx.y,pointer, button));
-//            if (button == 0) {
-////                System.out.println("##"+ECS.mTransform.get(ent).pos+" "+wx+"##");
-//                // S T R E S S T E S T
-////                for(int i=-6;i<=6;i++)
-////                    for(int j=-6;j<=6;j++)
-//                int i = 0, j = 0;
-//                makeBullet(ECS.mTransform.get(ent).pos.x + i, ECS.mTransform.get(ent).pos.y + j, wx.x + i, wx.y + j);
-//            }
-//            if (button == 2) {
-//                statics.add(makeThing(wx.x, wx.y, false));
-//            }
-            return false;
-        }
-
-        @Override
-        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-            if(stage.touchUp(screenX, screenY, pointer, button)){
-                System.out.println("input handled by ui");
-                return false;
-            }
-            if (editor.mode!=Editor.OFF) {
-                editor.mouseUp(screenX, screenY, button);
-            }
-            return false;
-        }
+        } else if (keycode == Input.Keys.F12) {
+            byte[] pixels = ScreenUtils.getFrameBufferPixels(0, 0, Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), true);
+            Pixmap pixmap = new Pixmap(Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight(), Pixmap.Format.RGBA8888);
+            BufferUtils.copy(pixels, 0, pixmap.getPixels(), pixels.length);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH_mm_ss_SSS");
+            System.out.println(Gdx.files.getLocalStoragePath());
+            PixmapIO.writePNG(Gdx.files.local("screenshots/screenshot " + sdf.format(new Date()) + ".png"), pixmap);
+            pixmap.dispose();
+            screenshotSound.play();
+        }else if(editor.mode!=Editor.OFF){
+            editor.keyDown(keycode);
+        }else gameKeyDown(keycode);
+        return false;
     }
-    public void clickEvent(Vector2 wp){
 
+
+    @Override
+    public boolean keyUp(int keycode) {
+        if(keycode==Input.Keys.SHIFT_LEFT){
+            editor.shiftUp();
+        }
+
+        if (keycode == Input.Keys.W) {
+            playerInput.up(CInput.UP);
+        } else if (keycode == Input.Keys.A) {
+            playerInput.up(CInput.LEFT);
+        } else if (keycode == Input.Keys.S) {
+            playerInput.up(CInput.DOWN);
+        } else if (keycode == Input.Keys.D) {
+            playerInput.up(CInput.RIGHT);
+        }
+        return stage.keyUp(keycode); // aaa
     }
+
+    @Override
+    public boolean scrolled(int amount) {
+        if(stage.scrolled(amount))return true;
+        if(freeCam) {
+            camController.changeZoomLevel(amount);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if(stage.touchDown(screenX, screenY, pointer, button)){
+            System.out.println("input handled by ui");
+            return false;
+        }
+        if (editor.mode!=Editor.OFF) {
+            editor.mouseDown(screenX, screenY, button);
+            return stage.touchDown(screenX, screenY, pointer, button);
+        }
+        mouseDown(getWorldMouse(),button);
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if(stage.touchUp(screenX, screenY, pointer, button)){
+            System.out.println("input handled by ui");
+            return false;
+        }
+        if (editor.mode!=Editor.OFF) {
+            editor.mouseUp(screenX, screenY, button);
+        }
+        return false;
+    }
+
+    public void mouseDown(Vector2 wp,int button){} // TO OVERRIDE
 }  

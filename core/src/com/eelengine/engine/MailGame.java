@@ -105,8 +105,8 @@ public class MailGame extends EelGame {
     }
 
     @Override
-    public void clickEvent(Vector2 wp) {
-        super.clickEvent(wp);
+    public void mouseDown(Vector2 wp) {
+        super.mouseDown(wp);
         int mb=triggerSystem.checkFlag("MAILBOX",wp);
         if(mb==-1)return;
         ECS.mMailbox.get(mb).mailCt++;
