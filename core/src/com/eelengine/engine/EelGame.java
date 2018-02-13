@@ -179,14 +179,14 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public void render () {
+        // ----- PRE RENDER ----- //
+        // Update the asset loader before anything else
         boolean loading=!assetSystem.update();
 //        System.out.println(assetSystem.getQueuedAssets()+":"+assetSystem.getLoadedAssets());
 
         // clear graphics
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // // Step physics
 
         // Update camera systems
         if(freeCam) {
@@ -201,6 +201,8 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         worldBatch.setProjectionMatrix(camController.getCam().combined);
         shapeRenderer.setProjectionMatrix(matrix4);
 
+        // ----- RENDER ----- //
+        // Render statics
         worldBatch.begin();
         for (StaticSprite sprite : editor.getLevelSource().staticLayer0) {
             RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
@@ -208,9 +210,6 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         for (StaticSprite sprite : editor.getLevelSource().staticLayer1) {
             RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
         }
-//        for (StaticSprite sprite : staticLayer1){
-//            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
-//        }
         worldBatch.end();
 
         // Draw grid
@@ -220,6 +219,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
             shapeRenderer.end();
         }
 
+        // Draw debug for nav
         if(DEV_draw_nav) {
             navigation.drawCells(shapeRenderer);
         }
@@ -227,6 +227,8 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         // Step ECS
         entityWorld.setDelta(Gdx.graphics.getDeltaTime()*DEV_time_mod);
         entityWorld.process();
+
+        // Call game-specific logic (overridden usually)
         logicStep();
 //            navPath=navigation.findPath(ECS.mTransform.get(ent).pos,
 //                    new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())));
@@ -235,14 +237,9 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 //        entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
 //        }
 
-        // TEST
-        worldBatch.begin();
-        //if(geomEditor !=null&& geomEditor.getSource().sprite!=null)worldBatch.draw(geomEditor.getSource().sprite.region,0,0);
-        //        //worldBatch.draw(region,0,0);
-//        worldBatch.draw(testSprite.region,0,0);
-//        for (StaticSprite sprite : staticLayer0) {
-//            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
-//        }
+        System.out.println("Are we drawing? "+worldBatch.isDrawing());
+
+        // Render upper statics
         for (StaticSprite sprite : editor.getLevelSource().staticLayer2) {
             RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
         }
