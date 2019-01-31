@@ -15,8 +15,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -29,13 +31,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.badlogic.gdx.utils.Align.topRight;
+
 /**
  * The core class of the engine
  * LONG BOI
  */
 public class EelGame extends ApplicationAdapter implements InputProcessor {
     // CONSTANTS
-    public static final float GSCALE=128;
+    public static final float GSCALE=32;
     public static final int VIRTUAL_WIDTH = 1920;
     public static final int VIRTUAL_HEIGHT = 1080;
     public static final int VIRTUAL_WINDOWED_WIDTH = 1600;
@@ -85,15 +89,15 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
     int entityCount;
 
     // DEV SWITCHES
-    boolean DEV_physics_render =true;
+    boolean DEV_physics_render =false;
     boolean DEV_draw_grid=false;
     boolean DEV_draw_nav=false;
     float DEV_time_mod=1f;
 
     // VISUAL ELEMENT SWITCHES
-    boolean fullscreen=true;
+    boolean fullscreen=false;
     boolean escapeMenu=false;
-    boolean freeCam =false;
+    boolean freeCam =true;
 
     // ENTITY CONTROL
     CInput playerInput;
@@ -116,24 +120,16 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         setupRendering();
 
         stage = new Stage();
-//
-//        table = new Table();
-//        table.setWidth(400);
-//        table.setHeight(800);
-//
-//        stage.addActor(table);
-//        table.setPosition(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),topRight);
-//        //table.setDebug(true);
-//        Table table1=new Table();
-//        table1.top().right();
-//        table1.setWidth(200);
-//        table1.setHeight(400);
-//        //table1.setDebug(true);
-//        stage.addActor(table1);
+
+
 
         TextureAtlas atlas = new TextureAtlas(Gdx.files.local("skin/tracer-ui.atlas"));
         Skin skin=new Skin(Gdx.files.internal("skin/tracer-ui.json"),atlas);
-//        table1.add(new Label("Test table 1",skin));
+
+        final TextArea button = new TextArea("Click Me",skin,"default");
+        button.setWidth(200);
+        button.setHeight(50);
+        stage.addActor(button);
 
 //        list.addListener(new ChangeListener() {
 //            @Override
@@ -147,7 +143,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 //        });
 
         setupEditor();
-        //editor.buildUI(table,skin);
+        editor.buildUI(table,skin);
         setupPhysics();
         navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
         setupECS();
@@ -237,8 +233,9 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 //        entNavigator.targetPoint =new Vector2(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY()));
 //        }
 
-        System.out.println("Are we drawing? "+worldBatch.isDrawing());
+//        System.out.println("Are we drawing? "+worldBatch.isDrawing());
 
+        worldBatch.begin();
         // Render upper statics
         for (StaticSprite sprite : editor.getLevelSource().staticLayer2) {
             RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
@@ -582,12 +579,18 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         viewport = new ScreenViewport();
         interfaceCam = new OrthographicCamera(VIRTUAL_WIDTH,VIRTUAL_HEIGHT);
         camController=new CamController(VIRTUAL_WIDTH,VIRTUAL_HEIGHT);
-        // Fullscreen
-        Graphics.Monitor currMonitor = Gdx.graphics.getMonitor();
-        Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode(currMonitor);
         Gdx.graphics.setResizable(false);
 
-        Gdx.graphics.setFullscreenMode(displayMode);
+        // Fullscreen
+        if (!fullscreen) {
+            Gdx.graphics.setWindowedMode(VIRTUAL_WINDOWED_WIDTH, VIRTUAL_WINDOWED_HEIGHT);
+        } else {
+            System.out.println("FULLSCREEN ON");
+            Graphics.Monitor currMonitor = Gdx.graphics.getMonitor();
+            Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode(currMonitor);
+            Gdx.graphics.setFullscreenMode(displayMode);
+        }
+
         Gdx.input.setInputProcessor(this);
     }
 

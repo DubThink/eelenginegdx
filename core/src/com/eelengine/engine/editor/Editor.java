@@ -40,51 +40,51 @@ public class Editor {
     }
 
     public void buildUI(Table table, Skin skin){
-        this.table=table;
-        table.top();
-        table.setBackground(new TextureRegionDrawable(new TextureRegion(Etil.init(0x2A2A2AAF))));
-        Label label=new Label("EDITOR",skin);
-        //label.setVisible(false);
-        table.add(label).pad(10);
-        table.row();
-        List<String> list=new List<>(skin);
-        list.setItems("Edit","play");
-
-
-        exwidth=(int)table.getWidth();
-        width=exwidth-20;
-        System.out.println("Building editor ui with width "+exwidth+"("+width+")");
-        table.add(list).fillX().width(Util.min(width,200));
-        table.row();
-
-        pane=new VerticalGroup();
-        pane.setWidth(exwidth);
-        pane.fill();
-        ScrollPane scrollPane=new ScrollPane(pane,skin);
-        scrollPane.setWidth(exwidth);
-        scrollPane.setDebug(true);
-        table.add(scrollPane).setActorWidth(exwidth);
-        Actor holder=new Actor();
-        holder.setWidth(width);
-        pane.addActor(holder);
-        pane.addActor(new Label("1",skin));
-        pane.addActor(new Label("2",skin));
-        pane.addActor(new Label("3",skin));
-        pane.addActor(new Label("4",skin));
-        pane.addActor(new Label("1",skin));
-        pane.addActor(new Label("2",skin));
-        pane.addActor(new Label("3",skin));
-        pane.addActor(new Label("4",skin));
-        pane.addActor(new Label("1",skin));
-        pane.addActor(new Label("2",skin));
-        pane.addActor(new Label("3",skin));
-        pane.addActor(new Label("4",skin));
-        pane.addActor(new Label("1",skin));
-        pane.addActor(new Label("2",skin));
-        pane.addActor(new Label("3",skin));
-        pane.addActor(new Label("4",skin));
-        pane.expand();
-
+//        this.table=table;
+//        table.top();
+//        table.setBackground(new TextureRegionDrawable(new TextureRegion(Etil.init(0x2A2A2AAF))));
+//        Label label=new Label("EDITOR",skin);
+//        //label.setVisible(false);
+//        table.add(label).pad(10);
+//        table.row();
+//        List<String> list=new List<>(skin);
+//        list.setItems("Edit","play");
+//
+//
+//        exwidth=(int)table.getWidth();
+//        width=exwidth-20;
+//        System.out.println("Building editor ui with width "+exwidth+"("+width+")");
+//        table.add(list).fillX().width(Util.min(width,200));
+//        table.row();
+//
+//        pane=new VerticalGroup();
+//        pane.setWidth(exwidth);
+//        pane.fill();
+//        ScrollPane scrollPane=new ScrollPane(pane,skin);
+//        scrollPane.setWidth(exwidth);
+//        scrollPane.setDebug(true);
+//        table.add(scrollPane).setActorWidth(exwidth);
+//        Actor holder=new Actor();
+//        holder.setWidth(width);
+//        pane.addActor(holder);
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.expand();
+//
 
     }
     public void render(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch){

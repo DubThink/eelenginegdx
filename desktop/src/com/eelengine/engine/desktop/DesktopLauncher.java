@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.eelengine.engine.EelGame;
 import com.eelengine.engine.MailGame;
+import com.eelengine.engine.SergeiGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
@@ -23,9 +24,9 @@ public class DesktopLauncher {
 		//new Lwjgl3Application(new EelGame(), config);
 //		System.out.println("ARG: "+arg.length);
 		if(arg.length==1)
-			new Lwjgl3Application(new MailGame(arg[0]), config);
+			new Lwjgl3Application(new SergeiGame(arg[0]), config);
 		else
-			new Lwjgl3Application(new MailGame(), config);
+			new Lwjgl3Application(new SergeiGame(), config);
 		//app.getGraphics().
 	}
 }
