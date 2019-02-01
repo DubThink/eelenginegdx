@@ -24,6 +24,7 @@ public class SergeiGame extends EelGame {
 
     GridWorld gridWorld;
     public SergeiGame() {
+        DEV_draw_grid=true;
     }
 
     public SergeiGame(String level){
@@ -93,7 +94,7 @@ public class SergeiGame extends EelGame {
     public void mouseDown(Vector2 wp,int button) {
         super.mouseDown(wp,button);
         Vector3 gridPos=camController.getCam().unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0));
-        gridWorld.setTile(round(gridPos.x/10),round(gridPos.y/10));
+        gridWorld.getTile(round(gridPos.x/10),round(gridPos.y/10)).setArid(255);
     }
 
     @Override
