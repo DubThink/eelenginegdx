@@ -5,6 +5,12 @@
 *.ear
 hs_err_pid*
 
+##
+
+*.iml
+*.ipr
+*.iws
+
 ## Robovm
 /ios/robovm-build/
 
