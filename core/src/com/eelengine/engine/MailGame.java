@@ -143,12 +143,12 @@ public class MailGame extends EelGame {
         super.gameKeyDown(keycode);
     }
     public void buildMailboxes(){
-        System.out.printf("Building %d Mailboxes\n",levelData.mailboxSrcs.size());
-        mailSystem.clearAll();
-        for(MailboxSrc src:levelData.mailboxSrcs){
-            if(src.zone<=activeZone){
-                JamEntityBuilder.makeMailbox(entityWorld,src.location);
-            }
-        }
+//        System.out.printf("Building %d Mailboxes\n",levelData.mailboxSrcs.size());
+//        mailSystem.clearAll();
+//        for(MailboxSrc src:levelData.mailboxSrcs){
+//            if(src.zone<=activeZone){
+//                JamEntityBuilder.makeMailbox(entityWorld,src.location);
+//            }
+//        }
     }
 }

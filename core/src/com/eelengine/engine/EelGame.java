@@ -50,8 +50,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
     SpriteBatch interfaceBatch; // Screenspace
     ShapeRenderer shapeRenderer; // Debug renderer (worldspace)
     Box2DDebugRenderer debugRenderer; // Physics debug renderer object
-    private Stage stage;
-    private Table table;
+    Stage stage;
 
     // RENDER SOURCES
     ArrayList<StaticSprite> staticLayer0 =new ArrayList<>();
@@ -67,7 +66,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
     com.artemis.World entityWorld;
     RenderOneTexSystem spriteRenderSystem;
     TriggerSystem triggerSystem;
-    MailSystem mailSystem;
+    RobotSystem robotSystem;
 
     // PHYSICS
     World physicsWorld;
@@ -79,6 +78,9 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 
     // EDITING
     Editor editor;
+
+    // UI
+    Skin skin;
 
     // TEST ASSETS
     Texture img,img2;
@@ -123,13 +125,9 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 
 
 
-        TextureAtlas atlas = new TextureAtlas(Gdx.files.local("skin/tracer-ui.atlas"));
-        Skin skin=new Skin(Gdx.files.internal("skin/tracer-ui.json"),atlas);
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.local("skin/uiskin.atlas"));
+        skin=new Skin(Gdx.files.internal("skin/uiskin.json"),atlas);
 
-        final TextArea button = new TextArea("Click Me",skin,"default");
-        button.setWidth(200);
-        button.setHeight(50);
-        stage.addActor(button);
 
 //        list.addListener(new ChangeListener() {
 //            @Override
@@ -143,7 +141,6 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 //        });
 
         setupEditor();
-        editor.buildUI(table,skin);
         setupPhysics();
         navigation=new Navigation(Gdx.files.internal("maps/map2.nav"));
         setupECS();
@@ -417,22 +414,20 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
     }
 
     /**
-     * Sets up the Entity-Component-System structure
-     * @pre All subsystems used by ECS should be initialized first
+     * Override to register your own ECS Systems
+     * @param worldConfigurationBuilder
      */
-    void setupECS(){
-        com.artemis.WorldConfiguration entityConfig=new WorldConfigurationBuilder()
-                .with(WorldConfigurationBuilder.Priority.HIGH + 1, new BaseSystem() {
-                    @Override
-                    protected void processSystem() {
-                        physicsWorld.step(Gdx.graphics.getDeltaTime()*DEV_time_mod, 6,2);
-                    }
-                })
+    void loadSystems(WorldConfigurationBuilder worldConfigurationBuilder){
+        worldConfigurationBuilder.with(WorldConfigurationBuilder.Priority.HIGH + 1, new BaseSystem() {
+            @Override
+            protected void processSystem() {
+                physicsWorld.step(Gdx.graphics.getDeltaTime()*DEV_time_mod, 6,2);
+            }
+        })
                 .with(WorldConfigurationBuilder.Priority.HIGH,new PhysicsToTransformUpdateSystem())
                 .with(spriteRenderSystem=new RenderOneTexSystem(worldBatch))
                 .with(triggerSystem=new TriggerSystem())
                 .with(new AnimSystem())
-                .with(mailSystem=new MailSystem(worldBatch,camController))
                 .with(WorldConfigurationBuilder.Priority.LOW,new UtilSystem())
                 .with(WorldConfigurationBuilder.Priority.LOW,new HealthSystem(interfaceBatch,camController))
                 .with(WorldConfigurationBuilder.Priority.LOW - 1, new BaseEntitySystem(Aspect.all()) {
@@ -444,8 +439,17 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
                 })
                 .with(WorldConfigurationBuilder.Priority.LOWEST,new PhysicsSystem())
                 .with(new MovementSystem())
-                .with(new NavigationSystem(navigation,shapeRenderer))
-                .build();
+                .with(new NavigationSystem(navigation,shapeRenderer));
+    }
+
+    /**
+     * Sets up the Entity-Component-System structure
+     * @pre All subsystems used by ECS should be initialized first
+     */
+    void setupECS(){
+        WorldConfigurationBuilder worldConfigurationBuilder = new WorldConfigurationBuilder();
+        loadSystems(worldConfigurationBuilder);
+        com.artemis.WorldConfiguration entityConfig=worldConfigurationBuilder.build();
         //entityConfig.
         entityWorld=new com.artemis.World(entityConfig);
         ECS.initialize(entityWorld);
@@ -659,9 +663,6 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
             if (keycode == Input.Keys.N) DEV_draw_nav = !DEV_draw_nav;
 //                if(keycode==Input.Keys.F) EelGame.GSCALE=150-EelGame.GSCALE;
 
-        }else if (keycode == Input.Keys.F5) {
-            for(int i=1;i<=128;i++)
-                assetSystem.load("stress/sig ("+i+").png",Texture.class);
         }
         else if (keycode == Input.Keys.F6) {
         }

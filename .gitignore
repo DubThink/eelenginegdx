@@ -208,3 +208,7 @@ core/assets/stress/
 core/out/
 desktop/out/
 /.idea/
+
+
+## Eelengine
+/promo/
