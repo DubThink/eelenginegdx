@@ -8,7 +8,7 @@ import bpw.Util;
  */
 public class Inventory {
     private int amounts[];
-    public final int size;
+    private int size;
     /*The number of free stacks*/
     private int stacks;
 
@@ -57,6 +57,20 @@ public class Inventory {
         amounts[item.id]+=amt;
         stacks-=getStackUsage(item)-usage;
         return amt;
+    }
+
+    /**
+     * Gets the size in stacks
+     */
+    public int getSize() {
+        return size;
+    }
+
+    /**
+     * Gets the number of free stacks
+     */
+    public int getFreeStacks() {
+        return stacks;
     }
 
     public static void main(String[] args) {

@@ -2,7 +2,6 @@ package com.eelengine.engine;
 
 import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,6 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
+import com.eelengine.engine.robot.CRobot;
+import com.eelengine.engine.robot.RobotSystem;
 
 import static java.lang.Math.round;
 
@@ -49,10 +50,9 @@ public class SergeiGame extends EelGame {
         textArea.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
             public void keyTyped(TextField textField, char key) {
-                if ((key == '\r' || key == '\n')){
+                if ((key == '\r' || key == '\n')&&ECS.mRobot.get(robot).ableToQueueCommand()){
                     System.out.println("executing command");
-                    ECS.mRobot.get(robot).command=textField.getText();
-                    ECS.mRobot.get(robot).commandHistory+="\n"+textField.getText();
+                    ECS.mRobot.get(robot).queueCommand(textField.getText());
                     textField.setText("");
                     scrollPane.setScrollPercentY(1);
                 }
@@ -60,7 +60,7 @@ public class SergeiGame extends EelGame {
         });
         terminalTable=new Table(skin);
 //        terminalTable.setFillParent(true);
-        terminalTable.setSize(400,800);
+        terminalTable.setSize(600,800);
         terminalTable.background("window");
         terminalTable.align(Align.bottom);
         stage.addActor(terminalTable);
@@ -92,7 +92,7 @@ public class SergeiGame extends EelGame {
         CRobot cRobot=ECS.mRobot.get(robot);
         terminalTable.setVisible(cRobot!=null);
         if(cRobot!=null) {
-            commandHistoryUI.setText(cRobot.commandHistory);
+            commandHistoryUI.setText(cRobot.getTextBuffer());
             commandBar.setValue(1-cRobot.getCooldownPercent());
 
         }

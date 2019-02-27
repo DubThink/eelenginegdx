@@ -1,9 +1,8 @@
 package com.eelengine.engine;
 
-import com.artemis.Archetype;
-import com.artemis.ArchetypeBuilder;
 import com.artemis.ComponentMapper;
 import com.artemis.World;
+import com.eelengine.engine.robot.CRobot;
 
 /**
  * Container class for {@link ComponentMapper}s.
