@@ -58,7 +58,6 @@ public class SergeiGame extends EelGame {
                     System.out.println("executing command");
                     ECS.mRobot.get(robot).queueCommand(textField.getText());
                     textField.setText("");
-                    scrollPane.setScrollPercentY(1);
                 }
             }
         });
@@ -96,7 +95,12 @@ public class SergeiGame extends EelGame {
         CRobot cRobot=ECS.mRobot.get(robot);
         terminalTable.setVisible(cRobot!=null);
         if(cRobot!=null) {
+            // TODO add listener and use scroll events to turn on/off snap-to-bottom
+            // TODO or think of an elegant solution (better idea)
+            float scrollpos=scrollPane.isScrollY()?1:scrollPane.getScrollPercentY();
+            System.out.println(scrollpos);
             cmdHistoryUI.setText(cRobot.getTextBuffer());
+            if(scrollpos==1)scrollPane.setScrollPercentY(1);
             cmdProgressBar.setValue(1-cRobot.getCooldownPercent());
 
         }
@@ -156,10 +160,12 @@ public class SergeiGame extends EelGame {
             // handle special keys on the command line
             if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)&&keycode==Input.Keys.U){
                 cmdTextField.setText(cmdTextField.getText().substring(cmdTextField.getCursorPosition()));
-            }else if(keycode==Input.Keys.UP){
-                cmdTextField.setText(ECS.mRobot.get(robot).previousCommand());
-            }else if(keycode==Input.Keys.DOWN){
-                cmdTextField.setText(ECS.mRobot.get(robot).nextCommand());
+            }else if(ECS.mRobot.get(robot)!=null&&ECS.mRobot.get(robot).ableToQueueCommand()){
+                if(keycode==Input.Keys.UP){
+                    cmdTextField.setText(ECS.mRobot.get(robot).previousCommand());
+                }else if(keycode==Input.Keys.DOWN){
+                    cmdTextField.setText(ECS.mRobot.get(robot).nextCommand());
+                }
             }
         }
         return super.keyDown(keycode);

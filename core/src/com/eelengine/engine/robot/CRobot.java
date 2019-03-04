@@ -26,9 +26,18 @@ public class CRobot extends Component {
     float cooldownLength=1;
     Inventory inventory=new Inventory(10);
 
+    /**
+     * Checks if the robot can accept a command for immediate execution
+     * @return true if the robot can accept a command
+     */
     public boolean ableToQueueCommand(){
-        return command.equals("");
+        return command.equals("")&&cooldown==0;
     }
+
+    /**
+     * Issues a command to the robot
+     * @param command command to run
+     */
     public void queueCommand(String command) {
         this.command = command;
         write("> "+command);
@@ -36,14 +45,36 @@ public class CRobot extends Component {
             commandHistory.addLast(command);
         historyIndex=0;
     }
+
+    /**
+     * Writes to the robot's console
+     * @param string the message to write
+     */
     public void write(String string){
-        textBuffer+=string+"\n";
+        textBuffer+="\n"+string;
     }
+
+    /**
+     * Writes an error message to the robot's console
+     * @param string the error message
+     */
+    public void writeError(String string){
+        textBuffer+="\n[#FF5050]"+string+"[]";
+    }
+
+    /**
+     * Sets the cooldown of the robot's current command
+     * @param f the time in seconds
+     */
     public void setCooldown(float f){
         cooldown =f;
         cooldownLength=f;
     }
 
+    /**
+     * Gets the percent complete the current command's cooldown is
+     * @return a percent in [0.0, 1.0]
+     */
     public float getCooldownPercent(){
         if(cooldownLength==0)return 1;
         return cooldown /cooldownLength;
@@ -64,7 +95,10 @@ public class CRobot extends Component {
         if(historyIndex==0)return "";
         return commandHistory.get(commandHistory.size()-historyIndex);
     }
-    
+
+    /**
+     * Gets the robot's console text
+     */
     public String getTextBuffer() {
         return textBuffer;
     }

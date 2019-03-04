@@ -40,13 +40,15 @@ public class RobotSystem extends IteratingSystem {
 
         String parts[]=robot.command.split(" ");
         // TODO REMOVE
-        if(parts.length>=2&&parts[0].equals("sudo")&&parts[1].equals("shutdown")){
+        if(parts.length>=2&&parts[0].equals("sudo")&&parts[1].equals("kill")){
             Gdx.app.exit();
         } else if(parts.length>=2&&parts[0].equals("move")) {
             Vector2 dir = FelixLangHelpers.ParseDirectionToVec2(parts[1]);
-            System.out.println(dir.toString());
             transform.pos.add(dir);
-            robot.setCooldown(1);
+            if(dir.len2()>0){
+                robot.setCooldown(1);
+                robot.write("Moving "+dir.toString());
+            }
         } else if(parts.length>=2&&(parts[0].equals("inventory")||parts[0].equals("inv"))){
             if(parts.length>=4&&parts[1].equals("insert")){
                 try{
@@ -55,9 +57,9 @@ public class RobotSystem extends IteratingSystem {
                     amt=robot.inventory.insert(item,amt);
                     robot.write("Inserted "+amt+" "+item.getHrName());
                 } catch (NumberFormatException E){
-                    robot.write("E:Bad amount");
+                    robot.writeError("Bad amount");
                 }catch (IllegalArgumentException E){
-                    robot.write("E:Invalid item");
+                    robot.writeError("Invalid item");
                 }
             } else if(parts[1].equals("list")){
                 robot.write("INVENTORY");
