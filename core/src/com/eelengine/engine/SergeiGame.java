@@ -2,6 +2,7 @@ package com.eelengine.engine;
 
 import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,10 +19,13 @@ public class SergeiGame extends EelGame {
 
     int robot;
     GridWorld gridWorld;
+
+    // UI
     Table terminalTable;
-    Label commandHistoryUI;
-    ProgressBar commandBar;
+    Label cmdHistoryUI;
+    ProgressBar cmdProgressBar;
     ScrollPane scrollPane;
+    TextField cmdTextField;
     public SergeiGame() {
     }
 
@@ -37,17 +41,17 @@ public class SergeiGame extends EelGame {
         playerInput =ECS.mInput.get(robot);
 
         // SET UP COMMAND LINE
-        final TextField textArea = new TextField("Click Me",skin,"default");
-//        textArea.setWidth(200);
-//        textArea.setHeight(50);
-        textArea.setTextFieldFilter(new TextField.TextFieldFilter() {
+        cmdTextField = new TextField("Click Me",skin,"default");
+//        cmdTextField.setWidth(200);
+//        cmdTextField.setHeight(50);
+        cmdTextField.setTextFieldFilter(new TextField.TextFieldFilter() {
             @Override
             public boolean acceptChar(TextField textField, char c) {
                 return 32<=c&&c<=126;
             }
         });
-        textArea.setBlinkTime(0.2f);
-        textArea.setTextFieldListener(new TextField.TextFieldListener() {
+        cmdTextField.setBlinkTime(0.2f);
+        cmdTextField.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
             public void keyTyped(TextField textField, char key) {
                 if ((key == '\r' || key == '\n')&&ECS.mRobot.get(robot).ableToQueueCommand()){
@@ -64,20 +68,20 @@ public class SergeiGame extends EelGame {
         terminalTable.background("window");
         terminalTable.align(Align.bottom);
         stage.addActor(terminalTable);
-        commandHistoryUI =new Label("",skin);
-        scrollPane=new ScrollPane(commandHistoryUI,skin);
+        cmdHistoryUI =new Label("",skin);
+        scrollPane=new ScrollPane(cmdHistoryUI,skin);
         scrollPane.setFadeScrollBars(false);
         scrollPane.setFlickScroll(false);
         scrollPane.setSmoothScrolling(false);
         scrollPane.setScrollingDisabled(true,false);
-        commandBar=new ProgressBar(0,1,.01f,false,skin);
-        commandBar.setValue(.6f);
+        cmdProgressBar =new ProgressBar(0,1,.01f,false,skin);
+        cmdProgressBar.setValue(.6f);
 
         terminalTable.add(scrollPane).prefWidth(11111);
         terminalTable.row();
-        terminalTable.add(commandBar).prefWidth(11111);
+        terminalTable.add(cmdProgressBar).prefWidth(11111);
         terminalTable.row();
-        terminalTable.add(textArea).prefWidth(11111);
+        terminalTable.add(cmdTextField).prefWidth(11111);
     }
 
     @Override
@@ -92,8 +96,8 @@ public class SergeiGame extends EelGame {
         CRobot cRobot=ECS.mRobot.get(robot);
         terminalTable.setVisible(cRobot!=null);
         if(cRobot!=null) {
-            commandHistoryUI.setText(cRobot.getTextBuffer());
-            commandBar.setValue(1-cRobot.getCooldownPercent());
+            cmdHistoryUI.setText(cRobot.getTextBuffer());
+            cmdProgressBar.setValue(1-cRobot.getCooldownPercent());
 
         }
         // Update controls
@@ -148,6 +152,16 @@ public class SergeiGame extends EelGame {
 
     @Override
     public boolean keyDown(int keycode) {
+        if(cmdTextField==stage.getKeyboardFocus()){
+            // handle special keys on the command line
+            if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)&&keycode==Input.Keys.U){
+                cmdTextField.setText(cmdTextField.getText().substring(cmdTextField.getCursorPosition()));
+            }else if(keycode==Input.Keys.UP){
+                cmdTextField.setText(ECS.mRobot.get(robot).previousCommand());
+            }else if(keycode==Input.Keys.DOWN){
+                cmdTextField.setText(ECS.mRobot.get(robot).nextCommand());
+            }
+        }
         return super.keyDown(keycode);
     }
 
