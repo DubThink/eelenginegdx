@@ -13,6 +13,9 @@ com.badlogic.gdx.graphics.Color: {
 com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	commodore-64: { file: commodore-64.fnt }
 },
+com.badlogic.gdx.graphics.g2d.BitmapFont: {
+	commodore-64-nomarkup: { file: commodore-64.fnt, markupEnabled:false }
+},
 com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	dialogDim: {
 		name: white,
@@ -78,7 +81,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 },
 com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 	default: {
-		font: commodore-64,
+		font: commodore-64-nomarkup,
 		fontColor: { a: 1 },
 		background: white,
 		cursor: cursor-black,

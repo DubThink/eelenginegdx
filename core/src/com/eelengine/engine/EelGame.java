@@ -6,6 +6,7 @@ import com.artemis.utils.IntBag;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -125,6 +126,8 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.local("skin/uiskin.atlas"));
         skin=new Skin(Gdx.files.internal("skin/uiskin.json"),atlas);
 
+        BitmapFont labelFont = skin.get("commodore-64", BitmapFont.class);
+        labelFont.getData().markupEnabled = true;
 
 //        list.addListener(new ChangeListener() {
 //            @Override
