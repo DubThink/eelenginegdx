@@ -3,6 +3,8 @@ package com.eelengine.engine;
 import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,6 +28,9 @@ public class SergeiGame extends EelGame {
     ProgressBar cmdProgressBar;
     ScrollPane scrollPane;
     TextField cmdTextField;
+    StaticNoise2D terrainRenderNoise=new StaticNoise2D(0);
+
+    LoadedTextureRegion terrain,ore;
     public SergeiGame() {
     }
 
@@ -34,7 +39,7 @@ public class SergeiGame extends EelGame {
     }
     @Override
     public void gameCreate() {
-        gridWorld=new GridWorld();
+        initializeTerrain();
         JamFontKit.initFonts();
         assetSystem.finishLoading();
         robot=RobotHelper.makeRobot(entityWorld,physicsWorld);
@@ -81,12 +86,22 @@ public class SergeiGame extends EelGame {
         terminalTable.add(cmdProgressBar).prefWidth(11111);
         terminalTable.row();
         terminalTable.add(cmdTextField).prefWidth(11111);
+
+        terrain=new LoadedTextureRegion("rok2.png");
+        ore=new LoadedTextureRegion("ore.png");
+
+    }
+
+    void initializeTerrain(){
+        gridWorld=new GridWorld(CVars.t_seed);
+        // TODO make less hacky
+        entityWorld.getSystem(RobotSystem.class).gridWorld=gridWorld;
     }
 
     @Override
     void loadSystems(WorldConfigurationBuilder worldConfigurationBuilder) {
         super.loadSystems(worldConfigurationBuilder);
-        worldConfigurationBuilder.with(robotSystem=new RobotSystem());
+        worldConfigurationBuilder.with(robotSystem=new RobotSystem(gridWorld,this));
 
     }
 
@@ -98,7 +113,6 @@ public class SergeiGame extends EelGame {
             // TODO add listener and use scroll events to turn on/off snap-to-bottom
             // TODO or think of an elegant solution (better idea)
             float scrollpos=scrollPane.isScrollY()?1:scrollPane.getScrollPercentY();
-            System.out.println(scrollpos);
             cmdHistoryUI.setText(cRobot.getTextBuffer());
             if(scrollpos==1)scrollPane.setScrollPercentY(1);
             cmdProgressBar.setValue(1-cRobot.getCooldownPercent());
@@ -109,18 +123,22 @@ public class SergeiGame extends EelGame {
     }
 
     @Override
-    public void render() {
-        super.render();
-//        Pixmap pixmap=new Pixmap((int)GSCALE*Chunk.SIZE,(int)GSCALE*Chunk.SIZE,RGBA8888);
-//        Chunk chunk=gridWorld.getChunk(0,0);
-//        pixmap.setColor(0xffffffff);
+    public void renderWorld() {
+        super.renderWorld();
+//        Pixmap pixmap=new Pixmap(GSCALE*Chunk.SIZE,GSCALE*Chunk.SIZE,RGBA8888);
 //        pixmap.fill();
 //        for(int x=0;x<16;x++){
 //            for(int y=0;y<16;y++) {
 //                pixmap.drawPixel(x,y, chunk.tiles[x][y].arid<<24|chunk.tiles[x][y].veg<<16|0x00ff);
 //            }
 //        }
+
         worldBatch.begin();
+        renderChunk(0,0);
+        renderChunk(1,0);
+        renderChunk(0,1);
+        renderChunk(1,1);
+
 //        Texture texture=new Texture(pixmap);
 //        System.out.println();
 //        System.out.println(ECS.mTransform.get(robot).pos);
@@ -135,6 +153,43 @@ public class SergeiGame extends EelGame {
         worldBatch.end();
     }
 
+    protected void renderChunk(int u, int v){
+        Chunk chunk=gridWorld.getChunk(u,v);
+        for(int x=0;x<16;x++){
+            for(int y=0;y<16;y++) {
+                switch (chunk.tiles[x][y].baseResource) {
+                    case SAND:
+                        worldBatch.setColor(Color.GOLDENROD);
+                        break;
+                    case ROCK:
+                        worldBatch.setColor(Color.GRAY);
+                        break;
+                    case DIRT:
+                        worldBatch.setColor(Color.BROWN);
+                        break;
+                    default:
+                        worldBatch.setColor(Color.RED);
+
+                }
+                int ax=x + u*Chunk.SIZE;
+                int ay=y + v*Chunk.SIZE;
+                worldBatch.draw(terrain.getTexture(),
+                        ax*GSCALE,ay*GSCALE,
+                        GSCALE*(terrainRenderNoise.test(ax,ay,1)?0:1),GSCALE*(terrainRenderNoise.test(ax,ay,2)?0:1),
+                        GSCALE, GSCALE);
+                int p=chunk.tiles[x][y].getPrimaryCount();
+                if(p>0) {
+                    if (chunk.tiles[x][y].getPrimaryResource() == Resource.COPPER) {
+                        worldBatch.setColor(Color.FIREBRICK);
+                    } else {
+                        worldBatch.setColor(Color.DARK_GRAY);
+                    }
+                    worldBatch.draw(ore.getTexture(), (u*Chunk.SIZE+x)*GSCALE,(v*Chunk.SIZE+y)*GSCALE, GSCALE*(p<8?0:1),GSCALE*(p%8<4?0:1), GSCALE, GSCALE);
+                }
+//                pixmap.drawPixel(x,y, chunk.tiles[x][y].arid<<24|chunk.tiles[x][y].veg<<16|0x00ff);
+            }
+        }
+    }
     @Override
     public void renderUI() {
         float width=Gdx.graphics.getWidth();
@@ -181,7 +236,7 @@ public class SergeiGame extends EelGame {
     public void mouseDown(Vector2 wp,int button) {
         super.mouseDown(wp,button);
         Vector3 gridPos=camController.getCam().unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0));
-        gridWorld.getTile(round(gridPos.x/10),round(gridPos.y/10)).setArid(255);
+        gridWorld.getTile(round(gridPos.x/10),round(gridPos.y/10));
     }
 
     @Override
@@ -189,5 +244,35 @@ public class SergeiGame extends EelGame {
 //        if(keycode==Input.Keys.S&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))LevelIO.saveLevelData(Gdx.files.internal(levelToBuild+".lvldat"),levelData);
 //        if(keycode==Input.Keys.O&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))levelData=LevelIO.loadLevelData(Gdx.files.internal(levelToBuild+".lvldat"));
         super.gameKeyDown(keycode);
+    }
+
+    public void parseSudoCmd(CRobot console, String[] parts){
+        if(parts.length<2||!parts[0].equals("sudo"))return;
+        if(parts[1].equals("kill")){
+            Gdx.app.exit();
+            return;
+        }
+        if(parts[1].equals("regenerate")){
+            initializeTerrain();
+            console.write("Regenerating world...");
+            return;
+        }
+        if(parts[1].equals("t_seed")){
+            if(parts.length>=3){
+                // set seed
+                try {
+                    CVars.t_seed=Long.parseLong(parts[2]);
+                }catch(NumberFormatException e){
+                    console.writeError("bad number <"+parts[2]+">");
+                }
+            }else
+                console.write(""+CVars.t_seed);
+            return;
+        }
+        console.writeError("unknown command");
+    }
+
+    public static class CVars{
+        public static long t_seed=0;
     }
 }

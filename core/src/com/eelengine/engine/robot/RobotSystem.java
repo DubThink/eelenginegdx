@@ -6,10 +6,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.eelengine.engine.CPhysics;
-import com.eelengine.engine.CTransform;
-import com.eelengine.engine.FelixLangHelpers;
-import com.eelengine.engine.Item;
+import com.eelengine.engine.*;
 
 /**
  * Updates robot logic, processing commands and running scripts
@@ -18,9 +15,13 @@ public class RobotSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.
     ComponentMapper<CPhysics> mPhysics; // injected automatically.
     ComponentMapper<CRobot> mRobot; // injected automatically.
+    public GridWorld gridWorld;
+    public SergeiGame game;
 
-    public RobotSystem() {
+    public RobotSystem(GridWorld gridWorld, SergeiGame game) {
         super(Aspect.all(CPhysics.class,CRobot.class));
+        this.gridWorld=gridWorld;
+        this.game=game;
     }
 
     @Override
@@ -40,13 +41,13 @@ public class RobotSystem extends IteratingSystem {
 
         String parts[]=robot.command.split(" ");
         // TODO REMOVE
-        if(parts.length>=2&&parts[0].equals("sudo")&&parts[1].equals("kill")){
-            Gdx.app.exit();
+        if(parts.length>=1&&parts[0].equals("sudo")){
+            game.parseSudoCmd(robot,parts);
         } else if(parts.length>=2&&parts[0].equals("move")) {
             Vector2 dir = FelixLangHelpers.ParseDirectionToVec2(parts[1]);
             transform.pos.add(dir);
             if(dir.len2()>0){
-                robot.setCooldown(1);
+                robot.setCooldown(.25f);
                 robot.write("Moving "+dir.toString());
             }
         } else if(parts.length>=2&&(parts[0].equals("inventory")||parts[0].equals("inv"))){
@@ -69,6 +70,11 @@ public class RobotSystem extends IteratingSystem {
                             robot.inventory.getAmount(item)));
                 }
             }
+        }else if(parts.length>=1&&parts[0].equals("scan")){
+            Tile tile=gridWorld.getTile(transform.pos);
+            if(!tile.isSolid())robot.write("empty Tile");
+            else
+                robot.write(tile.getBaseResource()+" tile ("+(int)(100*tile.getResourceDensity())+"% "+tile.getPrimaryResource()+")");
         }
         robot.command="";
     }

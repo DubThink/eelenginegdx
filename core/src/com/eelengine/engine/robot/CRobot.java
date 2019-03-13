@@ -59,7 +59,7 @@ public class CRobot extends Component {
      * @param string the error message
      */
     public void writeError(String string){
-        textBuffer+="\n[#FF5050]"+string+"[]";
+        textBuffer+="\n[#FF8080]"+string+"[]";
     }
 
     /**

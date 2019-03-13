@@ -27,8 +27,8 @@ public class DebugView {
         sr.set(ShapeRenderer.ShapeType.Line);
         float num=((quarters&&camera.zoom<1)?1f/divisions:1.0f);
         // unproject does some weird mutator thing where Vector3.Zero causes it to flip out
-        Vector3 startPos=camera.unproject(new Vector3(0,0,0)).scl(1/EelGame.GSCALE);
-        Vector3 endPos=camera.unproject(new Vector3(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),0)).scl(1/EelGame.GSCALE);
+        Vector3 startPos=camera.unproject(new Vector3(0,0,0)).scl(1/EelGame.GSCALE_F);
+        Vector3 endPos=camera.unproject(new Vector3(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),0)).scl(1/EelGame.GSCALE_F);
         //System.out.println(num+" "+startPos+" "+endPos);
         for(float i = Util.floor(startPos.x,1); i<=Util.ceil(endPos.x,1);i+=num){
             if(i==0)sr.setColor(0,1,0,.5f);

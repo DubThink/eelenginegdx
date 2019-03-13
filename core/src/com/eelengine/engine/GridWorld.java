@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.io.Serializable;
 
+/* big chonkus */
 class Chonk implements Serializable {
     private static final long serialVersionUID = 1L;
     Chunk chunks[][] = new Chunk[Chunk.SIZE][Chunk.SIZE];
@@ -14,13 +15,14 @@ public class GridWorld {
     private static final int WORLDSIZE=127;
     private Chunk[][] chunks = new Chunk[WORLDSIZE][WORLDSIZE];
     FelixTerrainGen terrainGen;
-    GridWorld(){
-        terrainGen=new FelixTerrainGen();
+    GridWorld(long seed){
+        terrainGen=new FelixTerrainGen(seed);
     }
-    Tile getTile(Vector2 v){
+    public Tile getTile(Vector2 v){
         return getTile((int)v.x,(int)v.y);
     }
-    Tile getTile(int x, int y){
+
+    public Tile getTile(int x, int y){
         Chunk chunk = getChunk(x>>Chunk.BSIZE,y>>Chunk.BSIZE);
         if(chunk==null)return null;
         return chunk.tiles[(Chunk.SIZE+x%Chunk.SIZE)%Chunk.SIZE][(Chunk.SIZE+y%Chunk.SIZE)%Chunk.SIZE];
@@ -43,7 +45,7 @@ public class GridWorld {
             return null;
         }
         if(chunks[u][v]==null){
-            chunks[u][v]=terrainGen.GenerateChunk(0,0);
+            chunks[u][v]=terrainGen.GenerateChunk(u,v);
         }
         return chunks[u][v];
     }

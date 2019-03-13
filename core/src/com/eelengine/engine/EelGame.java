@@ -37,7 +37,9 @@ import java.util.Date;
  */
 public class EelGame extends ApplicationAdapter implements InputProcessor {
     // CONSTANTS
-    public static final float GSCALE=32;
+    public static final int GSCALE=32;
+    public static final float GSCALE_F=(float)GSCALE;
+    public static final float GSCALE_HALF=GSCALE_F/2;
     public static final int VIRTUAL_WIDTH = 1920;
     public static final int VIRTUAL_HEIGHT = 1080;
     public static final int VIRTUAL_WINDOWED_WIDTH = 1600;
@@ -170,6 +172,26 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         stage.getViewport().update(width, height,false);
     }
 
+    /** to override*/
+    public void renderWorld(){
+        // Render statics
+        worldBatch.begin();
+        for (StaticSprite sprite : editor.getLevelSource().staticLayer0) {
+            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+        }
+        for (StaticSprite sprite : editor.getLevelSource().staticLayer1) {
+            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
+        }
+        worldBatch.end();
+
+    }
+
+    /**
+     * Don't override this
+     * put your code in one of the like 5 other functions
+     * unless you really need to
+     * but you don't
+     */
     @Override
     public void render () {
         // ----- PRE RENDER ----- //
@@ -195,15 +217,8 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         shapeRenderer.setProjectionMatrix(matrix4);
 
         // ----- RENDER ----- //
-        // Render statics
-        worldBatch.begin();
-        for (StaticSprite sprite : editor.getLevelSource().staticLayer0) {
-            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
-        }
-        for (StaticSprite sprite : editor.getLevelSource().staticLayer1) {
-            RenderUtil.renderSprite(worldBatch,sprite.region,sprite.pos.x, sprite.pos.y,sprite.rot);
-        }
-        worldBatch.end();
+
+        renderWorld();
 
         // Draw grid
         if (DEV_draw_grid) {

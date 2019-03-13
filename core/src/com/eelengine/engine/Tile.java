@@ -1,27 +1,82 @@
 package com.eelengine.engine;
 
 import java.io.Serializable;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Tile implements Serializable {
     private static final long serialVersionUID = 1L;
+    Resource baseResource;
+    Resource primaryResource;
+    int primaryCount;
+    int baseCount;
 
-    public Tile() {}
-
-    public Tile(byte arid, byte veg) {
-        this.arid = arid;
-        this.veg = veg;
+    public Tile(Resource baseResource, Resource primaryResource, int primaryCount) {
+        this.baseResource = baseResource;
+        this.primaryResource = primaryResource;
+        this.primaryCount = primaryCount;
+        this.baseCount =16- primaryCount;
     }
 
-    byte resource = Resource.NONE;
-    byte arid=0;
-    byte veg=0;
-
-    public Tile setArid(int arid) {
-        this.arid = (byte)arid;
-        return this;
+    /**
+     * returns i in [0,16] representing how much of a solid block is there (0 for not solid)
+     * @return
+     */
+    public int getSolidity(){
+        return baseCount + primaryCount;
     }
-    public Tile setVeg(int veg) {
-        this.veg = (byte)veg;
-        return this;
+
+    /**
+     * returns the percentage that the block is the primary resource
+     * @return
+     */
+    public float getResourceDensity(){
+        float f=getSolidity();
+        if(f==0)return 0;
+        return primaryCount/f;
+    }
+    /**
+     * Checks if the tile is solid
+     * @return true if the tile is solid
+     */
+    public boolean isSolid(){
+        return getSolidity()!=0;
+    }
+
+    /**
+     * Mines the block for one resource if possible
+     * @return the Item mined. Returns null if not able to mine
+     */
+    public Item mine(){
+        if(!isSolid())return null;
+        if(ThreadLocalRandom.current().nextFloat()<getResourceDensity()){
+            primaryCount--;
+            assert primaryCount>=0;
+            return primaryResource.yields;
+        }else{
+            baseCount--;
+            assert baseCount>=0;
+            return baseResource.yields;
+        }
+    }
+
+    public Resource getBaseResource() {
+        return baseResource;
+    }
+
+    public Resource getPrimaryResource() {
+        return primaryResource;
+    }
+
+    public int getPrimaryCount() {
+        return primaryCount;
+    }
+
+    public int getBaseCount() {
+        return baseCount;
+    }
+
+    @Override
+    public String toString() {
+        return "Tile()";
     }
 }

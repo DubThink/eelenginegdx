@@ -9,6 +9,8 @@ public enum Item {
     COPPER_ORE ("Copper ore",10),
     COAL ("Coal",20),
     STONE ("Stone",20),
+    DIRT ("Dirt",20),
+    SAND ("Sand",20),
     IRON("Iron bar",10);
 
     private String hrName;
