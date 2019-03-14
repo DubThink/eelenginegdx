@@ -10,6 +10,6 @@ public enum Resource {
     Item yields;
 
     Resource(Item yields) {
-        yields = yields;
+        this.yields = yields;
     }
 }

@@ -89,4 +89,9 @@ public class CamController {
         wx.scl(1/EelGame.GSCALE_F);
         return new Vector2(wx.x,wx.y);
     }
+
+    @Override
+    public String toString() {
+        return String.format(" zLevel: %d  zFactor: %.3f x:%.3f y:%.3f",zoomLevel,getZoomFactor(),cam.position.x,cam.position.y);
+    }
 }

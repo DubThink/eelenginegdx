@@ -155,22 +155,28 @@ public class SergeiGame extends EelGame {
 
     protected void renderChunk(int u, int v){
         Chunk chunk=gridWorld.getChunk(u,v);
+        Color c=Color.RED;
         for(int x=0;x<16;x++){
             for(int y=0;y<16;y++) {
                 switch (chunk.tiles[x][y].baseResource) {
                     case SAND:
-                        worldBatch.setColor(Color.GOLDENROD);
+                        c.set(Color.GOLDENROD);
                         break;
                     case ROCK:
-                        worldBatch.setColor(Color.GRAY);
+                        c.set(Color.GRAY);
                         break;
                     case DIRT:
-                        worldBatch.setColor(Color.BROWN);
+                        c.set(Color.BROWN);
                         break;
                     default:
-                        worldBatch.setColor(Color.RED);
-
+                        c.set(Color.RED);
                 }
+                if(!chunk.tiles[x][y].isSolid()) {
+                    c.r *= .4;
+                    c.g *= .4;
+                    c.b *= .4;
+                }
+                worldBatch.setColor(c);
                 int ax=x + u*Chunk.SIZE;
                 int ay=y + v*Chunk.SIZE;
                 worldBatch.draw(terrain.getTexture(),
@@ -180,7 +186,7 @@ public class SergeiGame extends EelGame {
                 int p=chunk.tiles[x][y].getPrimaryCount();
                 if(p>0) {
                     if (chunk.tiles[x][y].getPrimaryResource() == Resource.COPPER) {
-                        worldBatch.setColor(Color.FIREBRICK);
+                        worldBatch.setColor(Color.BROWN);
                     } else {
                         worldBatch.setColor(Color.DARK_GRAY);
                     }
@@ -248,7 +254,7 @@ public class SergeiGame extends EelGame {
 
     public void parseSudoCmd(CRobot console, String[] parts){
         if(parts.length<2||!parts[0].equals("sudo"))return;
-        if(parts[1].equals("kill")){
+        if(parts[1].equals("quit")){
             Gdx.app.exit();
             return;
         }

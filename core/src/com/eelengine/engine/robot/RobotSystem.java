@@ -74,7 +74,18 @@ public class RobotSystem extends IteratingSystem {
             Tile tile=gridWorld.getTile(transform.pos);
             if(!tile.isSolid())robot.write("empty Tile");
             else
-                robot.write(tile.getBaseResource()+" tile ("+(int)(100*tile.getResourceDensity())+"% "+tile.getPrimaryResource()+")");
+                robot.write(tile.getBaseResource()+" tile ("
+                        +(int)(100*tile.getResourceDensity())+"% "+tile.getPrimaryResource()+", "+tile.getSolidity()+" units left)");
+        }else if(parts.length>=1&&parts[0].equals("mine")){
+            Tile tile=gridWorld.getTile(transform.pos);
+            if(!tile.isSolid()){
+                robot.write("The tile is empty");
+
+            } else {
+                Item item = tile.mine();
+                robot.write("Mined " + item);
+                robot.inventory.insert(item, 1);
+            }
         }
         robot.command="";
     }

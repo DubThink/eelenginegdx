@@ -223,7 +223,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         // Draw grid
         if (DEV_draw_grid) {
             shapeRenderer.begin();
-            DebugView.drawGrid(shapeRenderer,camController.getCam(),true);
+            DebugView.drawGrid(shapeRenderer,camController.getCam(),false);
             shapeRenderer.end();
         }
 
@@ -259,6 +259,17 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 //        Vector2 ms=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
         if(editor.mode!=Editor.OFF) editor.render(worldBatch,shapeRenderer,interfaceBatch);
 
+        // Draw physics debug
+        if(DEV_physics_render) {
+            debugRenderer.render(physicsWorld, matrix4);
+        }
+//        if(Gdx.graphics.getFrameId()%60==0){
+//            makeBloob((int)((Math.random()-0.5)*40),(int)((Math.random()-0.5)*40));
+//        }
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
+        renderUI();
+
         // Display dev interface
         interfaceBatch.begin();
         if(escapeMenu){
@@ -270,7 +281,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
             FontKit.SysMedium.setColor(Color.WHITE);
             FontKit.SysMedium.draw(interfaceBatch,"FPS:"+Gdx.graphics.getFramesPerSecond(),10,Gdx.graphics.getHeight()-88);
             FontKit.SysMedium.draw(interfaceBatch,"Entity count: "+entityCount,10,Gdx.graphics.getHeight()-108);
-//            FontKit.SysMedium.draw(interfaceBatch,"FPS:"+Gdx.graphics.getFramesPerSecond(),10,Gdx.graphics.getHeight()-128);
+            FontKit.SysMedium.draw(interfaceBatch,"Cam:"+camController,10,Gdx.graphics.getHeight()-128);
 //            FontKit.SysMedium.draw(interfaceBatch,"FPS:"+Gdx.graphics.getFramesPerSecond(),10,Gdx.graphics.getHeight()-148);
             FontKit.SysMedium.draw(interfaceBatch,
                     "F1 to toggle 1/5 speed\n" +
@@ -293,23 +304,6 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
         FontKit.SysMedium.setColor(Color.TEAL);
         if(loading)FontKit.SysMedium.draw(interfaceBatch, "Loading ["+(int)(assetSystem.getProgress()*100)+"%]", Gdx.graphics.getWidth()-140, 20);
         interfaceBatch.end();
-
-        // Draw physics debug
-        if(DEV_physics_render) {
-            debugRenderer.render(physicsWorld, matrix4);
-        }
-//        if(Gdx.graphics.getFrameId()%60==0){
-//            makeBloob((int)((Math.random()-0.5)*40),(int)((Math.random()-0.5)*40));
-//        }
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-        renderUI();
-//        try {
-//            TimeUnit.MILLISECONDS.sleep(16);
-//        }catch (InterruptedException e){
-//            throw new  RuntimeException(e);
-//        }
-
     }
     public void logicStep(){}//To Extend
     public void renderUI(){}//To Extend
