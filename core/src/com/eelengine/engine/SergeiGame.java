@@ -266,7 +266,7 @@ public class SergeiGame extends EelGame {
             if(parts.length>=3){
                 // set seed
                 try {
-                    switch (parts[1].substring(2)){
+                    switch (parts[1]){
                         case "t_seed":
                             CVars.t_seed=Long.parseLong(parts[2]);
                             terrainGen.reseed();
@@ -276,6 +276,9 @@ public class SergeiGame extends EelGame {
                             break;
                         case "t_cave_trim":
                             CVars.t_cave_trim=Float.parseFloat(parts[2]);
+                            break;
+                        case "t_cave_cont":
+                            CVars.t_cave_cont=Integer.parseInt(parts[2]);
                             break;
                         default:
                             console.writeError("no var "+parts[1]);
@@ -294,6 +297,9 @@ public class SergeiGame extends EelGame {
                     case "t_cave_trim":
                         console.write(""+CVars.t_cave_trim);
                         break;
+                    case "t_cave_cont":
+                        console.write(""+CVars.t_cave_cont);
+                        break;
                     default:
                         console.writeError("no var "+parts[1]);
 
@@ -307,5 +313,6 @@ public class SergeiGame extends EelGame {
         public static long t_seed=0;
         public static float t_cave_height=0.5f;
         public static float t_cave_trim=0.0f;
+        public static int t_cave_cont=0;
     }
 }

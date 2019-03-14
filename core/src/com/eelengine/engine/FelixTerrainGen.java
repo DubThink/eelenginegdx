@@ -17,6 +17,13 @@ public class FelixTerrainGen {
         simplexNoise = new OpenSimplexNoise(SergeiGame.CVars.t_seed);
     }
 
+    private boolean isCave(int u, int v, int x, int y){
+        double cave_ridge=simplexNoise.evals(400000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.1);
+        double cave_cut=simplexNoise.evals(500000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.03);
+
+        return Math.abs(cave_ridge)< cave_cut*SergeiGame.CVars.t_cave_height + SergeiGame.CVars.t_cave_trim;//SergeiGame.CVars.t_cave_height;
+    }
+
     /**
      * Generates chunk at chunk coords u,v
      */
@@ -28,10 +35,7 @@ public class FelixTerrainGen {
                 double dirt=simplexNoise.evals(100000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.1);
                 double sand=simplexNoise.evals(200000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.1);
                 double ore=simplexNoise.evals(300000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.1);
-                double cave_ridge=simplexNoise.evals(400000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.1);
-                double cave_cut=simplexNoise.evals(500000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.03);
 
-                boolean isCave=Math.abs(cave_ridge)< cave_cut*SergeiGame.CVars.t_cave_height + SergeiGame.CVars.t_cave_trim;//SergeiGame.CVars.t_cave_height;
 //                isCave &= cave_cut> SergeiGame.CVars.t_cave_trim;
                 Resource base=stone>max(dirt,sand)?Resource.ROCK:(dirt>sand?Resource.DIRT:Resource.SAND);
                 Resource oreR=Resource.DIRT;
@@ -44,7 +48,13 @@ public class FelixTerrainGen {
                     case ROCK:
                         oreR=Resource.IRON;
                 }
-                if(isCave){
+                int nc=0;
+                if(isCave(u,v,x+1,y))nc++;
+                if(isCave(u,v,x-1,y))nc++;
+                if(isCave(u,v,x,y+1))nc++;
+                if(isCave(u,v,x,y-1))nc++;
+
+                if(isCave(u,v,x,y)&&nc> SergeiGame.CVars.t_cave_cont){
                     chunk.tiles[x][y]=new Tile(base,oreR,0,0);
 
                 } else {
