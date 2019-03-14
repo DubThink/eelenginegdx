@@ -15,8 +15,8 @@ public class GridWorld {
     private static final int WORLDSIZE=127;
     private Chunk[][] chunks = new Chunk[WORLDSIZE][WORLDSIZE];
     FelixTerrainGen terrainGen;
-    GridWorld(long seed){
-        terrainGen=new FelixTerrainGen(seed);
+    GridWorld(FelixTerrainGen terrainGen){
+        this.terrainGen=terrainGen;
     }
     public Tile getTile(Vector2 v){
         return getTile((int)v.x,(int)v.y);

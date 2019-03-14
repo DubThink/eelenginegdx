@@ -14,13 +14,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.eelengine.engine.robot.CRobot;
 import com.eelengine.engine.robot.RobotSystem;
-
 import static java.lang.Math.round;
 
 public class SergeiGame extends EelGame {
 
     int robot;
+    FelixTerrainGen terrainGen;
     GridWorld gridWorld;
+
 
     // UI
     Table terminalTable;
@@ -39,6 +40,8 @@ public class SergeiGame extends EelGame {
     }
     @Override
     public void gameCreate() {
+
+        terrainGen=new FelixTerrainGen();
         initializeTerrain();
         JamFontKit.initFonts();
         assetSystem.finishLoading();
@@ -93,7 +96,7 @@ public class SergeiGame extends EelGame {
     }
 
     void initializeTerrain(){
-        gridWorld=new GridWorld(CVars.t_seed);
+        gridWorld=new GridWorld(terrainGen);
         // TODO make less hacky
         entityWorld.getSystem(RobotSystem.class).gridWorld=gridWorld;
     }
@@ -125,31 +128,18 @@ public class SergeiGame extends EelGame {
     @Override
     public void renderWorld() {
         super.renderWorld();
-//        Pixmap pixmap=new Pixmap(GSCALE*Chunk.SIZE,GSCALE*Chunk.SIZE,RGBA8888);
-//        pixmap.fill();
-//        for(int x=0;x<16;x++){
-//            for(int y=0;y<16;y++) {
-//                pixmap.drawPixel(x,y, chunk.tiles[x][y].arid<<24|chunk.tiles[x][y].veg<<16|0x00ff);
-//            }
-//        }
 
         worldBatch.begin();
-        renderChunk(0,0);
-        renderChunk(1,0);
-        renderChunk(0,1);
-        renderChunk(1,1);
 
-//        Texture texture=new Texture(pixmap);
-//        System.out.println();
-//        System.out.println(ECS.mTransform.get(robot).pos);
-//        System.out.println(ECS.mTransform.get(robot).pos);
-//        worldBatch.draw(texture,0,0);
-        //252, 243, 123
-        //66, 51, 27
-        //186, 192,96
-//        Tile tile;
-//        int c=(int)(252-186*(float)tile.arid)<<24|(int)(243-192*(float)tile.arid)<<16|(int)(123-96*(float)tile.arid)<<8|0xff;
-//        worldBatch.draw
+        Vector2 topleft=camController.screenToWorld(0,0);
+        Vector2 bottomright=camController.screenToWorld(viewport.getScreenWidth(),viewport.getScreenHeight());
+        for (int u = (int)Math.floor(topleft.x/Chunk.SIZE); u < (int)Math.ceil(bottomright.x/Chunk.SIZE); u++) {
+            for (int v = (int)Math.floor(bottomright.y/Chunk.SIZE); v < (int)Math.ceil(topleft.y/Chunk.SIZE); v++) {
+                renderChunk(u, v);
+            }
+        }
+
+        worldBatch.setColor(Color.WHITE);
         worldBatch.end();
     }
 
@@ -172,17 +162,24 @@ public class SergeiGame extends EelGame {
                         c.set(Color.RED);
                 }
                 if(!chunk.tiles[x][y].isSolid()) {
-                    c.r *= .4;
-                    c.g *= .4;
-                    c.b *= .4;
+                    c.r *= .3;
+                    c.g *= .3;
+                    c.b *= .3;
+                    Etil.adjustSaturation(c,0.3f);
                 }
                 worldBatch.setColor(c);
                 int ax=x + u*Chunk.SIZE;
                 int ay=y + v*Chunk.SIZE;
-                worldBatch.draw(terrain.getTexture(),
+                    worldBatch.draw(terrain.getTexture(),
                         ax*GSCALE,ay*GSCALE,
                         GSCALE*(terrainRenderNoise.test(ax,ay,1)?0:1),GSCALE*(terrainRenderNoise.test(ax,ay,2)?0:1),
                         GSCALE, GSCALE);
+            }
+        }
+
+        // draw ores
+        for(int x=0;x<16;x++){
+            for(int y=0;y<16;y++) {
                 int p=chunk.tiles[x][y].getPrimaryCount();
                 if(p>0) {
                     if (chunk.tiles[x][y].getPrimaryResource() == Resource.COPPER) {
@@ -192,10 +189,10 @@ public class SergeiGame extends EelGame {
                     }
                     worldBatch.draw(ore.getTexture(), (u*Chunk.SIZE+x)*GSCALE,(v*Chunk.SIZE+y)*GSCALE, GSCALE*(p<8?0:1),GSCALE*(p%8<4?0:1), GSCALE, GSCALE);
                 }
-//                pixmap.drawPixel(x,y, chunk.tiles[x][y].arid<<24|chunk.tiles[x][y].veg<<16|0x00ff);
             }
         }
     }
+
     @Override
     public void renderUI() {
         float width=Gdx.graphics.getWidth();
@@ -224,8 +221,10 @@ public class SergeiGame extends EelGame {
             }else if(ECS.mRobot.get(robot)!=null&&ECS.mRobot.get(robot).ableToQueueCommand()){
                 if(keycode==Input.Keys.UP){
                     cmdTextField.setText(ECS.mRobot.get(robot).previousCommand());
+                    cmdTextField.setCursorPosition(10000);
                 }else if(keycode==Input.Keys.DOWN){
                     cmdTextField.setText(ECS.mRobot.get(robot).nextCommand());
+                    cmdTextField.setCursorPosition(10000);
                 }
             }
         }
@@ -258,21 +257,47 @@ public class SergeiGame extends EelGame {
             Gdx.app.exit();
             return;
         }
-        if(parts[1].equals("regenerate")){
+        if(parts[1].equals("regenerate")||parts[1].equals("regen")){
             initializeTerrain();
             console.write("Regenerating world...");
             return;
         }
-        if(parts[1].equals("t_seed")){
+        if(parts[1].startsWith("t_")){
             if(parts.length>=3){
                 // set seed
                 try {
-                    CVars.t_seed=Long.parseLong(parts[2]);
+                    switch (parts[1].substring(2)){
+                        case "t_seed":
+                            CVars.t_seed=Long.parseLong(parts[2]);
+                            terrainGen.reseed();
+                            break;
+                        case "t_cave_height":
+                            CVars.t_cave_height=Float.parseFloat(parts[2]);
+                            break;
+                        case "t_cave_trim":
+                            CVars.t_cave_trim=Float.parseFloat(parts[2]);
+                            break;
+                        default:
+                            console.writeError("no var "+parts[1]);
+                    }
                 }catch(NumberFormatException e){
                     console.writeError("bad number <"+parts[2]+">");
                 }
             }else
-                console.write(""+CVars.t_seed);
+                switch (parts[1]){
+                    case "t_seed":
+                        console.write(""+CVars.t_seed);
+                        break;
+                    case "t_cave_height":
+                        console.write(""+CVars.t_cave_height);
+                        break;
+                    case "t_cave_trim":
+                        console.write(""+CVars.t_cave_trim);
+                        break;
+                    default:
+                        console.writeError("no var "+parts[1]);
+
+                }
             return;
         }
         console.writeError("unknown command");
@@ -280,5 +305,7 @@ public class SergeiGame extends EelGame {
 
     public static class CVars{
         public static long t_seed=0;
+        public static float t_cave_height=0.5f;
+        public static float t_cave_trim=0.0f;
     }
 }

@@ -9,12 +9,18 @@ public class Tile implements Serializable {
     Resource primaryResource;
     int primaryCount;
     int baseCount;
-
     public Tile(Resource baseResource, Resource primaryResource, int primaryCount) {
+        this(baseResource,primaryResource,primaryCount,16-primaryCount);
+    }
+
+    public Tile(Resource baseResource, Resource primaryResource, int primaryCount, int baseCount) {
         this.baseResource = baseResource;
         this.primaryResource = primaryResource;
         this.primaryCount = primaryCount;
-        this.baseCount =16- primaryCount;
+        this.baseCount = baseCount;
+        assert baseCount>=0;
+        assert primaryCount>=0;
+        assert baseCount+primaryCount<=16;
     }
 
     /**

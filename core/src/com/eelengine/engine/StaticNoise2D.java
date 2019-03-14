@@ -15,7 +15,7 @@ public class StaticNoise2D {
     }
 
     public int get(int x, int y){
-        return noise[(x+y*GOOD_PRIME2)%GOOD_PRIME];
+        return noise[(GOOD_PRIME+(x+y*GOOD_PRIME2)%GOOD_PRIME)%GOOD_PRIME];
     }
     public boolean test(int x, int y, int bit){
         return (get(x,y)&bit)>0;
