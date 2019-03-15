@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.eelengine.engine.robot.CRobot;
+import com.eelengine.engine.robot.RobotMovementSystem;
 import com.eelengine.engine.robot.RobotSystem;
 import static java.lang.Math.round;
 
@@ -105,6 +106,7 @@ public class SergeiGame extends EelGame {
     void loadSystems(WorldConfigurationBuilder worldConfigurationBuilder) {
         super.loadSystems(worldConfigurationBuilder);
         worldConfigurationBuilder.with(robotSystem=new RobotSystem(gridWorld,this));
+        worldConfigurationBuilder.with(new RobotMovementSystem(gridWorld,this));
 
     }
 
@@ -310,7 +312,7 @@ public class SergeiGame extends EelGame {
     }
 
     public static class CVars{
-        public static long t_seed=0;
+        public static long t_seed=12;
         public static float t_cave_height=0.5f;
         public static float t_cave_trim=0.0f;
         public static int t_cave_cont=0;

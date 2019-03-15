@@ -13,16 +13,16 @@ import com.eelengine.engine.*;
  */
 public class RobotSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.
-    ComponentMapper<CPhysics> mPhysics; // injected automatically.
+    ComponentMapper<CRobotMovement> mRobotMovement; // injected automatically.
     ComponentMapper<CRobot> mRobot; // injected automatically.
     public GridWorld gridWorld;
     public SergeiGame game;
 
     public RobotSystem(GridWorld gridWorld, SergeiGame game) {
-        super(Aspect.all(CPhysics.class,CRobot.class));
+        super(Aspect.all(CTransform.class,CRobot.class));
         this.gridWorld=gridWorld;
         this.game=game;
-    }
+}
 
     @Override
     protected void process(int e) {
@@ -39,16 +39,40 @@ public class RobotSystem extends IteratingSystem {
 
         System.out.println("Running bot command: "+robot.command);
 
+        Vector2 target=new Vector2(1,0);
+        target.rotateRad(transform.rot);
+        target.add(transform.pos);
+
         String parts[]=robot.command.split(" ");
-        // TODO REMOVE
         if(parts.length>=1&&parts[0].equals("sudo")){
             game.parseSudoCmd(robot,parts);
+        } else if(parts.length>=3&&parts[0].equals("tp")) {
+            Vector2 delta = FelixLangHelpers.ParseVector2(parts,1);
+            if(delta==null){
+                robot.writeError("Bad vector");
+            }else{
+                transform.pos.add(delta);
+            }
+        } else if(parts.length>=2&&parts[0].equals("face")) {
+            Vector2 dir = FelixLangHelpers.ParseDirectionToVec2(parts[1]);
+            CRobotMovement movement = ECS.mRobotMovement.get(e);
+            assert movement!=null;
+            movement.setDesiredDirection(dir);
         } else if(parts.length>=2&&parts[0].equals("move")) {
             Vector2 dir = FelixLangHelpers.ParseDirectionToVec2(parts[1]);
-            transform.pos.add(dir);
-            if(dir.len2()>0){
-                robot.setCooldown(.25f);
-                robot.write("Moving "+dir.toString());
+            Vector2 dest=new Vector2(dir);
+            if(gridWorld.getTile(dest.add(transform.pos)).isSolid()){
+                robot.writeError("cannot move: solid block");
+            }else {
+                CRobotMovement movement = ECS.mRobotMovement.get(e);
+                assert movement!=null;
+                movement.setDesiredDirection(dir);
+                movement.setDesiredPosition(dest);
+                //transform.pos.add(dir);
+                if (dir.len2() > 0) {
+                    robot.setCooldown(.25f);
+                    robot.write("Moving " + dir.toString());
+                }
             }
         } else if(parts.length>=2&&(parts[0].equals("inventory")||parts[0].equals("inv"))){
             if(parts.length>=4&&parts[1].equals("insert")){
@@ -71,13 +95,13 @@ public class RobotSystem extends IteratingSystem {
                 }
             }
         }else if(parts.length>=1&&parts[0].equals("scan")){
-            Tile tile=gridWorld.getTile(transform.pos);
+            Tile tile=gridWorld.getTile(target);
             if(!tile.isSolid())robot.write("empty Tile");
             else
                 robot.write(tile.getBaseResource()+" tile ("
                         +(int)(100*tile.getResourceDensity())+"% "+tile.getPrimaryResource()+", "+tile.getSolidity()+" units left)");
         }else if(parts.length>=1&&parts[0].equals("mine")){
-            Tile tile=gridWorld.getTile(transform.pos);
+            Tile tile=gridWorld.getTile(target);
             if(!tile.isSolid()){
                 robot.write("The tile is empty");
 

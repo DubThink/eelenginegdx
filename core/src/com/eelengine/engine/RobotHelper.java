@@ -2,6 +2,7 @@ package com.eelengine.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -14,8 +15,9 @@ public class RobotHelper {
         CTransform cTransform = ECS.mTransform.create(ent);
 
         ECS.mInput.create(ent);
-        ECS.mMovement.create(ent).setMaxSpeed(0.7f);
-
+//        ECS.mMovement.create(ent).setMaxSpeed(0.7f);
+        cTransform.pos.set(5.5f,5.5f);
+        ECS.mRobotMovement.create(ent).setDesiredPosition(new Vector2(5.5f,5.5f));
         COneTex cOneTex =ECS.mGraphics.create(ent);
         Texture[] textures=new Texture[12];
         for(int i=0;i<12;i++){
@@ -25,7 +27,6 @@ public class RobotHelper {
         ECS.mAnim.create(ent).setTextures(textures);
         cOneTex.texture=textures[0];
         //cOneTex.setOffset(0.4f,0.5f);
-        cTransform.pos.set(5.5f,5.5f);
         CPhysics pc=ECS.mPhysics.create(ent);
         pc.buildBody(physicsWorld);
         pc.body.setType(BodyDef.BodyType.DynamicBody);

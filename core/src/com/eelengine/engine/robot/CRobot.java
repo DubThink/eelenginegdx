@@ -2,6 +2,7 @@ package com.eelengine.engine.robot;
 
 import bpw.Util;
 import com.artemis.Component;
+import com.badlogic.gdx.math.Vector2;
 import com.eelengine.engine.Inventory;
 
 import java.util.LinkedList;

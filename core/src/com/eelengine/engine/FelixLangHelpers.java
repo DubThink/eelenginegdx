@@ -20,4 +20,13 @@ public class FelixLangHelpers {
             return new Vector2(1,0);
         } else return Vector2.Zero;
     }
+
+    public static Vector2 ParseVector2(String[] s, int offset){
+        if(s.length<offset+2)return null;
+        try{
+            return new Vector2(Float.parseFloat(s[offset]),Float.parseFloat(s[offset+1]));
+        }catch (NumberFormatException e){
+            return null;
+        }
+    }
 }
