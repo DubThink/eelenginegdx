@@ -622,9 +622,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
     public void gameKeyDown(int keycode){
         // WASD
         if(playerInput !=null) {
-            if (keycode == Input.Keys.M) {
-                makeBloob(getWorldMouse().x, getWorldMouse().y);
-            } else if (keycode == Input.Keys.W) {
+            if (keycode == Input.Keys.W) {
                 playerInput.down(CInput.UP);
             } else if (keycode == Input.Keys.A) {
                 playerInput.down(CInput.LEFT);

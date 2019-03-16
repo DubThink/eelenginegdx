@@ -36,15 +36,18 @@ public class RobotMovementSystem extends IteratingSystem {
 
         float rotamt=movement.rotationSpeed*world.delta;
         float movamt=world.delta * movement.movementSpeed;
-        float currentAngle=transform.rot;
         transform.rot=((transform.rot%Util.TWO_PI_F)+Util.TWO_PI_F)%Util.TWO_PI_F;
+        float currentAngle=transform.rot;
         float desiredAngle=movement.desiredDir.angle()*Util.DEG_TO_RAD_F;
         if(Math.abs(currentAngle-desiredAngle)<rotamt) {
             transform.rot=desiredAngle;
+            if(!movement.isMoving)return;
             if (transform.pos.dst2(movement.desiredPos) > 0.2*movamt )
                 transform.pos.add(movement.desiredDir.nor().scl(movamt));
-            else
+            else{
+                movement.isMoving=false;
                 transform.pos.set(movement.desiredPos);
+            }
         } else{
             if(desiredAngle-currentAngle>Util.PI_F||(desiredAngle-currentAngle<0&&desiredAngle-currentAngle>-Util.PI_F)){
                 // rotate ccw

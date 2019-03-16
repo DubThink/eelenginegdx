@@ -112,7 +112,8 @@ public class SergeiGame extends EelGame {
 
     @Override
     public void logicStep() {
-        CRobot cRobot=ECS.mRobot.get(robot);
+        CRobot cRobot=null;
+        if(robot!=-1)cRobot=ECS.mRobot.get(robot);
         terminalTable.setVisible(cRobot!=null);
         if(cRobot!=null) {
             // TODO add listener and use scroll events to turn on/off snap-to-bottom
@@ -202,9 +203,6 @@ public class SergeiGame extends EelGame {
         float topThird=2*height/3;
         interfaceBatch.begin();
 
-
-        gridWorld.getTile(getWorldMouse());
-
         interfaceBatch.end();
         super.renderUI();
     }
@@ -230,6 +228,10 @@ public class SergeiGame extends EelGame {
                 }
             }
         }
+        if(keycode==Input.Keys.TAB){
+            // TODO holy shit very hacky bad
+            robot = -1 - robot;
+        }
         return super.keyDown(keycode);
     }
 
@@ -242,8 +244,8 @@ public class SergeiGame extends EelGame {
     @Override
     public void mouseDown(Vector2 wp,int button) {
         super.mouseDown(wp,button);
-        Vector3 gridPos=camController.getCam().unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0));
-        gridWorld.getTile(round(gridPos.x/10),round(gridPos.y/10));
+//        Vector3 gridPos=camController.getCam().unproject(new Vector3(Gdx.input.getX(),Gdx.input.getY(),0));
+//        gridWorld.getTile(round(gridPos.x/10),round(gridPos.y/10));
     }
 
     @Override

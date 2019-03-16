@@ -13,12 +13,15 @@ public class CRobotMovement extends Component {
     public float rotationSpeed = 4.0f;
     Vector2 desiredDir=new Vector2(1,0);
     Vector2 desiredPos=new Vector2();
+    // controls if the robot is moving on its own
+    boolean isMoving=false;
     public CRobotMovement setDesiredDirection(Vector2 dir){
         this.desiredDir=dir;
         return this;
     }
     public CRobotMovement setDesiredPosition(Vector2 pos){
         this.desiredPos=pos;
+        isMoving=true;
         return this;
     }
 

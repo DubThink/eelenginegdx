@@ -28,6 +28,7 @@ public class RobotSystem extends IteratingSystem {
     protected void process(int e) {
         CTransform transform = mTransform.get(e);
         CRobot robot = mRobot.get(e);
+        CRobotMovement movement = ECS.mRobotMovement.get(e);
 
         if(robot.cooldown>0){
             robot.cooldown-=world.delta;
@@ -51,11 +52,12 @@ public class RobotSystem extends IteratingSystem {
             if(delta==null){
                 robot.writeError("Bad vector");
             }else{
-                transform.pos.add(delta);
+                transform.pos.set(delta);
+                assert movement!=null;
+                movement.isMoving=false;
             }
         } else if(parts.length>=2&&parts[0].equals("face")) {
             Vector2 dir = FelixLangHelpers.ParseDirectionToVec2(parts[1]);
-            CRobotMovement movement = ECS.mRobotMovement.get(e);
             assert movement!=null;
             movement.setDesiredDirection(dir);
         } else if(parts.length>=2&&parts[0].equals("move")) {
@@ -64,7 +66,7 @@ public class RobotSystem extends IteratingSystem {
             if(gridWorld.getTile(dest.add(transform.pos)).isSolid()){
                 robot.writeError("cannot move: solid block");
             }else {
-                CRobotMovement movement = ECS.mRobotMovement.get(e);
+
                 assert movement!=null;
                 movement.setDesiredDirection(dir);
                 movement.setDesiredPosition(dest);
@@ -89,9 +91,10 @@ public class RobotSystem extends IteratingSystem {
             } else if(parts[1].equals("list")){
                 robot.write("INVENTORY");
                 for(Item item:Item.values()){
-                    robot.write(String.format("%-12s: %d",
-                            item.getHrName(),
-                            robot.inventory.getAmount(item)));
+                    if(robot.inventory.getAmount(item)>0)
+                        robot.write(String.format("%-12s: %d",
+                                item.getHrName(),
+                                robot.inventory.getAmount(item)));
                 }
             }
         }else if(parts.length>=1&&parts[0].equals("scan")){

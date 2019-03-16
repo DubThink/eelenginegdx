@@ -19,7 +19,7 @@ public class GridWorld {
         this.terrainGen=terrainGen;
     }
     public Tile getTile(Vector2 v){
-        return getTile((int)v.x,(int)v.y);
+        return getTile((int)Math.floor(v.x),(int)Math.floor(v.y));
     }
 
     public Tile getTile(int x, int y){
