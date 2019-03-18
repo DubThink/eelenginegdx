@@ -129,6 +129,7 @@ public class RobotSystem extends IteratingSystem {
                 Item item = tile.mine();
                 robot.write("Mined " + item);
                 robot.inventory.insert(item, 1);
+                LightingEngine.updateLighting(target,gridWorld);
             }
         }
         robot.command="";

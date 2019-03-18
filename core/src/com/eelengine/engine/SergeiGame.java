@@ -143,17 +143,15 @@ public class SergeiGame extends EelGame {
 
         if(robot>=0){
             CTransform transform=ECS.mTransform.get(robot);
-            LightingEngine.runLighting((int)transform.pos.x,(int)transform.pos.y,gridWorld);
+            LightingEngine.runLighting(transform.pos,gridWorld);
         }
         worldBatch.begin();
 
-        System.out.println();
         Vector2 topleft=camController.screenToWorld(0,0);
         int BGSCALE=64;
         Vector2 bottomright=camController.screenToWorld(viewport.getScreenWidth(),viewport.getScreenHeight());
         for (int u = (int)Math.floor(topleft.x/BGSCALE); u < (int)Math.ceil(bottomright.x/BGSCALE); u++) {
             for (int v = (int)Math.floor(bottomright.y/BGSCALE); v < (int)Math.ceil(topleft.y/BGSCALE); v++) {
-                System.out.println("bg at "+u+" "+v);
                 worldBatch.draw(background,BGSCALE*GSCALE*u,BGSCALE*GSCALE*v,BGSCALE*GSCALE,BGSCALE*GSCALE);
             }
         }
@@ -255,14 +253,10 @@ public class SergeiGame extends EelGame {
                     cmdTextField.setCursorPosition(10000);
                 }
             }
-            return true;
         }
         if(keycode==Input.Keys.TAB){
             // TODO holy shit very hacky bad
             robot = -1 - robot;
-        }
-        if(keycode==Input.Keys.L){
-            LightingEngine.runLighting(4,3,gridWorld);
         }
         return super.keyDown(keycode);
     }
