@@ -114,9 +114,12 @@ public class RobotSystem extends IteratingSystem {
         }else if(parts.length>=1&&parts[0].equals("scan")){
             Tile tile=gridWorld.getTile(target);
             if(!tile.isSolid())robot.write("empty Tile");
-            else
+            else{
+                //scan
+                tile.orescanned=true;
                 robot.write(tile.getBaseResource()+" tile ("
                         +(int)(100*tile.getResourceDensity())+"% "+tile.getPrimaryResource()+", "+tile.getSolidity()+" units left)");
+            }
         }else if(parts.length>=1&&parts[0].equals("mine")){
             Tile tile=gridWorld.getTile(target);
             if(!tile.isSolid()){

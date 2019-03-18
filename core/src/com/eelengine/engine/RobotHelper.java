@@ -19,13 +19,13 @@ public class RobotHelper {
         cTransform.pos.set(5.5f,5.5f);
         ECS.mRobotMovement.create(ent).setDesiredPosition(new Vector2(5.5f,5.5f));
         COneTex cOneTex =ECS.mGraphics.create(ent);
-        Texture[] textures=new Texture[12];
-        for(int i=0;i<12;i++){
-            textures[i]=new Texture(Gdx.files.internal("sprites/character/M_Run_Frame_"+i+".png"));
-        }
-
-        ECS.mAnim.create(ent).setTextures(textures);
-        cOneTex.texture=textures[0];
+//        Texture[] textures=new Texture[12];
+//        for(int i=0;i<12;i++){
+//            textures[i]=new Texture(Gdx.files.internal("sprites/character/M_Run_Frame_"+i+".png"));
+//        }
+//
+//        ECS.mAnim.create(ent).setTextures(textures);
+        cOneTex.texture=new Texture(Gdx.files.internal("felix.png"));//textures[0];
         //cOneTex.setOffset(0.4f,0.5f);
         CPhysics pc=ECS.mPhysics.create(ent);
         pc.buildBody(physicsWorld);

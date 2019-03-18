@@ -13,8 +13,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.eelengine.engine.robot.CRobot;
+import com.eelengine.engine.robot.LightingEngine;
 import com.eelengine.engine.robot.RobotMovementSystem;
 import com.eelengine.engine.robot.RobotSystem;
+import javafx.scene.effect.Light;
+
+import static bpw.Util.min;
 import static java.lang.Math.round;
 
 public class SergeiGame extends EelGame {
@@ -33,11 +37,12 @@ public class SergeiGame extends EelGame {
     StaticNoise2D terrainRenderNoise=new StaticNoise2D(0);
 
     LoadedTextureRegion terrain,ore;
+    LoadedTextureRegion background;
     public SergeiGame() {
     }
 
     public SergeiGame(String level){
-        DEV_draw_grid=true;
+        DEV_draw_grid=false;
     }
     @Override
     public void gameCreate() {
@@ -96,6 +101,7 @@ public class SergeiGame extends EelGame {
 
         terrain=new LoadedTextureRegion("rok2.png");
         ore=new LoadedTextureRegion("ore.png");
+        background=new LoadedTextureRegion("bg.png");
 
     }
 
@@ -135,10 +141,22 @@ public class SergeiGame extends EelGame {
     public void renderWorld() {
         super.renderWorld();
 
+        if(robot>=0){
+            CTransform transform=ECS.mTransform.get(robot);
+            LightingEngine.runLighting((int)transform.pos.x,(int)transform.pos.y,gridWorld);
+        }
         worldBatch.begin();
 
+        System.out.println();
         Vector2 topleft=camController.screenToWorld(0,0);
+        int BGSCALE=64;
         Vector2 bottomright=camController.screenToWorld(viewport.getScreenWidth(),viewport.getScreenHeight());
+        for (int u = (int)Math.floor(topleft.x/BGSCALE); u < (int)Math.ceil(bottomright.x/BGSCALE); u++) {
+            for (int v = (int)Math.floor(bottomright.y/BGSCALE); v < (int)Math.ceil(topleft.y/BGSCALE); v++) {
+                System.out.println("bg at "+u+" "+v);
+                worldBatch.draw(background,BGSCALE*GSCALE*u,BGSCALE*GSCALE*v,BGSCALE*GSCALE,BGSCALE*GSCALE);
+            }
+        }
         for (int u = (int)Math.floor(topleft.x/Chunk.SIZE); u < (int)Math.ceil(bottomright.x/Chunk.SIZE); u++) {
             for (int v = (int)Math.floor(bottomright.y/Chunk.SIZE); v < (int)Math.ceil(topleft.y/Chunk.SIZE); v++) {
                 renderChunk(u, v);
@@ -173,6 +191,13 @@ public class SergeiGame extends EelGame {
                     c.b *= .3;
                     Etil.adjustSaturation(c,0.3f);
                 }
+                c.a=chunk.tiles[x][y].visibility/256.f;
+                if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)){
+                    c.set(Color.BLACK);
+                    c.g=min(1,chunk.tiles[x][y].testBoi/8f);
+                    c.a=1;
+//                    c.b=min(0,chunk.tiles[x][y].testBoi/8);
+                }
                 worldBatch.setColor(c);
                 int ax=x + u*Chunk.SIZE;
                 int ay=y + v*Chunk.SIZE;
@@ -187,7 +212,7 @@ public class SergeiGame extends EelGame {
         for(int x=0;x<16;x++){
             for(int y=0;y<16;y++) {
                 int p=chunk.tiles[x][y].getPrimaryCount();
-                if(p>0) {
+                if(p>0&&chunk.tiles[x][y].orescanned) {
                     if (chunk.tiles[x][y].getPrimaryResource() == Resource.COPPER) {
                         worldBatch.setColor(Color.BROWN);
                     } else {
@@ -230,10 +255,14 @@ public class SergeiGame extends EelGame {
                     cmdTextField.setCursorPosition(10000);
                 }
             }
+            return true;
         }
         if(keycode==Input.Keys.TAB){
             // TODO holy shit very hacky bad
             robot = -1 - robot;
+        }
+        if(keycode==Input.Keys.L){
+            LightingEngine.runLighting(4,3,gridWorld);
         }
         return super.keyDown(keycode);
     }

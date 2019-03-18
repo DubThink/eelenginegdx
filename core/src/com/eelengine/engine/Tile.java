@@ -9,6 +9,10 @@ public class Tile implements Serializable {
     Resource primaryResource;
     int primaryCount;
     int baseCount;
+    public int visibility=0;
+    public int testBoi=0;
+    public boolean orescanned=false;
+
     public Tile(Resource baseResource, Resource primaryResource, int primaryCount) {
         this(baseResource,primaryResource,primaryCount,16-primaryCount);
     }
