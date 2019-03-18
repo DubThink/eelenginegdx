@@ -44,6 +44,9 @@ public class SergeiGame extends EelGame {
 
         terrainGen=new FelixTerrainGen();
         initializeTerrain();
+
+        Recipe.loadRecipes(Gdx.files.internal("recipes.json"));
+
         JamFontKit.initFonts();
         assetSystem.finishLoading();
         robot=RobotHelper.makeRobot(entityWorld,physicsWorld);

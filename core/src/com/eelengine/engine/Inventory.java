@@ -6,25 +6,15 @@ import bpw.Util;
 /**
  * Represents an inventory of Items with a finite number of stacks
  */
-public class Inventory {
-    private int amounts[];
+public class Inventory extends MutableItemCollection {
     private int size;
     /*The number of free stacks*/
     private int stacks;
 
     public Inventory(int size) {
+        super();
         this.size=size;
         this.stacks=size;
-        this.amounts = new int[Item.items.length];
-    }
-
-    /**
-     * Returns the amount of a stored item
-     * @param item the item to check
-     * @return the amount stored
-     */
-    public int getAmount(Item item){
-        return amounts[item.id];
     }
 
     /**
@@ -44,6 +34,12 @@ public class Inventory {
         return (int)Math.ceil(amounts[item.id]/(float)item.getStackSize());
     }
 
+    private void modifyItemCount(Item item,int amt){
+        int usage=getStackUsage(item);
+        amounts[item.id]+=amt;
+        stacks-=getStackUsage(item)-usage;
+    }
+
     /**
      * Attempts to insert items into the inventory
      * @param item the item to insert
@@ -53,10 +49,47 @@ public class Inventory {
     public int insert(Item item, int amt){
         if(amt<=0)return 0;
         amt= Util.min(amt,getSpace(item));
-        int usage=getStackUsage(item);
-        amounts[item.id]+=amt;
-        stacks-=getStackUsage(item)-usage;
+        modifyItemCount(item,amt);
         return amt;
+    }
+
+    /**
+     * Attempts to insert items into the inventory
+     * @return the amount that was inserted
+     */
+    public ItemCollection insert(ItemCollection c){
+        int overflow[] = new int[Item.items.length];
+        for(Item i:Item.items){
+            overflow[i.id]=insert(i,c.amounts[i.id]);
+        }
+        return new ItemCollection(overflow);
+    }
+
+    /**
+     * Attempts to remove items from the inventory
+     * @param item the item to remove
+     * @param amt the amount to attempt to remove
+     * @return the amount that was removed
+     */
+    public int remove(Item item, int amt){
+        if(amt<=0)return 0;
+        amt = Util.min(amt,getAmount(item));
+        modifyItemCount(item,-amt);
+        return amt;
+    }
+
+    @Override
+    public void setAmount(Item item, int amt) {
+        if(amt<0)throw new ValueError();
+        modifyItemCount(item,amt-getAmount(item));
+        if(amt!=getAmount(item))throw new ValueError();
+    }
+
+    @Override
+    public void subtract(ItemCollection c) {
+        assert supersetOf(c); /* this should be pre-checked by the caller */
+        for(Item item:Item.items)
+            remove(item,c.amounts[item.id]);
     }
 
     /**

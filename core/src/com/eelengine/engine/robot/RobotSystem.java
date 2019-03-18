@@ -63,11 +63,12 @@ public class RobotSystem extends IteratingSystem {
         } else if(parts.length>=2&&parts[0].equals("move")) {
             Vector2 dir = FelixLangHelpers.ParseDirectionToVec2(parts[1]);
             Vector2 dest=new Vector2(dir);
+            assert movement!=null;
             if(gridWorld.getTile(dest.add(transform.pos)).isSolid()){
                 robot.writeError("cannot move: solid block");
+            } else if(movement.isMoving){
+                robot.writeError("cannot move: already moving");
             }else {
-
-                assert movement!=null;
                 movement.setDesiredDirection(dir);
                 movement.setDesiredPosition(dest);
                 //transform.pos.add(dir);
@@ -95,6 +96,19 @@ public class RobotSystem extends IteratingSystem {
                         robot.write(String.format("%-12s: %d",
                                 item.getHrName(),
                                 robot.inventory.getAmount(item)));
+                }
+            }
+        }else if(parts.length>=2&&parts[0].equals("craft")){
+            if(!Recipe.hasRecipe(parts[1])){
+                robot.writeError("no recipe with that name");
+            }else{
+                Recipe r=Recipe.getRecipe(parts[1]);
+                if(r.checkInputs(robot.inventory)){
+                    // craft
+                    r.useInputs(robot.inventory);
+                    robot.inventory.insert(r.getOutputs());
+                } else {
+                    robot.writeError("Not enough inputs");
                 }
             }
         }else if(parts.length>=1&&parts[0].equals("scan")){
