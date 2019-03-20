@@ -29,7 +29,7 @@ public class SergeiGame extends EelGame {
 
 
     // UI
-    Table terminalTable;
+    Table terminalTable,scriptTable;
     Label cmdHistoryUI;
     ProgressBar cmdProgressBar;
     ScrollPane scrollPane;
@@ -58,7 +58,7 @@ public class SergeiGame extends EelGame {
         playerInput =ECS.mInput.get(robot);
 
         // SET UP COMMAND LINE
-        cmdTextField = new TextField("Click Me",skin,"default");
+        cmdTextField = new TextField("",skin,"default");
 //        cmdTextField.setWidth(200);
 //        cmdTextField.setHeight(50);
         cmdTextField.setTextFieldFilter(new TextField.TextFieldFilter() {
@@ -78,12 +78,15 @@ public class SergeiGame extends EelGame {
                 }
             }
         });
+
+        stage.setDebugAll(true);
         terminalTable=new Table(skin);
 //        terminalTable.setFillParent(true);
         terminalTable.setSize(600,800);
         terminalTable.background("window");
         terminalTable.align(Align.bottom);
         stage.addActor(terminalTable);
+
         cmdHistoryUI =new Label("",skin);
         scrollPane=new ScrollPane(cmdHistoryUI,skin);
         scrollPane.setFadeScrollBars(false);
@@ -98,6 +101,26 @@ public class SergeiGame extends EelGame {
         terminalTable.add(cmdProgressBar).prefWidth(11111);
         terminalTable.row();
         terminalTable.add(cmdTextField).prefWidth(11111);
+
+        // script editor
+
+        scriptTable=new Table(skin);
+        scriptTable.setSize(600,800);
+        scriptTable.background("window");
+        scriptTable.align(Align.bottom);
+        scriptTable.setVisible(false);
+        stage.addActor(scriptTable);
+
+        TextArea area = new TextArea("hello",skin,"default");
+//        area.setTextFieldFilter(new TextField.TextFieldFilter() {
+//            @Override
+//            public boolean acceptChar(TextField textField, char c) {
+//                return 32<=c&&c<=126;
+//            }
+//        });
+        area.setBlinkTime(0.2f);
+        scriptTable.add(area).prefWidth(11111).prefHeight(11111);
+        area.setFocusTraversal(false);
 
         terrain=new LoadedTextureRegion("rok2.png");
         ore=new LoadedTextureRegion("ore.png");
@@ -123,7 +146,7 @@ public class SergeiGame extends EelGame {
     public void logicStep() {
         CRobot cRobot=null;
         if(robot!=-1)cRobot=ECS.mRobot.get(robot);
-        terminalTable.setVisible(cRobot!=null);
+//        terminalTable.setVisible(cRobot!=null);
         if(cRobot!=null) {
             // TODO add listener and use scroll events to turn on/off snap-to-bottom
             // TODO or think of an elegant solution (better idea)
@@ -256,6 +279,7 @@ public class SergeiGame extends EelGame {
         }
         if(keycode==Input.Keys.TAB){
             // TODO holy shit very hacky bad
+            System.out.println("AAA");
             robot = -1 - robot;
         }
         return super.keyDown(keycode);
@@ -279,6 +303,17 @@ public class SergeiGame extends EelGame {
 //        if(keycode==Input.Keys.S&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))LevelIO.saveLevelData(Gdx.files.internal(levelToBuild+".lvldat"),levelData);
 //        if(keycode==Input.Keys.O&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))levelData=LevelIO.loadLevelData(Gdx.files.internal(levelToBuild+".lvldat"));
         super.gameKeyDown(keycode);
+        if(keycode == Input.Keys.F1){
+            // switch to cmd line
+            System.out.println("Switching to cmd");
+            terminalTable.setVisible(true);
+            scriptTable.setVisible(false);
+        }else if(keycode == Input.Keys.F2){
+            // switch to script editor
+            System.out.println("Switching to script");
+            terminalTable.setVisible(false);
+            scriptTable.setVisible(true);
+        }
     }
 
     public void parseSudoCmd(CRobot console, String[] parts){

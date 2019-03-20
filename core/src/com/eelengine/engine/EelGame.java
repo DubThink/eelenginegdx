@@ -653,6 +653,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+
         if(stage.keyDown(keycode)){
             if (keycode == Input.Keys.ESCAPE)
                 stage.unfocusAll();
@@ -678,7 +679,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
             camController.changeZoomLevel(1);
         } else if (keycode == Input.Keys.EQUALS) {
             camController.changeZoomLevel(-1);
-        }else if (keycode == Input.Keys.F1) {
+        }else if (keycode == Input.Keys.F3) {
             DEV_time_mod = 1.2f - DEV_time_mod;
         } else if (keycode == Input.Keys.SPACE) {
             //dynamicBody.setLinearVelocity(0, 20);
