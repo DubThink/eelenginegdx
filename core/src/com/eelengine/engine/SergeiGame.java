@@ -35,6 +35,7 @@ public class SergeiGame extends EelGame {
     ScrollPane scrollPane;
     TextField cmdTextField;
     StaticNoise2D terrainRenderNoise=new StaticNoise2D(0);
+    TextArea scriptArea;
 
     LoadedTextureRegion terrain,ore;
     LoadedTextureRegion background;
@@ -111,16 +112,16 @@ public class SergeiGame extends EelGame {
         scriptTable.setVisible(false);
         stage.addActor(scriptTable);
 
-        TextArea area = new TextArea("hello",skin,"default");
+        scriptArea = new TextArea("hello",skin,"default");
 //        area.setTextFieldFilter(new TextField.TextFieldFilter() {
 //            @Override
 //            public boolean acceptChar(TextField textField, char c) {
 //                return 32<=c&&c<=126;
 //            }
 //        });
-        area.setBlinkTime(0.2f);
-        scriptTable.add(area).prefWidth(11111).prefHeight(11111);
-        area.setFocusTraversal(false);
+        scriptArea.setBlinkTime(0.2f);
+        scriptTable.add(scriptArea).prefWidth(11111).prefHeight(11111);
+        scriptArea.setFocusTraversal(false);
 
         terrain=new LoadedTextureRegion("rok2.png");
         ore=new LoadedTextureRegion("ore.png");
@@ -277,7 +278,23 @@ public class SergeiGame extends EelGame {
                 }
             }
         }
-        if(keycode==Input.Keys.TAB){
+        if(keycode == Input.Keys.F1){
+            // switch to cmd line
+            System.out.println("Switching to cmd");
+            terminalTable.setVisible(true);
+            stage.setKeyboardFocus(cmdTextField);
+            scriptTable.setVisible(false);
+        }else if(keycode == Input.Keys.F2){
+            // switch to script editor
+            System.out.println("Switching to script");
+            terminalTable.setVisible(false);
+            scriptTable.setVisible(true);
+            stage.setKeyboardFocus(scriptArea);
+        }
+        if(keycode == Input.Keys.NUMPAD_0){
+            System.out.println("run script");
+            if(robot>=0)ECS.mRobot.get(robot).startNewScript(scriptArea.getText());
+        }else if(keycode==Input.Keys.TAB){
             // TODO holy shit very hacky bad
             System.out.println("AAA");
             robot = -1 - robot;
@@ -301,19 +318,8 @@ public class SergeiGame extends EelGame {
     @Override
     public void gameKeyDown(int keycode) {
 //        if(keycode==Input.Keys.S&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))LevelIO.saveLevelData(Gdx.files.internal(levelToBuild+".lvldat"),levelData);
-//        if(keycode==Input.Keys.O&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))levelData=LevelIO.loadLevelData(Gdx.files.internal(levelToBuild+".lvldat"));
+//        if(keycode==Input.Keys.O&&Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT))levelData=LevelIO.loadLevelData(Gdx.files.internal(levelToBuild+".lvldat");
         super.gameKeyDown(keycode);
-        if(keycode == Input.Keys.F1){
-            // switch to cmd line
-            System.out.println("Switching to cmd");
-            terminalTable.setVisible(true);
-            scriptTable.setVisible(false);
-        }else if(keycode == Input.Keys.F2){
-            // switch to script editor
-            System.out.println("Switching to script");
-            terminalTable.setVisible(false);
-            scriptTable.setVisible(true);
-        }
     }
 
     public void parseSudoCmd(CRobot console, String[] parts){

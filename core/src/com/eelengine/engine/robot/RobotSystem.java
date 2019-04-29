@@ -36,15 +36,26 @@ public class RobotSystem extends IteratingSystem {
             return;
         }
         // parse
-        if(robot.command.equals(""))return;
 
-        System.out.println("Running bot command: "+robot.command);
+        String command;
+        if(robot.runningScript){
+            command=robot.script.getNext();
+            robot.script.advance();
+            if(robot.script.finished())robot.runningScript=false;
+        } else {
+            command=robot.command;
+            robot.command="";
+        }
+
+        if(command.equals(""))return;
+
+        System.out.println("Running bot command: "+command);
 
         Vector2 target=new Vector2(1,0);
         target.rotateRad(transform.rot);
         target.add(transform.pos);
 
-        String parts[]=robot.command.split(" ");
+        String parts[]=command.split(" ");
         if(parts.length>=1&&parts[0].equals("sudo")){
             game.parseSudoCmd(robot,parts);
         } else if(parts.length>=3&&parts[0].equals("tp")) {
@@ -132,6 +143,5 @@ public class RobotSystem extends IteratingSystem {
                 LightingEngine.updateLighting(target,gridWorld);
             }
         }
-        robot.command="";
     }
 }

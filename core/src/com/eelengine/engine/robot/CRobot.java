@@ -26,7 +26,15 @@ public class CRobot extends Component {
     float cooldown =0;
     float cooldownLength=1;
     Inventory inventory=new Inventory(10);
+    Script script;
+    boolean runningScript=false;
 
+    
+
+    public void startNewScript(String script){
+        this.script=new Script(script);
+        runningScript=true;
+    }
     /**
      * Checks if the robot can accept a command for immediate execution
      * @return true if the robot can accept a command
