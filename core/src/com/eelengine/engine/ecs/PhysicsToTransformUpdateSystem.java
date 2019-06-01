@@ -1,9 +1,11 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import bpw.Util;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.eelengine.engine.ecs.CPhysics;
+import com.eelengine.engine.ecs.CTransform;
 
 /**
  * Simple region renderer

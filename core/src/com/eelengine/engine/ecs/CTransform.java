@@ -1,4 +1,4 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import com.artemis.Component;
 import com.badlogic.gdx.math.Vector2;

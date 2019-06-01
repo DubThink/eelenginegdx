@@ -4,13 +4,9 @@ import bpw.Util;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
-import com.badlogic.gdx.math.Vector2;
-import com.eelengine.engine.CMovement;
-import com.eelengine.engine.CTransform;
+import com.eelengine.engine.ecs.CTransform;
 import com.eelengine.engine.GridWorld;
 import com.eelengine.engine.SergeiGame;
-import com.eelengine.engine.robot.CRobot;
-import com.eelengine.engine.robot.CRobotMovement;
 
 /**
  * Simple region renderer

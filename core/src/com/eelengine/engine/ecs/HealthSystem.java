@@ -1,4 +1,4 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -9,16 +9,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * Handles health objects
  *
  */
-public class AISystem extends IteratingSystem {
+public class HealthSystem extends IteratingSystem {
     SpriteBatch debugBatch;
+    CamController camController;
     ComponentMapper<CHealth> mHealth; // injected automatically.
     ComponentMapper<CTeam> mTeam; // injected automatically.
-    ComponentMapper<CNavigator> mNavigator; // injected automatically.
-    ComponentMapper<CTransform> mTransform; // injected automatically.
 
-    public AISystem(SpriteBatch debugBatch) {
-        super(Aspect.all(CAIControl.class));
+    public HealthSystem(SpriteBatch debugBatch,CamController camController) {
+        super(Aspect.all(CHealth.class));
         this.debugBatch = debugBatch;
+        this.camController=camController;
     }
 
     @Override

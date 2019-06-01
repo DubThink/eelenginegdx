@@ -2,10 +2,8 @@ package com.eelengine.engine.ai;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.eelengine.engine.CTransform;
-import bpw.Util;
+import com.eelengine.engine.ecs.CTransform;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**

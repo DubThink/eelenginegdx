@@ -1,8 +1,9 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import com.artemis.Component;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.eelengine.engine.PHYS;
 
 /**
  * Physics component
@@ -13,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.*;
  */
 public class CPhysics extends Component {
     static final BodyDef initialBodyDef=new BodyDef();
-    Body body=null;
+    public Body body=null;
     private Filter filter=null;
     /**
      * A number of seconds the CPhysics is "stunned" for. While @<code>stunnedFor!=0</code>,

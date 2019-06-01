@@ -1,4 +1,4 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -6,6 +6,8 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.eelengine.engine.ai.Navigation;
+import com.eelengine.engine.ecs.CNavigator;
+import com.eelengine.engine.ecs.CTransform;
 
 /**
  * Updates the physics system based on transform.

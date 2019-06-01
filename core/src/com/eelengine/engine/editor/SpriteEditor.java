@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.eelengine.engine.*;
+import com.eelengine.engine.ecs.CamController;
 
 import java.io.File;
 import java.io.IOException;

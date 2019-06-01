@@ -3,6 +3,9 @@ package com.eelengine.engine;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
+import com.eelengine.engine.ecs.CHealth;
+import com.eelengine.engine.ecs.CProjectile;
+import com.eelengine.engine.ecs.CTransform;
 
 /**
  * Assorted stuff that doesn't have a better place to be YET
