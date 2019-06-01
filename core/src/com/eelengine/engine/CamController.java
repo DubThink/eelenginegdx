@@ -86,7 +86,12 @@ public class CamController {
     }
     public Vector2 screenToWorld(float screenX, float screenY){
         Vector3 wx=cam.unproject(new Vector3(screenX,screenY,0));
-        wx.scl(1/EelGame.GSCALE);
+        wx.scl(1/EelGame.GSCALE_F);
         return new Vector2(wx.x,wx.y);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(" zLevel: %d  zFactor: %.3f x:%.3f y:%.3f",zoomLevel,getZoomFactor(),cam.position.x,cam.position.y);
     }
 }

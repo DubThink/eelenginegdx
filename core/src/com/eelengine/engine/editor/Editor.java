@@ -2,294 +2,201 @@ package com.eelengine.engine.editor;
 
 import bpw.Util;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.eelengine.engine.CamController;
 import com.eelengine.engine.Etil;
-import com.eelengine.engine.FontKit;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 
 public class Editor {
-    private ArrayList<Brush> brushes=new ArrayList<>();
-    private HashSet<Brush> mSelected=new HashSet<>();
-    private boolean multiSelected=false;
-    private Brush selected=null;
-    private int selIdx=-1;
-    //Brush altSelected=null;
-    private int altSelIdx=-1;
-    boolean snapOn=true;
-    public int snapLevel=-2;
-    float selectThreshold=0.12f;
-    private float mouseDownX=0, mouseDownY=0;
-    private Vector2 startPos=new Vector2();
-    private boolean mouseDown=false;
-    public CamController camController;
-    private String errormsg="";
-    private float errorCooldown=0;
+    public static final int OFF=0;
+    public static final int GEOM =1;
+    public static final int SPRITE=2;
+    public int mode=OFF;
+    public GeomEditor geomEditor;
+    public SpriteEditor spriteEditor;
+    private Table table;
+    VerticalGroup pane;
+    private int width=180;
+    private int exwidth=200;
+    protected LevelSource levelSource;
+
+    public LevelSource getLevelSource() {
+        return levelSource;
+    }
 
     public Editor(CamController camController) {
-        this.camController = camController;
+        geomEditor=new GeomEditor(camController);
+        spriteEditor=new SpriteEditor(camController);
+        levelSource=new LevelSource();
+        geomEditor.setSource(levelSource);
+        spriteEditor.setSource(levelSource);
+
     }
 
+    public void buildUI(Table table, Skin skin){
+//        this.table=table;
+//        table.top();
+//        table.setBackground(new TextureRegionDrawable(new TextureRegion(Etil.init(0x2A2A2AAF))));
+//        Label label=new Label("EDITOR",skin);
+//        //label.setVisible(false);
+//        table.add(label).pad(10);
+//        table.row();
+//        List<String> list=new List<>(skin);
+//        list.setItems("Edit","play");
+//
+//
+//        exwidth=(int)table.getWidth();
+//        width=exwidth-20;
+//        System.out.println("Building editor ui with width "+exwidth+"("+width+")");
+//        table.add(list).fillX().width(Util.min(width,200));
+//        table.row();
+//
+//        pane=new VerticalGroup();
+//        pane.setWidth(exwidth);
+//        pane.fill();
+//        ScrollPane scrollPane=new ScrollPane(pane,skin);
+//        scrollPane.setWidth(exwidth);
+//        scrollPane.setDebug(true);
+//        table.add(scrollPane).setActorWidth(exwidth);
+//        Actor holder=new Actor();
+//        holder.setWidth(width);
+//        pane.addActor(holder);
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.addActor(new Label("1",skin));
+//        pane.addActor(new Label("2",skin));
+//        pane.addActor(new Label("3",skin));
+//        pane.addActor(new Label("4",skin));
+//        pane.expand();
+//
+
+    }
     public void render(PolygonSpriteBatch worldBatch, ShapeRenderer shapeRenderer, SpriteBatch interfaceBatch){
-        // -------- RENDER brushes -------- //
-        worldBatch.begin();
-        for(Brush brush:brushes){
-            if(brush==selected)continue;
-            brush.render(worldBatch,new Color(.2f,.2f,.0f,.4f));
-        }
-        worldBatch.end();
-        Vector2 wp=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
-        snap(wp);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for(Brush brush:brushes){
-            if(brush==selected)continue;
-//            if(brush.isPointIn(camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY())))
-//                brush.render(shapeRenderer,Color.GREEN,-1,camController.getZoomFactor());
-//            else
-                brush.render(shapeRenderer,Color.YELLOW,-1,-1,camController.getZoomFactor());
-        }
-        shapeRenderer.end();
-        for(Brush brush:mSelected){
-            brush.render(worldBatch,new Color(.4f,.0f,.0f,.5f));
-            brush.render(shapeRenderer,Color.ORANGE,selIdx,altSelIdx,camController.getZoomFactor());
-        }
-
-
-        if(selected!=null&&mouseDown&&!shiftKey){
-            if(selIdx>=0) {
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-                shapeRenderer.setColor(Color.CYAN);
-                shapeRenderer.line(new Vector2(selected.getVert(selIdx - 1)).add(selected.pos), wp);
-                shapeRenderer.line(new Vector2(selected.getVert(selIdx + 1)).add(selected.pos), wp);
-                float screenScale = camController.getZoomFactor() / 30;
-                shapeRenderer.rect(wp.x - screenScale, wp.y - screenScale,
-                        screenScale * 2, screenScale * 2);
-                shapeRenderer.end();
-            }else{
-                Vector2 wp2=camController.screenToWorld(Gdx.input.getX(),Gdx.input.getY());
-                Vector2 dp=new Vector2(wp2.x-startPos.x,wp2.y-startPos.y);
-                snap(dp);
-                for(Brush brush:mSelected)
-                    brush.render(shapeRenderer,Color.CYAN,-1,-1,camController.getZoomFactor(),dp);
-            }
-        }
-        // -------- UI -------- //
-        interfaceBatch.begin();
-        FontKit.SysMedium.setColor(Color.TEAL);
-        FontKit.SysMedium.draw(interfaceBatch,"Editor active. Press F9 to toggle.",10, Gdx.graphics.getHeight()-30);
-        FontKit.SysMedium.draw(interfaceBatch,
-                "Snap "+(!snapOn?"off":"increment="+(snapLevel<0?"1/":"")+(int)Math.pow(2,snapLevel<0?-snapLevel:snapLevel)),
-                10, Gdx.graphics.getHeight()-50);
-        FontKit.SysMedium.draw(interfaceBatch,"Selected vert #"+selIdx,10, Gdx.graphics.getHeight()-70);
-        FontKit.SysMedium.setColor(Color.SCARLET);
-        if(!errormsg.isEmpty()&&errorCooldown>0){
-            FontKit.SysMedium.draw(interfaceBatch,"Error: "+errormsg,10, 30);
-            errorCooldown-=Gdx.graphics.getDeltaTime();
-        }
-        interfaceBatch.end();
-
+        spriteEditor.render(worldBatch,shapeRenderer,interfaceBatch);
+        geomEditor.render(worldBatch,shapeRenderer,interfaceBatch);
+        if(mode==SPRITE)spriteEditor.activeRender(worldBatch, shapeRenderer, interfaceBatch);
+        if(mode==GEOM)geomEditor.activeRender(worldBatch, shapeRenderer, interfaceBatch);
+    }
+    public void shiftDown(){
+        geomEditor.shiftDown();
+        spriteEditor.shiftDown();
+    }
+    public void shiftUp(){
+        geomEditor.shiftUp();
+        spriteEditor.shiftUp();
     }
     public void mouseDown(int screenX, int screenY,int button){
-        if(button!=0)return; //ignore left clicks
-        mouseDownX=screenX;
-        mouseDownY=screenY;
-        mouseDown=true;
-        Vector2 wp=camController.screenToWorld(screenX,screenY);
-        startPos.set(wp);
-        //snap(wp);
-
-        //check selected brush's verts first
-        if(selected!=null&&mSelected.size()<=1) {
-            if(shiftKey){
-                if(selected.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
-                    altSelIdx = selected.getNearestVertIdx(wp.x, wp.y);
-                    return;
-                }
-            }
-            altSelIdx=-1;
-            if(selected.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
-                selIdx = selected.getNearestVertIdx(wp.x, wp.y);
-                return;
-            }
-        }
-        //if that fails, check for a vertex
-        for(Brush brush:brushes){
-            if(mSelected.size()>1&&mSelected.contains(brush))continue; // Don't select a vert of a multi-selection
-            if(brush.getDistToNearestVert2(wp.x,wp.y)<selectThreshold*camController.getZoomFactor()) {
-                selected=brush;
-                if(!shiftKey) {
-                    mSelected.clear();
-                    selIdx = selected.getNearestVertIdx(wp.x, wp.y);
-                }
-                mSelected.add(selected);
-
-                return;
-            }
-        }
-        // if that fails, check for a Brush
-        Brush nearest=null;
-        float ndist=1*camController.getZoomFactor();
-        for(Brush brush:brushes){
-            if(brush.isPointIn(wp)){
-                nearest=brush;
-                break;
-            }
-            if(brush.getDistToNearestVert2(wp.x,wp.y)<ndist)
-                nearest=brush;
-        }
-
-        if(nearest==null){
-            // absolutely nothing was selected
-            mSelected.clear();
-        } else {
-            selIdx=-1;
-            altSelIdx=-1;
-            selected=nearest;
-            if(!shiftKey&&!mSelected.contains(nearest))mSelected.clear();
-            mSelected.add(nearest);
-        }
+        if(mode==GEOM)geomEditor.mouseDown(screenX, screenY, button);
+        else if(mode==SPRITE)spriteEditor.mouseDown(screenX, screenY, button);
     }
-
     public void mouseUp(int screenX, int screenY,int button){
-        if(button!=0)return; //ignore left clicks
-        mouseDown=false;
-        if(Math.abs(mouseDownX-screenX)<10&&Math.abs(mouseDownY-screenY)<10)return;
-        Vector2 wp=camController.screenToWorld(screenX,screenY);
-        Vector2 dp=new Vector2(wp.x-startPos.x,wp.y-startPos.y);
-        snap(dp);
-        snap(wp);
-        if(selected!=null){
-            if(selIdx>=0)selected.setVert(wp.x,wp.y,selIdx);
-            else{
-                for(Brush brush:mSelected)
-                    brush.pos.add(dp);
+        if(mode==GEOM)geomEditor.mouseUp(screenX, screenY, button);
+        else if(mode==SPRITE)spriteEditor.mouseUp(screenX, screenY, button);
+    }
+
+    public String sourceName="testEnv.lvlsrc";
+    public void keyDown(int keycode) {
+        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+            if (keycode == Input.Keys.S) {
+                saveLevel(sourceName);
+                return;
+            } else if (keycode == Input.Keys.O) {
+                loadLevel(sourceName);
+//                StaticSprite sprite = new StaticSprite("test_map.png", 0, 0);
+//                geomEditor.getSource().staticLayer0.add(sprite);
+                //geomEditor.getSource().staticLayer0.add(new StaticSprite("test_map.png",10,0));
+                return;
             }
         }
-    }
-    /** returns false if brush already exists */
-    public boolean addBrush(Brush brush){
-        if(!brushes.contains(brush)){
-            brushes.add(brush);
-            return true;
-        }else return false;
-    }
-    public void addBrush(float[] verts){
-        brushes.add(new Brush(verts));
-    }
-    public void addBrush(Vector2 ... verts){
-        brushes.add(new Brush(verts));
-    }
-    public void selectBrushByNum(int num){
-        if(num<0||num>=brushes.size())return;
-        selected=brushes.get(num);
-        mSelected.clear();
-        mSelected.add(selected);
-    }
-    void snap(Vector2 v){
-        if(snapOn){
-            v.set(Util.round(v.x,(float)Math.pow(2,snapLevel)),Util.round(v.y,(float)Math.pow(2,snapLevel)));
-        }
-    }
+        if(mode== GEOM)geomKeyDown(keycode);
+        if(mode== SPRITE)spriteKeyDown(keycode);
 
-    public ArrayList<Body> buildStatics(World world){
-        ArrayList<Body> ret=new ArrayList<>();
-        for(Brush brush:brushes) {
-            BodyDef myBodyDef = new BodyDef();
-            myBodyDef.position.set(brush.pos);
-            Body body = world.createBody(myBodyDef);
-            PolygonShape shape = new PolygonShape();
-            shape.set(brush.getFloatArray());
-            FixtureDef fixtureDef = new FixtureDef();
-            fixtureDef.shape = shape;
-            fixtureDef.density = 1f;
-            body.createFixture(fixtureDef);
-            shape.dispose();
-            ret.add(body);
-        }
-        return ret;
     }
-
-    private boolean shiftKey=false;//,ctrlKey=false;
-    public void shiftDown(){shiftKey=true;}
-    public void shiftUp(){shiftKey=false;}
-//    public void ctrlDown(){}
-//    public void ctrlUp(){}
-    public void error(String errormsg){
-        this.errormsg=errormsg;
-        this.errorCooldown=6;
+    public void saveLevel(String name){
+        System.out.println("Saving "+name+" to "+Gdx.files.internal(name).path());
+        LevelIO.saveLevelSource(Gdx.files.internal(name), levelSource);
     }
-//    public void addVert(){
-//        if(selected!=null) {
-//            if(selected.getCount()>=8) {
-//                error("Cannot have a brush with more than 8 verts");
-//            }else {
-//                Vector2 wp = camController.screenToWorld(Gdx.input.getX(), Gdx.input.getY());
-//                snap(wp);
-//                selected.addVert(wp);
-//            }
+    public void loadLevel(String name){
+        levelSource = LevelIO.loadLevelSource(Gdx.files.internal(name));
+        System.out.println("level source: "+name);
+        geomEditor.setSource(levelSource);
+        spriteEditor.setSource(levelSource);
+//        System.out.println(levelSource.staticLayer0);
+    }
+    public void spriteKeyDown(int keycode) {
+//        if (keycode == Input.Keys.I) {
+//            spriteEditor.loadAssets();
 //        }
-//    }
-
-    public void delete(){
-        if(selected!=null){
-            if(selIdx>=0){
-                if(selected.getCount()<=3) {
-                    error("Cannot have a brush with less than 3 verts");
-                }else {
-                    selected.removeVert(selIdx);
-                    selIdx = -1;
-                }
-            }
-            else{
-                for(Brush brush:mSelected)brushes.remove(brush);
-                mSelected.clear();
-                selected=null;
-            }
+        if (keycode == Input.Keys.LEFT_BRACKET) {
+            spriteEditor.snapLevel++;
+        } else if (keycode == Input.Keys.RIGHT_BRACKET) {
+            spriteEditor.snapLevel--;
+        }
+        if (keycode == Input.Keys.TAB) {
+            spriteEditor.sidepanel=!spriteEditor.sidepanel;
+        }
+        else if (keycode == Input.Keys.A) {
+            spriteEditor.deselectAll();
+        }
+        else if (keycode == Input.Keys.BACKSPACE||keycode == Input.Keys.FORWARD_DEL) {
+            spriteEditor.removeSelected();
+        }
+        else if (keycode == Input.Keys.PAGE_UP) {
+            spriteEditor.changeTexPage(1);
+        }else if (keycode == Input.Keys.PAGE_DOWN) {
+            spriteEditor.changeTexPage(-1);
+        }else if (keycode == Input.Keys.NUM_1) {
+            spriteEditor.numKey(0);
+        }else if (keycode == Input.Keys.NUM_2) {
+            spriteEditor.numKey(1);
+        }else if (keycode == Input.Keys.NUM_3) {
+            spriteEditor.numKey(2);
+        }else if (keycode == Input.Keys.R) {
+            spriteEditor.rotateSelected();
         }
     }
-    public void centerOrigin(){
-        if(shiftKey){
-            for(Brush brush:brushes)brush.centerOrigin();
-        }
-        else{
-            if(mSelected.size()<=1&&selected!=null&&selIdx>=0){
-                selected.setOrigin(new Vector2(selected.getVert(selIdx)));
-            }
-            else for(Brush brush:mSelected)brush.centerOrigin();
-        }
-    }
-
-    public void split(){
-        if(selected!=null&&altSelIdx>=0){
-            int a=selIdx;
-            int b=altSelIdx;
-            if(a>b){//swap so b is greatest
-                int tmp=a;
-                a=b;
-                b=tmp;
-            }
-            if(!selected.areNeighbors(selIdx,altSelIdx)){
-                {
-                    brushes.add(new Brush(selected.getFloatArray(),a,b));
-                    for(int i=a+1;i<b;i++)selected.removeVert(a+1);
-                }
-            }else{ // are neighbors, try subdivide
-                if(selected.getCount()>=8) {
-                    error("Cannot have a brush with more than 8 verts");
-                }else {
-                    Vector2 half=new Vector2(Util.halfBetween(selected.getVert(a),selected.getVert(b)));
-                    half.add(selected.pos);
-                    System.out.println(selected.getVert(a)+" "+selected.getVert(b)+" "+half);
-                    selected.addVert(half,a+1);
-                }
-            }
+    public void geomKeyDown(int keycode) {
+        if (keycode == Input.Keys.LEFT_BRACKET) {
+            geomEditor.snapLevel++;
+        } else if (keycode == Input.Keys.RIGHT_BRACKET) {
+            geomEditor.snapLevel--;
+//        }else if(keycode == Input.Keys.F8){
+//            if(tempWorld!=null){
+//                for(Body body:tempWorld)physicsWorld.destroyBody(body);
+//            }
+//            tempWorld= geomEditor.buildStatics(physicsWorld);
+        } else if (keycode == Input.Keys.BACKSPACE || keycode == Input.Keys.FORWARD_DEL || keycode == Input.Keys.X) {
+            geomEditor.delete();
+//            }else if(keycode == Input.Keys.A){
+//                geomEditor.addVert();
+        } else if (keycode == Input.Keys.O) {
+            geomEditor.centerOrigin();
+        } else if (keycode == Input.Keys.S) {
+            geomEditor.split();
+        } else if (keycode == Input.Keys.D) {
+            geomEditor.duplicate();
+        } else if (keycode == Input.Keys.A) {
+            geomEditor.selectAll();
+        }else if (keycode == Input.Keys.N) {
+            float x=Gdx.input.getX();
+            float y=Gdx.input.getY();
+            geomEditor.addRectBrushAtMouse(1,1);
         }
     }
 }

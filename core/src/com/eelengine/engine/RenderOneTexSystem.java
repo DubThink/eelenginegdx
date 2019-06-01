@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 
 /**
- * Simple sprite renderer
+ * Simple region renderer
  */
 public class RenderOneTexSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.
@@ -24,7 +24,7 @@ public class RenderOneTexSystem extends IteratingSystem {
         assert renderBatch!=null;
         this.renderBatch=renderBatch;
     }
-
+    
     @Override
     protected void begin() {
         renderBatch.begin();
@@ -38,12 +38,13 @@ public class RenderOneTexSystem extends IteratingSystem {
     @Override
     protected void process(int e) {
         CTransform trans= mTransform.get(e);
-        Texture texture=mGraphics.get(e).texture;
+        COneTex tex=mGraphics.get(e);
+        Texture texture=tex.texture;
         renderBatch.draw(texture,
-                trans.pos.x*EelGame.GSCALE-texture.getWidth()*.5f,
-                trans.pos.y*EelGame.GSCALE-texture.getHeight()*.5f,
-                texture.getWidth()*.5f,
-                texture.getHeight()*.5f,
+                trans.pos.x*EelGame.GSCALE-texture.getWidth()*tex.offsetX,
+                trans.pos.y*EelGame.GSCALE-texture.getHeight()*tex.offsetY,
+                texture.getWidth()*tex.offsetX,
+                texture.getHeight()*tex.offsetY,
                 texture.getWidth(),
                 texture.getHeight(),
                 trans.scl.x,

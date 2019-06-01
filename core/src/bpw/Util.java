@@ -23,6 +23,7 @@ public class Util {
 
     public static final float PI_F=3.14159265358979323846f;
     public static final float HALF_PI_F=PI_F/2;
+    public static final float QUARTER_PI_F=PI_F/4;
     public static final float TWO_PI_F=PI_F*2;
 
 
@@ -41,8 +42,16 @@ public class Util {
         return Math.min(a,b)<=num&&num<=Math.max(a,b);
     }
 
+    public static boolean inBox(float x, float y, float x1, float y1, float x2, float y2){
+        return in(x,x1,x2)&&in(y,y1,y2);
+    }
+    public static float abs(float a){return a<0?-a:a;}
+    public static double abs(double a){return a<0?-a:a;}
+    public static int sign(float a){return a<0?-1:1;}
     public static float min(float a, float b){return a<b?a:b;}
     public static float max(float a, float b){return a>b?a:b;}
+    public static int min(int a, int b){return a<b?a:b;}
+    public static int max(int a, int b){return a>b?a:b;}
 
     public static int clamp(int num,int min, int max){
         return num<min?min:(num>max?max:num);
@@ -54,14 +63,14 @@ public class Util {
         return num<min?min:(num>max?max:num);
     }
     public static void main(String[] args) {
-        System.out.println(aabb(0,0,2,2,3,3,2,2));
+        System.out.println(!aabb(0,0,2,2,3,3,2,2));
         System.out.println(aabbInclusive(0,0,2,2,3,3,2,2));
 
         System.out.println( in(10,0,20));
         System.out.println( in(10,10,20));
         System.out.println( in(15,20,10));
-        System.out.println(clamp(10,9,11));
-        System.out.println(clamp(8,9,11));
+        System.out.println(10==clamp(10,9,11));
+        System.out.println(9==clamp(8,9,11));
 
         System.out.println("//  lerp test  //");
         System.out.println(0==lerp(.5,.25,.75,-10,10));

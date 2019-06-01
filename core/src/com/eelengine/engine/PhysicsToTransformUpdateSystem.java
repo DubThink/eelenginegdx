@@ -6,7 +6,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 
 /**
- * Simple sprite renderer
+ * Simple region renderer
  */
 public class PhysicsToTransformUpdateSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.

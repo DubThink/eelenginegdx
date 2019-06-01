@@ -1,0 +1,11 @@
+{
+  "Mud":{
+    "Inputs": {
+      "DIRT": 1,
+      "SAND": 1
+    },
+    "Outputs": {
+      "DIRT": 2
+    }
+  }
+}
