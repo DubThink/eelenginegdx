@@ -1,4 +1,6 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
+
+import com.eelengine.engine.Tile;
 
 import java.io.Serializable;
 
