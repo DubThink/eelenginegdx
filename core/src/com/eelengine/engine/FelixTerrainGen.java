@@ -1,6 +1,5 @@
 package com.eelengine.engine;
 
-import com.eelengine.engine.ecs.Chunk;
 import extlib.OpenSimplexNoise;
 
 import static java.lang.Double.max;

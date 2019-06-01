@@ -9,16 +9,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * Handles health objects
  *
  */
-public class AISystem extends IteratingSystem {
+public class DamageSystem extends IteratingSystem {
     SpriteBatch debugBatch;
-    ComponentMapper<CHealth> mHealth; // injected automatically.
+    CamController camController;
+    ComponentMapper<CDamageable> mHealth; // injected automatically.
     ComponentMapper<CTeam> mTeam; // injected automatically.
-    ComponentMapper<CNavigator> mNavigator; // injected automatically.
-    ComponentMapper<CTransform> mTransform; // injected automatically.
 
-    public AISystem(SpriteBatch debugBatch) {
-        super(Aspect.all(CAIControl.class));
+    public DamageSystem(SpriteBatch debugBatch, CamController camController) {
+        super(Aspect.all(CDamageable.class));
         this.debugBatch = debugBatch;
+        this.camController=camController;
     }
 
     @Override
@@ -34,15 +34,15 @@ public class AISystem extends IteratingSystem {
 
     @Override
     protected void process(int e) {
-        CHealth cHealth = mHealth.get(e);
-        while (!cHealth.damageEvents.isEmpty()) {
-            DamageEvent event = cHealth.damageEvents.poll();
+        CDamageable cDamageable = mHealth.get(e);
+        while (!cDamageable.damageEvents.isEmpty()) {
+            DamageEvent event = cDamageable.damageEvents.poll();
             int otherTeam = mTeam.has(event.source)?mTeam.get(event.source).team:0;
             int team = mTeam.has(e)?mTeam.get(e).team:0;
             if(team==otherTeam&&team!=0)continue; // Continue if teams are the same and not 0
-            cHealth.health -= event.amt;
+            cDamageable.health -= event.amt;
         }
-        if (cHealth.health <= 0)world.delete(e);
+        if (cDamageable.health <= 0)world.delete(e);
 //        if (mHealth.has(e)) {
 //            Vector2 pos=camController.toScreen(trans.pos);
 //            FontKit.SysHuge.draw(debugBatch,

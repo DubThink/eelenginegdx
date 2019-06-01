@@ -427,7 +427,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
      * Override to register your own ECS Systems
      * @param worldConfigurationBuilder
      */
-    void loadSystems(WorldConfigurationBuilder worldConfigurationBuilder){
+    void addECSSystems(WorldConfigurationBuilder worldConfigurationBuilder){
         worldConfigurationBuilder.with(WorldConfigurationBuilder.Priority.HIGH + 1, new BaseSystem() {
             @Override
             protected void processSystem() {
@@ -439,7 +439,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
                 .with(triggerSystem=new TriggerSystem())
                 .with(new AnimSystem())
                 .with(WorldConfigurationBuilder.Priority.LOW,new UtilSystem())
-                .with(WorldConfigurationBuilder.Priority.LOW,new HealthSystem(interfaceBatch,camController))
+                .with(WorldConfigurationBuilder.Priority.LOW,new DamageSystem(interfaceBatch,camController))
                 .with(WorldConfigurationBuilder.Priority.LOW - 1, new BaseEntitySystem(Aspect.all()) {
                     @Override
                     protected void processSystem() {
@@ -458,7 +458,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
      */
     void setupECS(){
         WorldConfigurationBuilder worldConfigurationBuilder = new WorldConfigurationBuilder();
-        loadSystems(worldConfigurationBuilder);
+        addECSSystems(worldConfigurationBuilder);
         com.artemis.WorldConfiguration entityConfig=worldConfigurationBuilder.build();
         //entityConfig.
         entityWorld=new com.artemis.World(entityConfig);

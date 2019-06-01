@@ -22,7 +22,7 @@ public class MailSystem extends IteratingSystem {
     ComponentMapper<CMailbox> mMailbox; // injected automatically.
     PolygonSpriteBatch renderBatch;
     CamController controller;
-    Texture mailPopup;
+    public Texture mailPopup;
 
     public MailSystem(PolygonSpriteBatch renderBatch, CamController controller) {
         super(Aspect.all(CMailbox.class,CTransform.class));
