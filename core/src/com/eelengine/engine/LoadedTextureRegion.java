@@ -12,7 +12,7 @@ public class LoadedTextureRegion extends TextureRegion implements Externalizable
     private static Texture nullTex= _makeNullTex();
     private static Texture _makeNullTex(){
         Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pix.setColor(0xDEADBEFF); // DE is red, AD is green and BE is blue.
+        pix.setColor(0xDEADBEFF);
         pix.fill();
         return new Texture(pix);
     }
