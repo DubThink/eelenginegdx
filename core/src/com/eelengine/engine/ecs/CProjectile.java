@@ -7,8 +7,8 @@ import com.artemis.Component;
  */
 public class CProjectile extends Component {
     public boolean destroyOnHit=true;
-    float age=0;
-    float lifetime =-1;//-1 lives forever
+    public float age=0;
+    public float lifetime =-1;//-1 lives forever
 
     /**
      * Sets the maximum lifetime of the projectile. non-positive values live forever.

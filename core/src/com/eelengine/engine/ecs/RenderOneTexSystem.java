@@ -9,9 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.eelengine.engine.EelGame;
 import com.eelengine.engine.FontKit;
-import com.eelengine.engine.ecs.CHealth;
-import com.eelengine.engine.ecs.COneTex;
-import com.eelengine.engine.ecs.CTransform;
 
 /**
  * Simple region renderer
@@ -19,7 +16,7 @@ import com.eelengine.engine.ecs.CTransform;
 public class RenderOneTexSystem extends IteratingSystem {
     ComponentMapper<CTransform> mTransform; // injected automatically.
     ComponentMapper<COneTex> mGraphics; // injected automatically.
-    ComponentMapper<CHealth> mHealth; // injected automatically.
+    ComponentMapper<CDamageable> mHealth; // injected automatically.
     PolygonSpriteBatch renderBatch;
     public RenderOneTexSystem(PolygonSpriteBatch renderBatch) {
         super(Aspect.all(COneTex.class,CTransform.class));

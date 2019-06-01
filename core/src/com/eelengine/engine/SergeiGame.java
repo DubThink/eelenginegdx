@@ -135,8 +135,8 @@ public class SergeiGame extends EelGame {
     }
 
     @Override
-    void loadSystems(WorldConfigurationBuilder worldConfigurationBuilder) {
-        super.loadSystems(worldConfigurationBuilder);
+    void addECSSystems(WorldConfigurationBuilder worldConfigurationBuilder) {
+        super.addECSSystems(worldConfigurationBuilder);
         worldConfigurationBuilder.with(robotSystem=new RobotSystem(gridWorld,this));
         worldConfigurationBuilder.with(new RobotMovementSystem(gridWorld,this));
 

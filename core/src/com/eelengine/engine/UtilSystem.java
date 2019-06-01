@@ -3,7 +3,7 @@ package com.eelengine.engine;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
-import com.eelengine.engine.ecs.CHealth;
+import com.eelengine.engine.ecs.CDamageable;
 import com.eelengine.engine.ecs.CProjectile;
 import com.eelengine.engine.ecs.CTransform;
 
@@ -12,7 +12,7 @@ import com.eelengine.engine.ecs.CTransform;
  * //TODO find homes for these functionalities
  */
 public class UtilSystem extends IteratingSystem {
-    ComponentMapper<CHealth> mHealth; // injected automatically.
+    ComponentMapper<CDamageable> mHealth; // injected automatically.
     ComponentMapper<CTransform> mTransform; // injected automatically.
     ComponentMapper<CProjectile> mProjectile; // injected automatically.
     //ComponentMapper<CPhysics> mPhysics; // injected automatically.

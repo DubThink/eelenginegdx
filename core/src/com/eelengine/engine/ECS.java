@@ -17,7 +17,7 @@ public class ECS {
     public static ComponentMapper<CInput> mInput;
     public static ComponentMapper<CDamager> mDamager;
     public static ComponentMapper<CProjectile> mProjectile;
-    public static ComponentMapper<CHealth> mHealth;
+    public static ComponentMapper<CDamageable> mHealth;
     public static ComponentMapper<CTeam> mTeam;
     public static ComponentMapper<CNavigator> mNavigator;
     public static ComponentMapper<CMovement> mMovement;
@@ -39,7 +39,7 @@ public class ECS {
         mInput=entityWorld.getMapper(CInput.class);
         mDamager=entityWorld.getMapper(CDamager.class);
         mProjectile=entityWorld.getMapper(CProjectile.class);
-        mHealth=entityWorld.getMapper(CHealth.class);
+        mHealth=entityWorld.getMapper(CDamageable.class);
         mTeam=entityWorld.getMapper(CTeam.class);
         mNavigator=entityWorld.getMapper(CNavigator.class);
         mMovement=entityWorld.getMapper(CMovement.class);
