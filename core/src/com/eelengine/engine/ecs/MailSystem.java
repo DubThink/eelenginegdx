@@ -1,18 +1,18 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import bpw.Util;
 import com.artemis.Aspect;
-import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-
-import javax.xml.soap.Text;
+import com.eelengine.engine.EelGame;
+import com.eelengine.engine.FontKit;
+import com.eelengine.engine.ecs.CMailbox;
+import com.eelengine.engine.ecs.CTransform;
+import com.eelengine.engine.ecs.CamController;
 
 /**
  * Updates the physics system based on transform.
@@ -34,7 +34,7 @@ public class MailSystem extends IteratingSystem {
         CTransform trans=mTransform.get(e);
         if(mMailbox.get(e).mailCt>0){
             renderBatch.draw(mailPopup,
-                    trans.pos.x*EelGame.GSCALE-mailPopup.getWidth()*.5f,
+                    trans.pos.x* EelGame.GSCALE-mailPopup.getWidth()*.5f,
                     trans.pos.y*EelGame.GSCALE-mailPopup.getHeight()*.5f,
                     mailPopup.getWidth()*.5f,
                     mailPopup.getHeight()*.5f,

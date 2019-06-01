@@ -1,13 +1,11 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
-import bpw.Util;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
-import com.artemis.utils.IntBag;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.eelengine.engine.ecs.CAnim;
+import com.eelengine.engine.ecs.COneTex;
+import com.eelengine.engine.ecs.CPhysics;
 
 /**
  * Updates the physics system based on transform.

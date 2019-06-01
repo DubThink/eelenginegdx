@@ -1,17 +1,12 @@
 package com.eelengine.engine.editor;
 
-import bpw.Util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.eelengine.engine.CamController;
-import com.eelengine.engine.Etil;
+import com.eelengine.engine.ecs.CamController;
 
 public class Editor {
     public static final int OFF=0;

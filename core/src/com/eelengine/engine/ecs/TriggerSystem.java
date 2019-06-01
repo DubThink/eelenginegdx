@@ -1,12 +1,13 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import bpw.Util;
 import com.artemis.Aspect;
 import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
-import com.artemis.systems.IteratingSystem;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.math.Vector2;
+import com.eelengine.engine.ecs.CTransform;
+import com.eelengine.engine.ecs.CTrigger;
 
 /**
  * Updates the physics system based on transform.

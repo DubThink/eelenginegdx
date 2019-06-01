@@ -4,9 +4,9 @@ import bpw.Util;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.eelengine.engine.*;
+import com.eelengine.engine.ecs.CTransform;
 
 /**
  * Updates robot logic, processing commands and running scripts

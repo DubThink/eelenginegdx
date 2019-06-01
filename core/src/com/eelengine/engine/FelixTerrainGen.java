@@ -1,5 +1,6 @@
 package com.eelengine.engine;
 
+import com.eelengine.engine.ecs.Chunk;
 import extlib.OpenSimplexNoise;
 
 import static java.lang.Double.max;
@@ -18,7 +19,7 @@ public class FelixTerrainGen {
     }
 
     private boolean isCave(int u, int v, int x, int y){
-        double cave_ridge=simplexNoise.evals(400000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.1);
+        double cave_ridge=simplexNoise.evals(400000+x+u* Chunk.SIZE,y+v*Chunk.SIZE,0.1);
         double cave_cut=simplexNoise.evals(500000+x+u*Chunk.SIZE,y+v*Chunk.SIZE,0.03);
 
         return Math.abs(cave_ridge)< cave_cut*SergeiGame.CVars.t_cave_height + SergeiGame.CVars.t_cave_trim;//SergeiGame.CVars.t_cave_height;

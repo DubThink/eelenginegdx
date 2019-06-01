@@ -4,19 +4,18 @@ import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
+import com.eelengine.engine.ecs.CTransform;
+import com.eelengine.engine.ecs.Chunk;
 import com.eelengine.engine.robot.CRobot;
 import com.eelengine.engine.robot.LightingEngine;
 import com.eelengine.engine.robot.RobotMovementSystem;
 import com.eelengine.engine.robot.RobotSystem;
-import javafx.scene.effect.Light;
 
 import static bpw.Util.min;
 import static java.lang.Math.round;
@@ -179,7 +178,7 @@ public class SergeiGame extends EelGame {
                 worldBatch.draw(background,BGSCALE*GSCALE*u,BGSCALE*GSCALE*v,BGSCALE*GSCALE,BGSCALE*GSCALE);
             }
         }
-        for (int u = (int)Math.floor(topleft.x/Chunk.SIZE); u < (int)Math.ceil(bottomright.x/Chunk.SIZE); u++) {
+        for (int u = (int)Math.floor(topleft.x/ Chunk.SIZE); u < (int)Math.ceil(bottomright.x/Chunk.SIZE); u++) {
             for (int v = (int)Math.floor(bottomright.y/Chunk.SIZE); v < (int)Math.ceil(topleft.y/Chunk.SIZE); v++) {
                 renderChunk(u, v);
             }

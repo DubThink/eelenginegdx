@@ -1,4 +1,4 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import com.artemis.Component;
 
@@ -6,7 +6,7 @@ import com.artemis.Component;
  * Defines projectile-related attributes
  */
 public class CProjectile extends Component {
-    boolean destroyOnHit=true;
+    public boolean destroyOnHit=true;
     float age=0;
     float lifetime =-1;//-1 lives forever
 

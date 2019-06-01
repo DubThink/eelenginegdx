@@ -2,6 +2,7 @@ package com.eelengine.engine;
 
 import bpw.Util;
 import com.badlogic.gdx.math.Vector2;
+import com.eelengine.engine.ecs.Chunk;
 
 import java.io.Serializable;
 

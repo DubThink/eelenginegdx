@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.eelengine.engine.CamController;
+import com.eelengine.engine.ecs.CamController;
 import com.eelengine.engine.FontKit;
 
 import java.util.ArrayList;
