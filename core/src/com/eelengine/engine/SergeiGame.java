@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.eelengine.engine.ecs.CTransform;
-import com.eelengine.engine.ecs.Chunk;
 import com.eelengine.engine.robot.CRobot;
 import com.eelengine.engine.robot.LightingEngine;
 import com.eelengine.engine.robot.RobotMovementSystem;
