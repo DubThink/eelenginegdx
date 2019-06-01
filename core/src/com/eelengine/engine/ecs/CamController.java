@@ -1,10 +1,11 @@
-package com.eelengine.engine;
+package com.eelengine.engine.ecs;
 
 import bpw.Util;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.eelengine.engine.EelGame;
 
 /**
  * Encapsulates an orthographic camera and controls zoom and position of the camera
@@ -86,7 +87,7 @@ public class CamController {
     }
     public Vector2 screenToWorld(float screenX, float screenY){
         Vector3 wx=cam.unproject(new Vector3(screenX,screenY,0));
-        wx.scl(1/EelGame.GSCALE_F);
+        wx.scl(1/ EelGame.GSCALE_F);
         return new Vector2(wx.x,wx.y);
     }
 
