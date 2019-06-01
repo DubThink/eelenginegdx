@@ -34,8 +34,6 @@ public class LoadedTextureRegion extends TextureRegion implements Externalizable
         out.writeFloat(getV());
         out.writeFloat(getU2());
         out.writeFloat(getV2());
-        out.writeInt(getRegionWidth());
-        out.writeInt(getRegionHeight());
     }
 
     @Override
@@ -45,8 +43,6 @@ public class LoadedTextureRegion extends TextureRegion implements Externalizable
         setV(in.readFloat());
         setU2(in.readFloat());
         setV2(in.readFloat());
-        setRegionWidth(in.readInt());
-        setRegionHeight(in.readInt());
     }
 
     private void getTexFromFile(String file){

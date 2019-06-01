@@ -18,7 +18,7 @@ public class DesktopLauncher {
 //        config.resizable=false;
 //        config.title="EelEngine Alpha";
 //        //config.samples=2;
-//        config.addIcon("Eel_E_128x.png", Files.FileType.Internal);
+        config.setWindowIcon(Files.FileType.Internal,"Eel_E_128x.png");
 //        config.addIcon("Eel_E_32x.png", Files.FileType.Internal);
 //        config.addIcon("Eel_invE_16x.png", Files.FileType.Internal);
         //config.stencil=8; // LOOK we can have stencil bits

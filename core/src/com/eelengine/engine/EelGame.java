@@ -37,7 +37,7 @@ import java.util.Date;
  */
 public class EelGame extends ApplicationAdapter implements InputProcessor {
     // CONSTANTS
-    public static final int GSCALE=32;
+    public static final int GSCALE=16;
     public static final float GSCALE_F=(float)GSCALE;
     public static final float GSCALE_HALF=GSCALE_F/2;
     public static final int VIRTUAL_WIDTH = 1920;
@@ -308,6 +308,9 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
     public void logicStep(){}//To Extend
     public void renderUI(){}//To Extend
 
+    public float getdt(){
+        return Gdx.graphics.getDeltaTime()*DEV_time_mod;
+    }
     @Override
     public void dispose () {
         System.out.println("CLEANING UP FOR EXIT");
