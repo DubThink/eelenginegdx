@@ -4,7 +4,7 @@ import bpw.Util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.eelengine.engine.ecs.CamController;
+import com.eelengine.engine.CamController;
 import com.eelengine.engine.FontKit;
 
 public class BaseEditor {

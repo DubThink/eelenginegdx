@@ -1,4 +1,4 @@
-package com.eelengine.engine.ecs;
+package com.eelengine.engine;
 
 import bpw.Util;
 import com.badlogic.gdx.graphics.Camera;

@@ -4,6 +4,7 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.eelengine.engine.CamController;
 
 /**
  * Handles health objects
@@ -11,14 +12,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  */
 public class DamageSystem extends IteratingSystem {
     SpriteBatch debugBatch;
-    CamController camController;
     ComponentMapper<CDamageable> mHealth; // injected automatically.
     ComponentMapper<CTeam> mTeam; // injected automatically.
 
-    public DamageSystem(SpriteBatch debugBatch, CamController camController) {
+    public DamageSystem(SpriteBatch debugBatch) {
         super(Aspect.all(CDamageable.class));
         this.debugBatch = debugBatch;
-        this.camController=camController;
     }
 
     @Override

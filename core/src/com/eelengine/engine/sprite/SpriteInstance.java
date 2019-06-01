@@ -10,6 +10,7 @@ public class SpriteInstance {
     public int x;
     public int y;
     protected int idx=0;
+    private boolean removed;
 //    int facing=0;
 
     public SpriteInstance(Sprite sprite, int x, int y) {
@@ -19,6 +20,7 @@ public class SpriteInstance {
     }
 
     public void render(Batch batch){
+        if(removed)return;
         batch.draw(sprite.regions[idx],x* EelGame.GSCALE,y*EelGame.GSCALE,sprite.regions[idx].getRegionWidth(),sprite.regions[idx].getRegionHeight());
     }
 
@@ -37,5 +39,12 @@ public class SpriteInstance {
     TextureRegion getCurrentRegion(){
         return sprite.getRegion(idx);
 
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+    public void markToRemove(){
+        removed=true;
     }
 }

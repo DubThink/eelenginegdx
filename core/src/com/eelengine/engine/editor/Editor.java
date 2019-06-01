@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.eelengine.engine.ecs.CamController;
+import com.eelengine.engine.CamController;
 
 public class Editor {
     public static final int OFF=0;

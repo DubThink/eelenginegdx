@@ -3,8 +3,8 @@ package com.eelengine.engine;
 import com.artemis.ComponentMapper;
 import com.artemis.World;
 import com.eelengine.engine.ecs.*;
-import com.eelengine.engine.robot.CRobot;
-import com.eelengine.engine.robot.CRobotMovement;
+import com.eelengine.engine.sprite.CSpriteInstances;
+
 
 /**
  * Container class for {@link ComponentMapper}s.
@@ -24,8 +24,8 @@ public class ECS {
     public static ComponentMapper<CTrigger> mTrigger;
     public static ComponentMapper<CMailbox> mMailbox;
     public static ComponentMapper<CAnim> mAnim;
-    public static ComponentMapper<CRobot> mRobot;
-    public static ComponentMapper<CRobotMovement> mRobotMovement;
+    public static ComponentMapper<CSpriteInstances> mSpriteInstances;
+
 
 //    public static Archetype Bullet;
     /**
@@ -44,10 +44,8 @@ public class ECS {
         mNavigator=entityWorld.getMapper(CNavigator.class);
         mMovement=entityWorld.getMapper(CMovement.class);
         mTrigger=entityWorld.getMapper(CTrigger.class);
-        mMailbox=entityWorld.getMapper(CMailbox.class);
         mAnim=entityWorld.getMapper(CAnim.class);
-        mRobot=entityWorld.getMapper(CRobot.class);
-        mRobotMovement=entityWorld.getMapper(CRobotMovement.class);
+        mSpriteInstances=entityWorld.getMapper(CSpriteInstances.class);
         //        Bullet=new ArchetypeBuilder()
 //                .add(CDamager.class)
 //                .add(CProjectile.class)

@@ -442,7 +442,7 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
                 .with(triggerSystem=new TriggerSystem())
                 .with(new AnimSystem())
                 .with(WorldConfigurationBuilder.Priority.LOW,new UtilSystem())
-                .with(WorldConfigurationBuilder.Priority.LOW,new DamageSystem(interfaceBatch,camController))
+                .with(WorldConfigurationBuilder.Priority.LOW,new DamageSystem(interfaceBatch))
                 .with(WorldConfigurationBuilder.Priority.LOW - 1, new BaseEntitySystem(Aspect.all()) {
                     @Override
                     protected void processSystem() {

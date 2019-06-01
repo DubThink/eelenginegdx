@@ -10,8 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.eelengine.engine.ecs.CTransform;
-import com.eelengine.engine.ecs.Chunk;
+import com.eelengine.engine.ecs.*;
 import com.eelengine.engine.robot.CRobot;
 import com.eelengine.engine.robot.LightingEngine;
 import com.eelengine.engine.robot.RobotMovementSystem;
@@ -71,12 +70,12 @@ public class SergeiGame extends EelGame {
         cmdTextField.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
             public void keyTyped(TextField textField, char key) {
-                if ((key == '\r' || key == '\n')&&ECS.mRobot.get(robot).ableToQueueCommand()){
+//                if ((key == '\r' || key == '\n')&&ECS.mRobot.get(robot).ableToQueueCommand()){
                     System.out.println("executing command");
-                    ECS.mRobot.get(robot).queueCommand(textField.getText());
+//                    ECS.mRobot.get(robot).queueCommand(textField.getText());
                     textField.setText("");
                 }
-            }
+//            }
         });
 
         stage.setDebugAll(true);
@@ -145,7 +144,7 @@ public class SergeiGame extends EelGame {
     @Override
     public void logicStep() {
         CRobot cRobot=null;
-        if(robot!=-1)cRobot=ECS.mRobot.get(robot);
+//        if(robot!=-1)cRobot=ECS.mRobot.get(robot);
 //        terminalTable.setVisible(cRobot!=null);
         if(cRobot!=null) {
             // TODO add listener and use scroll events to turn on/off snap-to-bottom
@@ -263,20 +262,20 @@ public class SergeiGame extends EelGame {
 
     @Override
     public boolean keyDown(int keycode) {
-        if(cmdTextField==stage.getKeyboardFocus()){
-            // handle special keys on the command line
-            if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)&&keycode==Input.Keys.U){
-                cmdTextField.setText(cmdTextField.getText().substring(cmdTextField.getCursorPosition()));
-            }else if(ECS.mRobot.get(robot)!=null&&ECS.mRobot.get(robot).ableToQueueCommand()){
-                if(keycode==Input.Keys.UP){
-                    cmdTextField.setText(ECS.mRobot.get(robot).previousCommand());
-                    cmdTextField.setCursorPosition(10000);
-                }else if(keycode==Input.Keys.DOWN){
-                    cmdTextField.setText(ECS.mRobot.get(robot).nextCommand());
-                    cmdTextField.setCursorPosition(10000);
-                }
-            }
-        }
+//        if(cmdTextField==stage.getKeyboardFocus()){
+//            // handle special keys on the command line
+//            if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)&&keycode==Input.Keys.U){
+//                cmdTextField.setText(cmdTextField.getText().substring(cmdTextField.getCursorPosition()));
+//            }else if(ECS.mRobot.get(robot)!=null&&ECS.mRobot.get(robot).ableToQueueCommand()){
+//                if(keycode==Input.Keys.UP){
+//                    cmdTextField.setText(ECS.mRobot.get(robot).previousCommand());
+//                    cmdTextField.setCursorPosition(10000);
+//                }else if(keycode==Input.Keys.DOWN){
+//                    cmdTextField.setText(ECS.mRobot.get(robot).nextCommand());
+//                    cmdTextField.setCursorPosition(10000);
+//                }
+//            }
+//        }
         if(keycode == Input.Keys.F1){
             // switch to cmd line
             System.out.println("Switching to cmd");
@@ -292,7 +291,7 @@ public class SergeiGame extends EelGame {
         }
         if(keycode == Input.Keys.NUMPAD_0){
             System.out.println("run script");
-            if(robot>=0)ECS.mRobot.get(robot).startNewScript(scriptArea.getText());
+//            if(robot>=0)ECS.mRobot.get(robot).startNewScript(scriptArea.getText());
         }else if(keycode==Input.Keys.TAB){
             // TODO holy shit very hacky bad
             System.out.println("AAA");

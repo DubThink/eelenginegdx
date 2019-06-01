@@ -28,7 +28,7 @@ public class RobotSystem extends IteratingSystem {
     protected void process(int e) {
         CTransform transform = mTransform.get(e);
         CRobot robot = mRobot.get(e);
-        CRobotMovement movement = ECS.mRobotMovement.get(e);
+        CRobotMovement movement = mRobotMovement.get(e);
 
         if(robot.cooldown>0){
             robot.cooldown-=world.delta;

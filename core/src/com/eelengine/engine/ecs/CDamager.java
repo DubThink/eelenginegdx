@@ -7,9 +7,9 @@ import com.artemis.Component;
  */
 public class CDamager extends Component {
     public static short MYSTICAL=1;
-    int amount=0;
-    int team=0;
-    short type=0;
+    public int amount=0;
+    public int team=0;
+    public short type=0;
 
     /**
      * Sets {@link #amount}

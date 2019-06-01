@@ -10,9 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.eelengine.engine.EelGame;
 import com.eelengine.engine.FontKit;
-import com.eelengine.engine.ecs.CMailbox;
-import com.eelengine.engine.ecs.CTransform;
-import com.eelengine.engine.ecs.CamController;
+import com.eelengine.engine.CamController;
 
 /**
  * Updates the physics system based on transform.

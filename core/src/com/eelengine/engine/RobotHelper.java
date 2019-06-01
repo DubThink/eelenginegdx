@@ -20,7 +20,7 @@ public class RobotHelper {
         ECS.mInput.create(ent);
 //        ECS.mMovement.create(ent).setMaxSpeed(0.7f);
         cTransform.pos.set(5.5f,5.5f);
-        ECS.mRobotMovement.create(ent).setDesiredPosition(new Vector2(5.5f,5.5f));
+//        ECS.mRobotMovement.create(ent).setDesiredPosition(new Vector2(5.5f,5.5f));
         COneTex cOneTex =ECS.mGraphics.create(ent);
 //        Texture[] textures=new Texture[12];
 //        for(int i=0;i<12;i++){
@@ -49,7 +49,7 @@ public class RobotHelper {
 
         // robot shit
 
-        ECS.mRobot.create(ent);
+//        ECS.mRobot.create(ent);
 
         return ent;
     }
