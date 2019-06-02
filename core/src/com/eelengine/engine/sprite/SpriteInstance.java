@@ -2,18 +2,19 @@ package com.eelengine.engine.sprite;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.eelengine.engine.EelGame;
 
 public class SpriteInstance {
 //    public static final int
     private Sprite sprite;
-    public int x;
-    public int y;
-    protected int idx=0;
-    private boolean removed;
-//    int facing=0;
+    public float x;
+    public float y;
 
-    public SpriteInstance(Sprite sprite, int x, int y) {
+    protected int idx=0;
+    private boolean removed=false;
+
+    public SpriteInstance(Sprite sprite, float x, float y) {
         this.sprite = sprite;
         this.x = x;
         this.y = y;
@@ -21,7 +22,8 @@ public class SpriteInstance {
 
     public void render(Batch batch){
         if(removed)return;
-        batch.draw(sprite.regions[idx],x* EelGame.GSCALE,y*EelGame.GSCALE,sprite.regions[idx].getRegionWidth(),sprite.regions[idx].getRegionHeight());
+        batch.draw(sprite.getRegion(idx),(x-sprite.originx)* EelGame.GSCALE,(y-sprite.originy)*EelGame.GSCALE,
+                sprite.getRegion(idx).getRegionWidth(),sprite.getRegion(idx).getRegionHeight());
     }
 
     /**
@@ -46,5 +48,15 @@ public class SpriteInstance {
     }
     public void markToRemove(){
         removed=true;
+    }
+
+    public void setPos(Vector2 v){
+        x=v.x;
+        y=v.y;
+    }
+
+    public void setPosCentered(Vector2 v){
+        x=v.x-sprite.getWidth()/2;
+        y=v.y-sprite.getHeight()/2;
     }
 }

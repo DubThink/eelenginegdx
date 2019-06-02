@@ -6,7 +6,6 @@ import com.artemis.Component;
  * A null class to copy.
  */
 public class CDamager extends Component {
-    public static short MYSTICAL=1;
     public int amount=0;
     public int team=0;
     public short type=0;

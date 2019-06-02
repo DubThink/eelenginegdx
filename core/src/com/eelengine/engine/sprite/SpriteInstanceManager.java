@@ -9,13 +9,13 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import java.util.ArrayList;
 
 public class SpriteInstanceManager implements EntitySubscription.SubscriptionListener {
-    ComponentMapper<CSpriteInstances> mSpriteInstances;
+    ComponentMapper<CSprite> mSpriteInstance;
 
     ArrayList<SpriteInstance> spriteInstances = new ArrayList<>();
     ArrayList<AnimatedSpriteInstance> animatedSpriteInstances = new ArrayList<>();
 
     public SpriteInstanceManager(World entityWorld){
-        mSpriteInstances = entityWorld.getMapper(CSpriteInstances.class);
+        mSpriteInstance = entityWorld.getMapper(CSprite.class);
     }
 
     public void addSpriteInstance(SpriteInstance instance){
@@ -32,8 +32,7 @@ public class SpriteInstanceManager implements EntitySubscription.SubscriptionLis
     public void inserted(IntBag entities) {
         for(int i=0;i<entities.size();i++) {
             int e = entities.get(i);
-            for (SpriteInstance spriteInstance : mSpriteInstances.get(e).instances)
-                addSpriteInstance(spriteInstance);
+            addSpriteInstance(mSpriteInstance.get(e).getInstance());
         }
     }
 
@@ -41,8 +40,7 @@ public class SpriteInstanceManager implements EntitySubscription.SubscriptionLis
     public void removed(IntBag entities) {
         for(int i=0;i<entities.size();i++) {
             int e = entities.get(i);
-            for (SpriteInstance spriteInstance : mSpriteInstances.get(e).instances)
-                removeSpriteInstance(spriteInstance);
+            removeSpriteInstance(mSpriteInstance.get(e).getInstance());
         }
     }
 

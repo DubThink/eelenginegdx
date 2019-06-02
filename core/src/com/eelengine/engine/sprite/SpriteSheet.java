@@ -53,8 +53,8 @@ public class SpriteSheet {
      */
     public Sprite makeSprite(int x1, int y1, int x2, int y2, int w, int h){
         ArrayList<TextureRegion> regions = new ArrayList<>();
-        for(int x=x1;x<=x2;x+=w){
-            for(int y=y1;y<=y2;y+=h){
+        for(int y=y1;y<=y2;y+=h){
+            for(int x=x1;x<=x2;x+=w){
                 System.out.println("getting sprite "+x+" "+y);
                 regions.add(getRegion(x,y,w,h));
             }

@@ -730,14 +730,16 @@ public class EelGame extends ApplicationAdapter implements InputProcessor {
             editor.shiftUp();
         }
 
-        if (keycode == Input.Keys.W) {
-            playerInput.up(CInput.UP);
-        } else if (keycode == Input.Keys.A) {
-            playerInput.up(CInput.LEFT);
-        } else if (keycode == Input.Keys.S) {
-            playerInput.up(CInput.DOWN);
-        } else if (keycode == Input.Keys.D) {
-            playerInput.up(CInput.RIGHT);
+        if(playerInput !=null) {
+            if (keycode == Input.Keys.W) {
+                playerInput.up(CInput.UP);
+            } else if (keycode == Input.Keys.A) {
+                playerInput.up(CInput.LEFT);
+            } else if (keycode == Input.Keys.S) {
+                playerInput.up(CInput.DOWN);
+            } else if (keycode == Input.Keys.D) {
+                playerInput.up(CInput.RIGHT);
+            }
         }
         return stage.keyUp(keycode); // aaa
     }

@@ -3,8 +3,8 @@ package com.eelengine.engine;
 import com.artemis.ComponentMapper;
 import com.artemis.World;
 import com.eelengine.engine.ecs.*;
-import com.eelengine.engine.sprite.CSpriteInstances;
-
+import com.eelengine.engine.eelgame.CCharacterAnimation;
+import com.eelengine.engine.sprite.CSprite;
 
 /**
  * Container class for {@link ComponentMapper}s.
@@ -24,7 +24,8 @@ public class ECS {
     public static ComponentMapper<CTrigger> mTrigger;
     public static ComponentMapper<CMailbox> mMailbox;
     public static ComponentMapper<CAnim> mAnim;
-    public static ComponentMapper<CSpriteInstances> mSpriteInstances;
+    public static ComponentMapper<CSprite> mSprite;
+    public static ComponentMapper<CCharacterAnimation> mCharacterAnimation;
 
 
 //    public static Archetype Bullet;
@@ -45,7 +46,8 @@ public class ECS {
         mMovement=entityWorld.getMapper(CMovement.class);
         mTrigger=entityWorld.getMapper(CTrigger.class);
         mAnim=entityWorld.getMapper(CAnim.class);
-        mSpriteInstances=entityWorld.getMapper(CSpriteInstances.class);
+        mSprite=entityWorld.getMapper(CSprite.class);
+        mCharacterAnimation=entityWorld.getMapper(CCharacterAnimation.class);
         //        Bullet=new ArchetypeBuilder()
 //                .add(CDamager.class)
 //                .add(CProjectile.class)

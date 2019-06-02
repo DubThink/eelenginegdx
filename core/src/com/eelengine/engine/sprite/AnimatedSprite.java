@@ -10,8 +10,8 @@ import java.util.TreeMap;
  * A sprite with animation sequences
  */
 public class AnimatedSprite extends Sprite {
-    private TreeMap<String, Sequence> sequences=new TreeMap<>();
-
+    private TreeMap<String, Sequence> sequences = new TreeMap<>();
+    private String defaultSequence = null;
     public AnimatedSprite(TextureRegion... regions) {
         super(regions);
     }
@@ -25,7 +25,7 @@ public class AnimatedSprite extends Sprite {
     }
 
     public void addSequence(String name, float[] times, int[] indexes){
-        sequences.put(name,new Sequence(indexes,times));
+        sequences.put(name,new Sequence(indexes.clone(),times.clone()));
     }
 
     public void addSequence(String name, float time, int ... indexes){
@@ -37,6 +37,7 @@ public class AnimatedSprite extends Sprite {
     }
 
     public Sequence getSequence(String id){
+        if(id==null)return null;
         return sequences.get(id);
     }
 
@@ -70,5 +71,13 @@ public class AnimatedSprite extends Sprite {
                     ", times=" + Arrays.toString(times) +
                     '}';
         }
+    }
+
+    public String getDefaultSequence() {
+        return defaultSequence;
+    }
+
+    public void setDefaultSequence(String defaultSequence) {
+        this.defaultSequence = defaultSequence;
     }
 }

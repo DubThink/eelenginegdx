@@ -7,8 +7,9 @@ public class AnimatedSpriteInstance extends SpriteInstance {
     float clock=0;
     AnimatedSprite.Sequence sequence=null;
 
-    public AnimatedSpriteInstance(AnimatedSprite sprite, int x, int y) {
+    public AnimatedSpriteInstance(AnimatedSprite sprite, int x, int y){
         super(sprite,x,y);
+        if(sprite.getDefaultSequence()!=null)playSequence(sprite.getDefaultSequence());
     }
 
     public AnimatedSprite getSprite(){
@@ -41,6 +42,8 @@ public class AnimatedSpriteInstance extends SpriteInstance {
     }
 
     public void playSequence(String id){
+        clock=0;
+        state=0;
         sequence = getSprite().getSequence(id);
     }
 

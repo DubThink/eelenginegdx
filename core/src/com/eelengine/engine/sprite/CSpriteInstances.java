@@ -5,6 +5,7 @@ import com.artemis.Component;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+@Deprecated
 public class CSpriteInstances extends Component implements Iterable<SpriteInstance>{
     LinkedList<SpriteInstance> instances;
     SpriteInstanceManager manager;

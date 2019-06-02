@@ -47,4 +47,8 @@ public class CDamageable extends Component {
         damageEvents.add(event);
         return this;
     }
+
+    public LinkedList<DamageEvent> getDamageEvents() {
+        return damageEvents;
+    }
 }
