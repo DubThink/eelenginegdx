@@ -43,14 +43,17 @@ public class StunnedGame extends EelGame {
 
         JamFontKit.initFonts();
         tileSheet=new SpriteSheet("nongit/tiles_dungeon_v1.1.png",20,24);
+
+        TestLoadLevel level=new TestLoadLevel(tileSheet.makeSprite(),spriteInstanceManager);
+        level.doIt();
         instance=new SpriteInstance(tileSheet.makeSprite(6,17,6,17,1,2),0,0);
-        spriteInstanceManager.addSpriteInstance(instance);
+        spriteInstanceManager.addStaticSpriteInstance(instance);
         AnimatedSprite sprite = tileSheet.makeAnimatedSprite(0,17,4,18,1,2);
-        sprite.addSequence("lit",.2f,0,1,2,3);
+        sprite.addSequence("lit",.1f,0,1,2,3);
         sprite.addSequence("unlit",0,4);
         instance2=new AnimatedSpriteInstance(sprite,0,0);
         instance2.playSequence("lit");
-        spriteInstanceManager.addSpriteInstance(instance2);
+        spriteInstanceManager.addStaticSpriteInstance(instance2);
 
         heroSheet=new SpriteSheet("nongit/chara_hero.png",4,11);
         heroSprite=heroSheet.makeAnimatedSprite(0,0,3,10);

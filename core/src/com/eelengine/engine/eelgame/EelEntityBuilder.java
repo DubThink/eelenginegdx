@@ -28,7 +28,7 @@ public class EelEntityBuilder {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
-        shape.dispose();
+//        shape.dispose(); // TODO MEMORY LEAK
         return  fixtureDef;
     }
 

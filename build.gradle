@@ -11,6 +11,8 @@ buildscript {
         classpath "net.onedaybeard.artemis:artemis-odb-gradle-plugin:2.1.0"
         //classpath "org.lwjgl:lwjgl-stb:3.1.5:natives-windows"
         //classpath 'edu.sc.seis.gradle:launch4j:2.4.2'
+        classpath ("org.junit.platform:junit-platform-gradle-plugin:1.0.0-M4")
+
     }
 }
 
@@ -18,6 +20,8 @@ buildscript {
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
+    apply plugin: "java"
+    apply plugin: 'org.junit.platform.gradle.plugin'
     //apply plugin: 'edu.sc.seis.launch4j'
 
     version = '1.0'
@@ -42,6 +46,7 @@ allprojects {
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
     }
+
 }
 
 //launch4j {
@@ -86,7 +91,11 @@ project(":core") {
 //        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux'
 
 //        compile "com.github.kotlin-graphics:imgui:-SNAPSHOT"
+        compile('org.junit.jupiter:junit-jupiter-api:5.0.0-M4')
+        runtime('org.junit.jupiter:junit-jupiter-engine:5.0.0-M4')
+//        testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
     }
+
     weave {
         classesDir = sourceSets.main.output.classesDir
         dependsOn build

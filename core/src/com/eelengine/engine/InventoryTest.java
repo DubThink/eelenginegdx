@@ -1,10 +1,11 @@
 package com.eelengine.engine;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class InventoryTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     void getSpace() {
         Inventory i = new Inventory(10);
         assert i.getSpace(Item.COAL)==Item.COAL.getStackSize()*10;
@@ -16,7 +17,7 @@ class InventoryTest {
         assert i.getSpace(Item.COAL)==Item.COAL.getStackSize()*8 - 5;
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void insert() {
         Inventory i = new Inventory(10);
         assert i.insert(Item.COAL,-10)==0;
@@ -28,19 +29,19 @@ class InventoryTest {
 
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void remove() {
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void setAmount() {
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void getSize() {
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void getFreeStacks() {
     }
 }

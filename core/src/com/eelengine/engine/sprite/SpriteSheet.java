@@ -37,6 +37,11 @@ public class SpriteSheet {
     public Sprite makeSprite(int x, int y){
         return new Sprite(getRegion(x,y));
     }
+
+    public Sprite makeSprite(){
+        return makeSprite(0,0,xdivs-1,ydivs-1);
+    }
+
     public Sprite makeSprite(int x1, int y1, int x2, int y2){
         return makeSprite(x1, y1, x2, y2,1,1);
     }
@@ -55,8 +60,17 @@ public class SpriteSheet {
         ArrayList<TextureRegion> regions = new ArrayList<>();
         for(int y=y1;y<=y2;y+=h){
             for(int x=x1;x<=x2;x+=w){
-                System.out.println("getting sprite "+x+" "+y);
                 regions.add(getRegion(x,y,w,h));
+            }
+        }
+        return new Sprite(regions);
+    }
+
+    public Sprite makeMasterSprite(){
+        ArrayList<TextureRegion> regions = new ArrayList<>();
+        for(int y=ydivs-1;y>=0;y--){
+            for(int x=0;x<xdivs;x++){
+                regions.add(getRegion(x,y));
             }
         }
         return new Sprite(regions);
