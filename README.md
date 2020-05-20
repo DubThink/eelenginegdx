@@ -1,29 +1,8 @@
-# README #
+# EelEngineGdx #
+A 2d game engine built on libgdx and artemis-odb.
 
-This README would normally document whatever steps are necessary to get your application up and running.
+More info on my portfolio [here](http://www.dubthink.com/#portfolio-1).
 
-### What is this repository for? ###
+This project is the basis of a few game experiments. Perhaps the most interesting branch is sergei, a prototype game of a little robot that you script to control.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+Originally at https://bitbucket.org/DubThink/eelenginegdx

@@ -4,31 +4,25 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
+        google()
     }
     dependencies {
-        classpath "net.onedaybeard.artemis:artemis-odb-gradle-plugin:2.1.0"
-        //classpath "org.lwjgl:lwjgl-stb:3.1.5:natives-windows"
-        //classpath 'edu.sc.seis.gradle:launch4j:2.4.2'
-        classpath ("org.junit.platform:junit-platform-gradle-plugin:1.0.0-M4")
+        
 
     }
 }
 
-
 allprojects {
     apply plugin: "eclipse"
-    apply plugin: "idea"
-    apply plugin: "java"
-    apply plugin: 'org.junit.platform.gradle.plugin'
-    //apply plugin: 'edu.sc.seis.launch4j'
 
     version = '1.0'
     ext {
-        appName = "EelEngineGdx"
-        gdxVersion = '1.9.9'
-        roboVMVersion = '2.3.1'
+        appName = "eelengine"
+        gdxVersion = '1.9.10'
+        roboVMVersion = '2.3.8'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
@@ -37,63 +31,41 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        jcenter()
+        google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-//        maven { url 'https://jitpack.io' } // imgui
-//        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" } // Required since imgui uses version 1.2 of Kotlin
-        jcenter()
     }
-    tasks.withType(Javadoc) {
-        options.addStringOption('Xdoclint:none', '-quiet')
-    }
-
 }
 
-//launch4j {
-//    mainClassName = 'com.eelengine.engine.desktop.DesktopLauncher'
-//    icon = 'icons/myApp.ico'
-//    jar = "lib/desktop-1.0.jar"
-//}
-
 project(":desktop") {
-    apply plugin: "java"
+    apply plugin: "java-library"
 
 
     dependencies {
-        compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        compile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-        //compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
-        //compile "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
-        //compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-        
+        implementation project(":core")
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+        api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        api "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
     }
 }
 
 project(":core") {
-    apply plugin: "java"
-    apply plugin: "artemis"
-    dependencies {
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-//        compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        //compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-        //compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        compile "net.onedaybeard.artemis:artemis-odb:2.1.0"
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows'
-//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos'
-//        runtime 'org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux'
+    apply plugin: "java-library"
 
-//        compile "com.github.kotlin-graphics:imgui:-SNAPSHOT"
-        compile('org.junit.jupiter:junit-jupiter-api:5.0.0-M4')
-        runtime('org.junit.jupiter:junit-jupiter-engine:5.0.0-M4')
-//        testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+
+    dependencies {
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+        compile "net.onedaybeard.artemis:artemis-odb:2.3.0"
+        api 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+        api 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
     }
 
     weave {
@@ -104,8 +76,4 @@ project(":core") {
         generateLinkMutators = true
         optimizeEntitySystems = true
     }
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
 }
