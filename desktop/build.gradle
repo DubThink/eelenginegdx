@@ -1,44 +1,11 @@
 apply plugin: "java"
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.resources.srcDirs = ["../core/assets"]
 
 project.ext.mainClassName = "com.eelengine.engine.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../core/assets");
-
-jar {
-    manifest {
-        attributes("Manifest-Version": "1.0",
-                "Main-Class": "com.eelengine.engine.desktop.DesktopLauncher",
-                "Class-Path": "/assets")
-    }
-}
-
-//task copyAssets(type: Copy){
-//    from "test"//"$project.rootDir\\core\\assets"
-//    into "build\\assets"
-//    println  "$project.rootDir/core/assets/
-//}
-
-task fatJar(type: Jar) {
-    //delete fileTree(dir: "$rootDir/jarbuild/", exclude: "$rootDir/jarbuild/persistant/")
-    manifest.from jar.manifest
-    classifier = 'all'
-    destinationDir = file("$rootDir/jarbuild/")
-    from {
-        configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
-    } {
-        exclude "META-INF/*.SF"
-        exclude "META-INF/*.DSA"
-        exclude "META-INF/*.RSA"
-    }
-    with jar
-
-    copy {
-        from fileTree("$rootDir/core/assets/")
-        into "$rootDir/jarbuild/"
-    }
-}
+project.ext.assetsDir = new File("../core/assets")
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
@@ -58,32 +25,17 @@ task debug(dependsOn: classes, type: JavaExec) {
 }
 
 task dist(type: Jar) {
-    from files(sourceSets.main.output.classesDir)
-    from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
-    from files(project.assetsDir);
- 
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
 }
+
 
 dist.dependsOn classes
 
-eclipse {
-    project {
-        name = appName + "-desktop"
-        linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/core/assets'
-    }
-}
-
-task afterEclipseImport(description: "Post processing after project generation", group: "IDE") {
-  doLast {
-    def classpath = new XmlParser().parse(file(".classpath"))
-    new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ]);
-    def writer = new FileWriter(file(".classpath"))
-    def printer = new XmlNodePrinter(new PrintWriter(writer))
-    printer.setPreserveWhitespace(true)
-    printer.print(classpath)
-  }
-}
+eclipse.project.name = appName + "-desktop"

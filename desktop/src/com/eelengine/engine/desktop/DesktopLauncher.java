@@ -1,8 +1,8 @@
 package com.eelengine.engine.desktop;
 
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.eelengine.engine.EelGame;
 import com.eelengine.engine.MailGame;
 import com.eelengine.engine.SergeiGame;
@@ -10,7 +10,7 @@ import com.eelengine.engine.StunnedGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		//config.
 		//config.foregroundFPS = 288; // 2x 144hz // set to 0 for no frame limit
         //config.backgroundFPS = 15; // Use 0 to never sleep, -1 to not render.
@@ -25,9 +25,9 @@ public class DesktopLauncher {
 		//new Lwjgl3Application(new EelGame(), config);
 //		System.out.println("ARG: "+arg.length);
 		if(arg.length==1)
-			new Lwjgl3Application(new StunnedGame(arg[0]), config);
+			new LwjglApplication(new SergeiGame(arg[0]), config);
 		else
-			new Lwjgl3Application(new StunnedGame(), config);
+			new LwjglApplication(new SergeiGame(), config);
 		//app.getGraphics().
 	}
 }
