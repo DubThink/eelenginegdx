@@ -92,7 +92,7 @@ public class TestLoadLevel {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     if(data[x][y]!=0)
-                        manager.addStaticSpriteInstance(new SpriteInstance(masterSprite,x,-y,1,data[x][y]-1));
+                        manager.addStaticSpriteInstance(new SpriteInstance(masterSprite,x,-y,id-2,data[x][y]-1));
                 }
             }
         }

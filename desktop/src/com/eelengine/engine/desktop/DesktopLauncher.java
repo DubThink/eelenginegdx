@@ -18,16 +18,16 @@ public class DesktopLauncher {
 //        config.resizable=false;
 //        config.title="EelEngine Alpha";
 //        //config.samples=2;
-        config.setWindowIcon(Files.FileType.Internal,"Eel_E_128x.png");
+//        config.setWindowIcon(Files.FileType.Internal,"Eel_E_128x.png");
 //        config.addIcon("Eel_E_32x.png", Files.FileType.Internal);
 //        config.addIcon("Eel_invE_16x.png", Files.FileType.Internal);
         //config.stencil=8; // LOOK we can have stencil bits
 		//new Lwjgl3Application(new EelGame(), config);
 //		System.out.println("ARG: "+arg.length);
 		if(arg.length==1)
-			new LwjglApplication(new SergeiGame(arg[0]), config);
+			new LwjglApplication(new StunnedGame(arg[0]), config);
 		else
-			new LwjglApplication(new SergeiGame(), config);
+			new LwjglApplication(new StunnedGame(), config);
 		//app.getGraphics().
 	}
 }
